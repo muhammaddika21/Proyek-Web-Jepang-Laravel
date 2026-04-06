@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dokumentasi NihonLearn - Panduan Arsitektur Sistem</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #1a202c; line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, #1a5e3a 0%, #2d9e6e 50%, #1a5e8a 100%); color: white; padding: 60px 40px; text-align: center; }
+  .cover h1 { font-size: 2.8em; font-weight: 900; letter-spacing: -1px; }
+  .cover p { font-size: 1.2em; opacity: 0.9; margin-top: 10px; }
+  .cover .badge { display: inline-block; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); padding: 6px 18px; border-radius: 20px; font-size: 0.85em; margin-top: 20px; }
+  .toc { background: white; margin: 30px auto; max-width: 900px; border-radius: 12px; padding: 30px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); }
+  .toc h2 { color: #1a5e3a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { padding: 5px 0; color: #2d9e6e; font-weight: 600; }
+  .container { max-width: 900px; margin: 0 auto 40px; padding: 0 20px; }
+  .section { background: white; border-radius: 12px; padding: 35px; margin-bottom: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.07); }
+  .section-title { font-size: 1.6em; font-weight: 800; color: #1a5e3a; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #d1fae5; display: flex; align-items: center; gap: 10px; }
+  .section-title span { background: #1a5e3a; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85em; flex-shrink: 0; }
+  h3 { font-size: 1.15em; font-weight: 700; color: #2d6a4f; margin: 20px 0 10px; }
+  p { margin-bottom: 12px; color: #374151; }
+  code { background: #f1f5f9; color: #be185d; padding: 2px 8px; border-radius: 5px; font-family: 'Courier New', monospace; font-size: 0.88em; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 10px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.88em; line-height: 1.6; margin: 15px 0; }
+  pre .comment { color: #94a3b8; }
+  pre .keyword { color: #f472b6; }
+  pre .string { color: #86efac; }
+  pre .func { color: #67e8f9; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 15px 0; }
+  .card { border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+  .card.green { border-color: #86efac; background: #f0fdf4; }
+  .card.blue { border-color: #93c5fd; background: #eff6ff; }
+  .card.purple { border-color: #c4b5fd; background: #f5f3ff; }
+  .card.orange { border-color: #fcd34d; background: #fffbeb; }
+  .card h4 { font-weight: 700; margin-bottom: 10px; font-size: 1em; }
+  .card.green h4 { color: #166534; }
+  .card.blue h4 { color: #1e40af; }
+  .card.purple h4 { color: #6b21a8; }
+  .card.orange h4 { color: #92400e; }
+  .card ul { padding-left: 18px; }
+  .card li { font-size: 0.9em; padding: 3px 0; color: #374151; }
+  .flow { display: flex; align-items: center; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+  .flow-box { background: #1a5e3a; color: white; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.9em; text-align: center; }
+  .flow-box.light { background: #d1fae5; color: #1a5e3a; }
+  .flow-box.blue { background: #1e40af; }
+  .flow-box.red { background: #dc2626; }
+  .arrow { font-size: 1.4em; color: #6b7280; }
+  .alert { padding: 15px 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid; }
+  .alert.info { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
+  .alert.warn { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+  .alert.tip { background: #f0fdf4; border-color: #22c55e; color: #166534; }
+  .alert strong { display: block; margin-bottom: 5px; }
+  table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+  th { background: #1a5e3a; color: white; padding: 10px 14px; text-align: left; }
+  td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .file-tree { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; font-family: 'Courier New', monospace; font-size: 0.88em; line-height: 1.8; }
+  .file-tree .dir { color: #1a5e3a; font-weight: 600; }
+  .file-tree .file { color: #374151; }
+  .file-tree .note { color: #6b7280; font-style: italic; }
+  footer { text-align: center; color: #6b7280; font-size: 0.85em; padding: 30px; }
+  @media print {
+    body { background: white; }
+    .section { box-shadow: none; border: 1px solid #e2e8f0; page-break-inside: avoid; }
+  }
+  @media (max-width: 600px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .cover h1 { font-size: 2em; }
+    .flow { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div style="font-size:3em; margin-bottom:15px;">🌸</div>
+  <h1>DOKUMENTASI SISTEM<br>NihonLearn</h1>
+  <p>Panduan Arsitektur & Alur Kode — Landing Page → Login → Admin Dashboard</p>
+  <div class="badge">Laravel 12 · Tailwind CSS v4 · Alpine.js · TailAdmin · Vite 7</div>
+  <div class="badge" style="margin-left:10px;">Versi 1.0 — April 2026</div>
+</div>
+
+<div class="container">
+
+  <!-- DAFTAR ISI -->
+  <div class="toc">
+    <h2>📋 Daftar Isi</h2>
+    <ol>
+      <li>Gambaran Besar Sistem (Arsitektur)</li>
+      <li>Struktur Folder yang Penting</li>
+      <li>Sistem Dual CSS: app.css vs admin.css</li>
+      <li>Alur Lengkap: Landing Page → Login → Dashboard</li>
+      <li>File-File Kunci & Penjelasan Kodenya</li>
+      <li>Sistem Blade: Layout, Include, Section, Yield</li>
+      <li>Alpine.js: Interaktivitas Tanpa jQuery</li>
+      <li>MenuHelper: Mengatur Navigasi Sidebar</li>
+      <li>Middleware: Sistem Keamanan Halaman Admin</li>
+      <li>Ringkasan: Apa yang Harus Dipahami</li>
+    </ol>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-title"><span>1</span> Gambaran Besar Sistem (Arsitektur)</div>
+    <p>NihonLearn adalah aplikasi web dengan <strong>dua area utama</strong>: area publik untuk pengunjung biasa, dan area admin untuk pengelola konten. Keduanya berjalan dalam satu proyek Laravel tetapi menggunakan tampilan (CSS/Layout) yang <strong>sepenuhnya terpisah</strong>.</p>
+    <div class="grid2">
+      <div class="card green">
+        <h4>🌍 Area Publik (Pengunjung)</h4>
+        <ul>
+          <li>URL: <code>/</code>, <code>/bahasa</code></li>
+          <li>Layout: <code>layouts/app.blade.php</code></li>
+          <li>CSS: <code>app.css</code> (Tailwind standar)</li>
+          <li>Tidak perlu login</li>
+          <li>Menampilkan konten UKM</li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <h4>🛡️ Area Admin (Pengelola)</h4>
+        <ul>
+          <li>URL: <code>/admin/*</code></li>
+          <li>Layout: <code>layouts/admin.blade.php</code></li>
+          <li>CSS: <code>admin.css</code> (TailAdmin theme)</li>
+          <li><strong>Harus login terlebih dahulu</strong></li>
+          <li>Mengelola artikel & konten</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert info">
+      <strong>💡 Kenapa dipisah?</strong>
+      CSS TailAdmin memiliki ratusan custom theme (warna, font, breakpoint) yang akan merusak tampilan landing page UKM jika digabung. Dengan memisahkan menjadi <code>app.css</code> dan <code>admin.css</code>, keduanya bisa hidup berdampingan tanpa konflik.
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-title"><span>2</span> Struktur Folder yang Penting</div>
+    <p>Tidak semua folder perlu Anda hafal. Ini adalah folder dan file yang paling sering Anda sentuh saat bekerja di proyek ini:</p>
+    <div class="file-tree">
+      <span class="dir">nihon-learn-laravel/</span><br>
+      ├── <span class="dir">app/</span><br>
+      │&nbsp;&nbsp;&nbsp;├── <span class="dir">Http/Controllers/</span><br>
+      │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">AuthController.php</span>&nbsp;&nbsp;<span class="note">← Logika Login & Logout</span><br>
+      │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">HomeController.php</span>&nbsp;&nbsp;<span class="note">← Halaman Landing Page</span><br>
+      │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">BahasaController.php</span>&nbsp;&nbsp;<span class="note">← Halaman Bahasa</span><br>
+      │&nbsp;&nbsp;&nbsp;├── <span class="dir">Helpers/</span><br>
+      │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">MenuHelper.php</span>&nbsp;&nbsp;<span class="note">← Daftar menu sidebar admin</span><br>
+      │&nbsp;&nbsp;&nbsp;└── <span class="dir">Models/</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file">User.php</span>&nbsp;&nbsp;<span class="note">← Struktur data user (name, username, password)</span><br>
+      ├── <span class="dir">resources/</span><br>
+      │&nbsp;&nbsp;&nbsp;├── <span class="dir">css/</span><br>
+      │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">app.css</span>&nbsp;&nbsp;<span class="note">← CSS halaman publik (minimal)</span><br>
+      │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">admin.css</span>&nbsp;&nbsp;<span class="note">← CSS halaman admin (penuh TailAdmin)</span><br>
+      │&nbsp;&nbsp;&nbsp;├── <span class="dir">js/</span><br>
+      │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">app.js</span>&nbsp;&nbsp;<span class="note">← Import Alpine.js</span><br>
+      │&nbsp;&nbsp;&nbsp;└── <span class="dir">views/</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="dir">layouts/</span>&nbsp;&nbsp;<span class="note">← File "kerangka" halaman</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">app.blade.php</span>&nbsp;&nbsp;<span class="note">← Kerangka publik</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">admin.blade.php</span>&nbsp;&nbsp;<span class="note">← Kerangka admin (sidebar+header)</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">admin-sidebar.blade.php</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">admin-header.blade.php</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="dir">pages/</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">home.blade.php</span>&nbsp;&nbsp;<span class="note">← Konten Landing Page</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="dir">admin/</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">login.blade.php</span>&nbsp;&nbsp;<span class="note">← Halaman form login</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">dashboard-new.blade.php</span>&nbsp;&nbsp;<span class="note">← Isi dashboard TailAdmin</span><br>
+      │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="dir">articles/</span>&nbsp;&nbsp;<span class="note">← Halaman kelola artikel</span><br>
+      ├── <span class="file">routes/web.php</span>&nbsp;&nbsp;<span class="note">← SEMUA daftar URL / rute</span><br>
+      ├── <span class="file">vite.config.js</span>&nbsp;&nbsp;<span class="note">← Konfigurasi kompilasi CSS & JS</span><br>
+      └── <span class="file">package.json</span>&nbsp;&nbsp;<span class="note">← Daftar dependency Node.js</span>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-title"><span>3</span> Sistem Dual CSS: app.css vs admin.css</div>
+    <p>Ini adalah perubahan paling krusial yang kita lakukan. File <code>vite.config.js</code> dikonfigurasi untuk mengompilasi <strong>dua file CSS terpisah</strong>:</p>
+    <pre><span class="comment">// vite.config.js</span>
+laravel({
+    input: [
+        <span class="string">'resources/css/app.css'</span>,    <span class="comment">// ← CSS untuk halaman publik</span>
+        <span class="string">'resources/css/admin.css'</span>,  <span class="comment">// ← CSS untuk halaman admin</span>
+        <span class="string">'resources/js/app.js'</span>,
+    ],
+})</pre>
+    <div class="grid2">
+      <div class="card green">
+        <h4>📄 app.css (Publik)</h4>
+        <ul>
+          <li>Hanya berisi: <code>@import 'tailwindcss'</code></li>
+          <li>Tailwind v4 standar, bersih</li>
+          <li>Tidak ada custom theme TailAdmin</li>
+          <li>Digunakan di <code>layouts/app.blade.php</code></li>
+        </ul>
+      </div>
+      <div class="card purple">
+        <h4>📄 admin.css (Admin)</h4>
+        <ul>
+          <li>877 baris CSS TailAdmin</li>
+          <li>Custom font Outfit, custom breakpoint</li>
+          <li>Tema warna brand, dark mode</li>
+          <li>Digunakan di <code>layouts/admin.blade.php</code></li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert warn">
+      <strong>⚠️ Jangan gabungkan!</strong>
+      Jika admin.css dimasukkan ke app.css (seperti yang terjadi sebelumnya), seluruh tampilan landing page UKM akan rusak karena theme TailAdmin menimpa semua warna dan font standar Tailwind.
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-title"><span>4</span> Alur Lengkap: Landing Page → Login → Dashboard</div>
+    
+    <h3>A. Mengakses Landing Page (/)</h3>
+    <div class="flow">
+      <div class="flow-box light">Browser<br>localhost:8000/</div>
+      <div class="arrow">→</div>
+      <div class="flow-box">routes/web.php<br>Route::get('/')</div>
+      <div class="arrow">→</div>
+      <div class="flow-box">HomeController<br>index()</div>
+      <div class="arrow">→</div>
+      <div class="flow-box">pages/home<br>.blade.php</div>
+    </div>
+    <pre><span class="comment">// routes/web.php</span>
+Route::get(<span class="string">'/'</span>, [HomeController::class, <span class="string">'index'</span>])-&gt;name(<span class="string">'home'</span>);
+
+<span class="comment">// app/Http/Controllers/HomeController.php</span>
+<span class="keyword">public function</span> <span class="func">index</span>() {
+    <span class="keyword">return</span> view(<span class="string">'pages.home'</span>); <span class="comment">// ← Tampilkan halaman UKM</span>
+}</pre>
+
+    <h3>B. Masuk ke Halaman Login (/login)</h3>
+    <div class="flow">
+      <div class="flow-box light">Browser<br>/login</div>
+      <div class="arrow">→</div>
+      <div class="flow-box">Middleware<br>'guest'</div>
+      <div class="arrow">→</div>
+      <div class="flow-box">AuthController<br>showLoginForm()</div>
+      <div class="arrow">→</div>
+      <div class="flow-box">admin/login<br>.blade.php</div>
+    </div>
+    <div class="alert tip">
+      <strong>💡 Middleware 'guest'</strong>
+      Rute login dibungkus middleware <code>guest</code>. Artinya jika Anda sudah login dan mencoba buka <code>/login</code> lagi, Anda langsung diarahkan ke dashboard. Pengunjung yang belum login bisa mengakses halaman login seperti biasa.
+    </div>
+
+    <h3>C. Proses Login (POST /login)</h3>
+    <div class="flow">
+      <div class="flow-box light">User submit<br>form login</div>
+      <div class="arrow">→</div>
+      <div class="flow-box">AuthController<br>login()</div>
+      <div class="arrow">→</div>
+      <div class="flow-box red">Cek DB<br>Auth::attempt()</div>
+      <div class="arrow">→</div>
+      <div class="flow-box blue">Redirect ke<br>/admin</div>
+    </div>
+    <pre><span class="comment">// AuthController.php - fungsi login()</span>
+<span class="keyword">public function</span> <span class="func">login</span>(Request $request) {
+
+    <span class="comment">// 1. Validasi: username & password wajib diisi</span>
+    $credentials = $request-&gt;validate([
+        <span class="string">'username'</span> =&gt; [<span class="string">'required'</span>],
+        <span class="string">'password'</span> =&gt; [<span class="string">'required'</span>],
+    ]);
+
+    <span class="comment">// 2. Cek ke database: apakah cocok?</span>
+    <span class="keyword">if</span> (Auth::attempt($credentials)) {
+        $request-&gt;session()-&gt;regenerate(); <span class="comment">// Buat sesi baru (keamanan)</span>
+        <span class="keyword">return</span> redirect()-&gt;intended(<span class="string">'/admin'</span>); <span class="comment">// ← REDIRECT KE ADMIN!</span>
+    }
+
+    <span class="comment">// 3. Jika gagal: kembali dengan pesan error</span>
+    <span class="keyword">return</span> back()-&gt;withErrors([
+        <span class="string">'username'</span> =&gt; <span class="string">'Username atau password salah.'</span>,
+    ])-&gt;onlyInput(<span class="string">'username'</span>);
+}</pre>
+
+    <h3>D. Masuk Dashboard Admin (/admin)</h3>
+    <div class="flow">
+      <div class="flow-box light">Browser<br>/admin</div>
+      <div class="arrow">→</div>
+      <div class="flow-box red">Middleware<br>'auth'</div>
+      <div class="arrow">→</div>
+      <div class="flow-box">routes/web.php<br>Route admin</div>
+      <div class="arrow">→</div>
+      <div class="flow-box">admin/dashboard-new<br>.blade.php</div>
+    </div>
+    <pre><span class="comment">// routes/web.php - semua rute admin</span>
+Route::middleware(<span class="string">'auth'</span>)-&gt;prefix(<span class="string">'admin'</span>)-&gt;group(<span class="keyword">function</span> () {
+
+    Route::get(<span class="string">'/'</span>, <span class="keyword">function</span> () {
+        <span class="keyword">return</span> view(<span class="string">'admin.dashboard-new'</span>, [<span class="string">'title'</span> =&gt; <span class="string">'Dashboard'</span>]);
+    })-&gt;name(<span class="string">'admin.dashboard'</span>);
+
+    Route::get(<span class="string">'/articles'</span>, <span class="keyword">function</span> () {
+        <span class="keyword">return</span> view(<span class="string">'admin.articles.index'</span>, [<span class="string">'title'</span> =&gt; <span class="string">'Kelola Artikel'</span>]);
+    })-&gt;name(<span class="string">'admin.articles.index'</span>);
+    <span class="comment">// ... dst</span>
+});</pre>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-title"><span>5</span> File-File Kunci & Penjelasan Kodenya</div>
+    <table>
+      <tr><th>File</th><th>Fungsi</th><th>Yang Penting Dipahami</th></tr>
+      <tr><td><code>routes/web.php</code></td><td>Daftar semua URL di website</td><td>Route group + middleware + prefix</td></tr>
+      <tr><td><code>AuthController.php</code></td><td>Login, logout, redirect</td><td><code>Auth::attempt()</code>, <code>redirect()->intended()</code></td></tr>
+      <tr><td><code>User.php</code> (Model)</td><td>Struktur data user di DB</td><td><code>$fillable</code> = kolom yang bisa diisi (name, username, password)</td></tr>
+      <tr><td><code>MenuHelper.php</code></td><td>Daftar menu sidebar admin</td><td>Array menu yang di-loop di sidebar Blade</td></tr>
+      <tr><td><code>layouts/admin.blade.php</code></td><td>Kerangka halaman admin</td><td>Includes sidebar, header, dan <code>@yield('content')</code></td></tr>
+      <tr><td><code>layouts/app.blade.php</code></td><td>Kerangka halaman publik</td><td>Navbar, footer, dan <code>@yield('content')</code></td></tr>
+      <tr><td><code>admin/dashboard-new.blade.php</code></td><td>Isi dashboard TailAdmin</td><td><code>@extends</code> dan <code>@section('content')</code></td></tr>
+      <tr><td><code>vite.config.js</code></td><td>Konfigurasi build CSS/JS</td><td>Dua entry point: app.css dan admin.css</td></tr>
+    </table>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-title"><span>6</span> Sistem Blade: Layout, Include, Section, Yield</div>
+    <p>Laravel Blade adalah "bahasa template" yang memungkinkan kita memecah HTML menjadi bagian-bagian kecil yang bisa di-reuse. Analoginya seperti puzzle.</p>
+
+    <h3>Konsep @extends + @section</h3>
+    <p>File konten "meminjam" kerangka dari file layout menggunakan <code>@extends</code>, lalu mengisi bagian kosong dengan <code>@section</code>:</p>
+    <div class="grid2">
+      <div>
+        <p><strong>File Kerangka</strong> (layouts/admin.blade.php)</p>
+        <pre>&lt;body&gt;
+  @include(<span class="string">'layouts.admin-sidebar'</span>)
+  @include(<span class="string">'layouts.admin-header'</span>)
+  &lt;div class="p-6"&gt;
+    <span class="comment">&lt;!-- KOTAK KOSONG --&gt;</span>
+    @yield(<span class="string">'content'</span>)
+  &lt;/div&gt;
+&lt;/body&gt;</pre>
+      </div>
+      <div>
+        <p><strong>File Konten</strong> (admin/dashboard-new.blade.php)</p>
+        <pre><span class="comment">&lt;!-- Pakai kerangka admin --&gt;</span>
+@extends(<span class="string">'layouts.admin'</span>)
+
+<span class="comment">&lt;!-- Isi kotak yang kosong tadi --&gt;</span>
+@section(<span class="string">'content'</span>)
+  &lt;h1&gt;Selamat Datang!&lt;/h1&gt;
+  &lt;div&gt;... grafik, tabel ...&lt;/div&gt;
+@endsection</pre>
+      </div>
+    </div>
+
+    <h3>Konsep @include</h3>
+    <p>Untuk "menarik" file lain dan menyatukannya. Seperti copy-paste tapi lebih rapi:</p>
+    <pre>@include(<span class="string">'layouts.admin-sidebar'</span>)  <span class="comment">← Tarik konten sidebar ke sini</span>
+@include(<span class="string">'layouts.admin-header'</span>)   <span class="comment">← Tarik konten header ke sini</span>
+@include(<span class="string">'layouts.admin-sidebar-widget'</span>)  <span class="comment">← Widget di bawah sidebar</span></pre>
+
+    <h3>@stack + @push (untuk JavaScript)</h3>
+    <p>Mirip seperti <code>@yield</code> tapi khusus untuk script yang perlu ditambahkan dari file konten:</p>
+    <pre><span class="comment">&lt;!-- Di layouts/admin.blade.php --&gt;</span>
+@stack(<span class="string">'scripts'</span>)  <span class="comment">← Tampung script dari konten</span>
+
+<span class="comment">&lt;!-- Di dashboard-new.blade.php --&gt;</span>
+@push(<span class="string">'scripts'</span>)
+  &lt;script&gt;console.log('Script khusus halaman ini')&lt;/script&gt;
+@endpush</pre>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section">
+    <div class="section-title"><span>7</span> Alpine.js: Interaktivitas Tanpa jQuery</div>
+    <p>Template admin menggunakan <strong>Alpine.js</strong> — library JavaScript ringan untuk menangani interaksi UI seperti dropdown, toggle, dan show/hide elemen. Cara penulisannya langsung di HTML.</p>
+    <div class="alert info">
+      <strong>💡 Kenapa Alpine.js?</strong>
+      Alpine.js jauh lebih ringan dari Vue.js atau React, dan tidak perlu dikompilasi. Cocok untuk interaksi kecil-kecilan di halaman admin seperti dropdown, accordion, dan sidebar toggle.
+    </div>
+
+    <h3>Kata Kunci Penting Alpine.js:</h3>
+    <table>
+      <tr><th>Sintaks</th><th>Fungsi</th><th>Analogi</th></tr>
+      <tr><td><code>x-data</code></td><td>Mendefinisikan data/state lokal</td><td>Seperti menyiapkan variabel</td></tr>
+      <tr><td><code>x-show</code></td><td>Tampilkan/sembunyikan elemen</td><td>Seperti display:block/none otomatis</td></tr>
+      <tr><td><code>@click</code></td><td>Jalankan kode ketika diklik</td><td>Seperti onclick= di HTML biasa</td></tr>
+      <tr><td><code>x-bind / :</code></td><td>Ikat nilai atribut ke variabel</td><td>Nilai berubah sesuai kondisi</td></tr>
+      <tr><td><code>x-transition</code></td><td>Animasi masuk/keluar elemen</td><td>Fade in/out otomatis</td></tr>
+      <tr><td><code>$store</code></td><td>State yang diakses semua komponen</td><td>Variabel global</td></tr>
+    </table>
+
+    <h3>Contoh Nyata: Dropdown Profil User</h3>
+    <pre><span class="comment">&lt;!-- user-dropdown.blade.php --&gt;</span>
+&lt;div <span class="keyword">x-data</span>="{ dropdownOpen: <span class="keyword">false</span> }"&gt;
+
+    <span class="comment">&lt;!-- Klik tombol → ubah nilai dropdownOpen --&gt;</span>
+    &lt;button <span class="keyword">@click</span>="dropdownOpen = !dropdownOpen"&gt;
+        Profil Saya
+    &lt;/button&gt;
+
+    <span class="comment">&lt;!-- Hanya tampil jika dropdownOpen bernilai true --&gt;</span>
+    &lt;div <span class="keyword">x-show</span>="dropdownOpen" <span class="keyword">x-transition</span>&gt;
+        &lt;a href="/admin"&gt;Edit Profile&lt;/a&gt;
+        &lt;a href="/logout"&gt;Sign Out&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+
+    <h3>Contoh Nyata: Sidebar Collapse (Alpine Store)</h3>
+    <p>Sidebar admin menggunakan <code>Alpine.store</code> — sebuah state global yang bisa diakses dari mana saja (tidak hanya dari komponen yang sama).</p>
+    <pre><span class="comment">&lt;!-- Definisi di layouts/admin.blade.php --&gt;</span>
+Alpine.store(<span class="string">'sidebar'</span>, {
+    isExpanded: window.innerWidth >= 1280, <span class="comment">// Default terbuka di layar lebar</span>
+    
+    toggleExpanded() {
+        this.isExpanded = !this.isExpanded; <span class="comment">// Toggle buka/tutup</span>
+    }
+});
+
+<span class="comment">&lt;!-- Penggunaan di admin-sidebar.blade.php --&gt;</span>
+&lt;aside :class="{
+    <span class="string">'w-[290px]'</span>: $store.sidebar.isExpanded,  <span class="comment">// Lebar jika terbuka</span>
+    <span class="string">'w-[90px]'</span>: !$store.sidebar.isExpanded   <span class="comment">// Sempit jika tertutup</span>
+}"&gt;</pre>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section">
+    <div class="section-title"><span>8</span> MenuHelper: Mengatur Navigasi Sidebar</div>
+    <p>File <code>app/Helpers/MenuHelper.php</code> adalah sumber kebenaran untuk menu di sidebar admin. Daripada menulis HTML menu langsung di sidebar (yang sulit diubah), kita mendefinisikan menu sebagai <strong>array PHP</strong> lalu me-loop-nya di Blade.</p>
+    <pre><span class="comment">// app/Helpers/MenuHelper.php</span>
+<span class="keyword">public static function</span> <span class="func">getMainNavItems</span>(): array {
+    <span class="keyword">return</span> [
+        [
+            <span class="string">'icon'</span>  =&gt; <span class="string">'dashboard'</span>,  <span class="comment">// Nama ikon SVG</span>
+            <span class="string">'name'</span>  =&gt; <span class="string">'Dashboard'</span>,
+            <span class="string">'path'</span>  =&gt; <span class="string">'/admin'</span>,
+        ],
+        [
+            <span class="string">'icon'</span>     =&gt; <span class="string">'forms'</span>,
+            <span class="string">'name'</span>     =&gt; <span class="string">'Buat Artikel'</span>,
+            <span class="string">'subItems'</span> =&gt; [  <span class="comment">// Menu dengan submenu</span>
+                [<span class="string">'name'</span> =&gt; <span class="string">'Artikel Umum'</span>,  <span class="string">'path'</span> =&gt; <span class="string">'/admin/articles/create'</span>],
+                [<span class="string">'name'</span> =&gt; <span class="string">'Artikel Bahasa'</span>, <span class="string">'path'</span> =&gt; <span class="string">'/admin/articles/create-bahasa'</span>],
+            ],
+        ],
+    ];
+}</pre>
+    <div class="alert tip">
+      <strong>✅ Cara menambah menu baru:</strong>
+      Cukup tambahkan satu array baru di dalam fungsi <code>getMainNavItems()</code> di file <code>MenuHelper.php</code>. Menu langsung muncul di sidebar tanpa perlu sentuh file HTML sidebar sama sekali.
+    </div>
+  </div>
+
+  <!-- SECTION 9 -->
+  <div class="section">
+    <div class="section-title"><span>9</span> Middleware: Sistem Keamanan Halaman Admin</div>
+    <p>Middleware adalah "petugas keamanan" yang bekerja sebelum request sampai ke controller. Ada dua middleware utama yang dipakai:</p>
+    <div class="grid2">
+      <div class="card orange">
+        <h4>🔒 Middleware 'auth'</h4>
+        <ul>
+          <li>Dipakai di semua rute <code>/admin/*</code></li>
+          <li>Cek: apakah user sudah login?</li>
+          <li>Jika BELUM login → redirect ke <code>/login</code></li>
+          <li>Jika SUDAH login → lanjutkan ke halaman</li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <h4>👤 Middleware 'guest'</h4>
+        <ul>
+          <li>Dipakai di rute <code>/login</code></li>
+          <li>Cek: apakah user BELUM login?</li>
+          <li>Jika SUDAH login → redirect ke <code>/admin</code></li>
+          <li>Jika BELUM login → tampilkan halaman login</li>
+        </ul>
+      </div>
+    </div>
+    <pre><span class="comment">// routes/web.php</span>
+
+<span class="comment">// Halaman login hanya untuk yang BELUM login</span>
+Route::middleware(<span class="string">'guest'</span>)-&gt;group(<span class="keyword">function</span> () {
+    Route::get(<span class="string">'/login'</span>, [AuthController::class, <span class="string">'showLoginForm'</span>]);
+    Route::post(<span class="string">'/login'</span>, [AuthController::class, <span class="string">'login'</span>]);
+});
+
+<span class="comment">// Semua halaman admin hanya untuk yang SUDAH login</span>
+Route::middleware(<span class="string">'auth'</span>)-&gt;prefix(<span class="string">'admin'</span>)-&gt;group(<span class="keyword">function</span> () {
+    Route::get(<span class="string">'/'</span>, ...);         <span class="comment">// /admin</span>
+    Route::get(<span class="string">'/articles'</span>, ...); <span class="comment">// /admin/articles</span>
+});</pre>
+  </div>
+
+  <!-- SECTION 10 -->
+  <div class="section">
+    <div class="section-title"><span>10</span> Ringkasan: Apa yang Harus Dipahami</div>
+    <p>Sebelum lanjut ke pembuatan Backend Database, pastikan Anda paham konsep-konsep berikut:</p>
+    <div class="grid2">
+      <div class="card green">
+        <h4>✅ Harus Paham</h4>
+        <ul>
+          <li>Alur Route → Controller → View</li>
+          <li>Perbedaan app.css vs admin.css</li>
+          <li>@extends, @section, @yield, @include</li>
+          <li>Cara kerja middleware 'auth' dan 'guest'</li>
+          <li>Cara menambah menu di MenuHelper.php</li>
+          <li>Logika login di AuthController.php</li>
+        </ul>
+      </div>
+      <div class="card orange">
+        <h4>📚 Pelajari Lebih Lanjut</h4>
+        <ul>
+          <li>Alpine.js: x-data, x-show, @click</li>
+          <li>Alpine.js: $store (global state)</li>
+          <li>Blade Components (x-component)</li>
+          <li>Laravel Eloquent (untuk backend nanti)</li>
+          <li>Database Migration &amp; Seeder</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert tip">
+      <strong>🚀 Langkah Berikutnya: Backend Database</strong>
+      Setelah memahami alur di atas, langkah berikutnya adalah membuat tabel database untuk Artikel menggunakan <strong>Migration</strong>, mendefinisikan model <strong>Artikel</strong>, dan membuat <strong>Controller</strong> dengan fungsi CRUD (Create, Read, Update, Delete) yang terhubung ke halaman-halaman admin yang sudah ada.
+    </div>
+
+    <h3 style="margin-top:25px;">Cara Menjalankan Proyek:</h3>
+    <pre><span class="comment"># Terminal 1: Jalankan server Laravel</span>
+php artisan serve
+
+<span class="comment"># Terminal 2: Jalankan compiler CSS/JS (biarkan tetap berjalan)</span>
+npm run dev
+
+<span class="comment"># Akses di browser:</span>
+<span class="comment"># http://localhost:8000          → Landing Page UKM</span>
+<span class="comment"># http://localhost:8000/login    → Halaman Login</span>
+<span class="comment"># http://localhost:8000/admin    → Dashboard Admin (butuh login)</span>
+<span class="comment"># http://localhost:8000/bypass   → Shortcut login tanpa password (hapus di production!)</span></pre>
+  </div>
+
+</div>
+
+<footer>
+  <p>📄 Dokumentasi NihonLearn &mdash; Dibuat April 2026</p>
+  <p style="margin-top:5px;">Laravel 12 · Tailwind CSS v4 · Alpine.js · TailAdmin · Vite 7</p>
+  <p style="margin-top:5px; color:#22c55e; font-weight:600;">Baca → Pahami → Praktikkan → Berkembang 🌸</p>
+</footer>
+
+</body>
+</html>

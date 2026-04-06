@@ -1,0 +1,173 @@
+/* ==========================================================
+   GALERI SECTION WRAPPER
+   ========================================================== */
+.gallery-section {
+    padding: 4rem 2rem;
+    background: var(--very-pale-green);
+}
+
+.gallery-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ==========================================================
+   CAROUSEL BASE STYLE
+   ========================================================== */
+.carousel-container {
+    position: relative;
+    width: auto;
+    max-width: 1100px;
+    margin: 30px 50px 50px 50px;
+    overflow: hidden;
+
+    background: #f4faef;
+    border-radius: 22px;
+    padding: 60px 10px 60px 10px; 
+
+    box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+}
+
+/* ==========================================================
+   WRAPPER SLIDES
+   ========================================================== */
+.carousel-wrapper {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+/* ==========================================================
+   SLIDE (1 layar)
+   ========================================================== */
+.carousel-slide {
+    min-width: 100%;
+    display: flex;
+    gap: 25px;
+    padding: 10px 20px;
+    justify-content: center;
+}
+
+/* ==========================================================
+   GALLERY ITEM — CARD BESAR
+   ========================================================== */
+.gallery-item {
+    flex: 1;
+    max-width: 320px;
+    aspect-ratio: 16/9;
+
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+/* ==========================================================
+   GALLERY PLACEHOLDER (warna pastel + text center)
+   ========================================================== */
+.gallery-placeholder {
+    background-image: url("../images/1.png");
+  background-size: cover;      /* Memaksa gambar menutupi seluruh area tanpa gepeng */
+  background-position: center; /* Memastikan fokus gambar tetap di tengah */
+  background-repeat: no-repeat;/* Mencegah gambar berulang-ulang (tiling) */
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--dark-text);
+}
+
+/* ==========================================================
+   NAV BUTTONS — BULAT GLASS
+   ========================================================== */
+.carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+
+    background: white;
+    font-size: 1.5rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 10;
+
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+
+    transition: all 0.3s ease;
+}
+
+.carousel-nav:hover {
+    background: var(--dark-green);
+    color: var(--white);
+    transform: translateY(-50%) scale(1.12);
+}
+
+.carousel-nav.prev { left: 10px; }
+.carousel-nav.next { right: 10px; }
+
+/* ==========================================================
+   DOTS — BAR STYLE + ACTIVE EXPAND
+   ========================================================== */
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+
+    background: #8dcfa3;
+    opacity: 0.35;
+
+    cursor: pointer;
+
+    transition: all 0.3s ease;
+}
+
+.dot:hover {
+    opacity: 0.6;
+    transform: scale(1.2);
+}
+
+.dot.active {
+    opacity: 1;
+    width: 30px;
+    border-radius: 6px;
+}
+
+ .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--dark-green);
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        display: inline-block;
+        width: 100%;
+      }

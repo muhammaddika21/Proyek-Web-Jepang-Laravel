@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Rekomendasi Dashboard Admin — NihonLearn</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --green: #448646;
+                --dark-green: #296751;
+                --light-green: #8fd6b0;
+                --cream: #f8f7ef;
+                --accent: #d6975e;
+                --pink: #f7b6e4;
+                --dark: #1a2e24;
+                --gray-light: #f1f5f9;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Inter", sans-serif;
+                background: var(--cream);
+                color: #333;
+                line-height: 1.7;
+            }
+
+            /* HERO */
+            .hero {
+                background: linear-gradient(
+                    135deg,
+                    var(--dark),
+                    var(--dark-green)
+                );
+                color: white;
+                padding: 4rem 2rem;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+            .hero::before {
+                content: "⛩️";
+                position: absolute;
+                font-size: 15rem;
+                opacity: 0.05;
+                top: -50px;
+                right: -50px;
+                transform: rotate(15deg);
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+                font-weight: 800;
+                margin-bottom: 0.5rem;
+                position: relative;
+                z-index: 1;
+            }
+            .hero .subtitle {
+                opacity: 0.85;
+                font-size: 1.1rem;
+                position: relative;
+                z-index: 1;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+
+            /* CONTAINER */
+            .container {
+                max-width: 950px;
+                margin: 0 auto;
+                padding: 2rem 1.5rem;
+            }
+
+            /* SECTION */
+            .section {
+                background: white;
+                border-radius: 16px;
+                padding: 2.5rem;
+                margin-bottom: 2.5rem;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+                border-top: 5px solid var(--green);
+            }
+            .section h2 {
+                font-size: 1.8rem;
+                font-weight: 800;
+                color: var(--dark-green);
+                margin-bottom: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                border-bottom: 2px solid var(--gray-light);
+                padding-bottom: 10px;
+            }
+            .section h3 {
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: var(--green);
+                margin: 2rem 0 1rem;
+            }
+
+            /* TABLES */
+            table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin: 1.5rem 0;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 0 0 1px #e2e8f0;
+            }
+            th,
+            td {
+                padding: 1rem;
+                text-align: left;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            th {
+                background: var(--gray-light);
+                font-weight: 700;
+                color: var(--dark);
+            }
+            tr:last-child td {
+                border-bottom: none;
+            }
+
+            .badge {
+                display: inline-block;
+                padding: 0.25rem 0.75rem;
+                border-radius: 50px;
+                font-size: 0.8rem;
+                font-weight: 600;
+            }
+            .badge.green {
+                background: #dcfce7;
+                color: #166534;
+            }
+            .badge.yellow {
+                background: #fef9c3;
+                color: #854d0e;
+            }
+
+            /* MOCKUP UI */
+            .mockup {
+                background: var(--gray-light);
+                border-radius: 12px;
+                padding: 1.5rem;
+                font-family: "Cascadia Code", monospace;
+                font-size: 0.85rem;
+                color: #475569;
+                margin: 1rem 0;
+                border: 1px solid #cbd5e1;
+                white-space: pre-wrap;
+                line-height: 1.5;
+            }
+            .mockup strong {
+                color: var(--dark-green);
+            }
+
+            /* CARDS / GRIDS */
+            .grid-cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+                margin: 1.5rem 0;
+            }
+            .stat-card {
+                background: white;
+                border: 1px solid #e2e8f0;
+                padding: 1.5rem;
+                border-radius: 12px;
+                text-align: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+                transition: transform 0.2s;
+            }
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+            .stat-card .icon {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+            .stat-card .value {
+                font-size: 1.8rem;
+                font-weight: 800;
+                color: var(--dark);
+            }
+            .stat-card .label {
+                font-size: 0.9rem;
+                color: #64748b;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            /* ROADMAP */
+            .roadmap {
+                margin: 2rem 0;
+                border-left: 3px solid var(--light-green);
+                padding-left: 1.5rem;
+            }
+            .roadmap-item {
+                position: relative;
+                margin-bottom: 2rem;
+            }
+            .roadmap-item::before {
+                content: "";
+                position: absolute;
+                left: -1.5rem - 6px;
+                top: 5px;
+                width: 15px;
+                height: 15px;
+                background: var(--green);
+                border-radius: 50%;
+                border: 3px solid white;
+            }
+            .roadmap-item h4 {
+                color: var(--dark);
+                font-size: 1.2rem;
+                margin-bottom: 0.5rem;
+            }
+            .roadmap-item ul {
+                margin-left: 1.5rem;
+                color: #475569;
+            }
+
+            /* COLORS PALETTE */
+            .color-palette {
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+                margin-top: 1rem;
+            }
+            .color-box {
+                width: 100px;
+                padding-bottom: 10px;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                font-size: 0.8rem;
+                text-align: center;
+                font-weight: bold;
+            }
+            .c-dark {
+                background: var(--dark);
+                color: white;
+            }
+            .c-green {
+                background: var(--green);
+                color: white;
+            }
+            .c-light {
+                background: var(--light-green);
+                color: var(--dark);
+            }
+            .c-accent {
+                background: var(--accent);
+                color: white;
+            }
+            .c-gray {
+                background: var(--gray-light);
+                color: var(--dark);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="hero">
+            <p
+                style="
+                    font-family: &quot;Noto Sans JP&quot;;
+                    font-size: 1.5rem;
+                    margin-bottom: 0.5rem;
+                "
+            >
+                管理画面
+            </p>
+            <h1>Rekomendasi Dashboard Admin</h1>
+            <p class="subtitle">
+                Desain & Arsitektur Sistem Manajemen Konten NihonLearn
+            </p>
+        </div>
+
+        <div class="container">
+            <!-- 1. STRUKTUR HALAMAN -->
+            <div class="section">
+                <h2>🗺️ 1. Struktur Halaman & URL</h2>
+                <p>
+                    Dashboard admin akan menggunakan sistem routing yang
+                    terproteksi (harus login). Berikut adalah struktur
+                    halamannya:
+                </p>
+                <table>
+                    <tr>
+                        <th>URL Route</th>
+                        <th>Fungsi Halaman</th>
+                    </tr>
+                    <tr>
+                        <td><code>/admin</code></td>
+                        <td>
+                            <strong>Dashboard Utama:</strong> Menampilkan
+                            statistik, grafik, dan ringkasan aktivitas terbaru.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>/admin/articles</code></td>
+                        <td>
+                            <strong>Daftar Artikel:</strong> Tabel semua artikel
+                            dengan fitur pencarian, filter, dan pagination.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>/admin/articles/create</code></td>
+                        <td>
+                            <strong>Buat Artikel:</strong> Form editor lengkap
+                            untuk menulis artikel baru.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>/admin/articles/{id}/edit</code></td>
+                        <td>
+                            <strong>Edit Artikel:</strong> Mengubah konten
+                            artikel yang sudah ada.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>/admin/categories</code></td>
+                        <td>
+                            <strong>Kategori:</strong> Manajemen kategori
+                            tulisan (Budaya, Bahasa, dll).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>/admin/settings</code></td>
+                        <td>
+                            <strong>Pengaturan:</strong> Konfigurasi dasar
+                            website.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- 2. LAYOUT DASHBOARD -->
+            <div class="section">
+                <h2>🖥️ 2. Wireframe / Layout Admin</h2>
+                <p>
+                    Layout admin dipisah total dari tampilan publik. Menggunakan
+                    format klasik Sidebar + Topbar.
+                </p>
+
+                <div class="mockup">
+                    ┌─────────────────────────────────────────────────────────────┐
+                    │ <strong>[☰] NihonLearn Admin</strong> [🔍 Pencarian] [👤
+                    Admin ▼] │
+                    ├────────────┬────────────────────────────────────────────────┤
+                    │ <strong>MENU</strong> │ 🏠 Dashboard > Artikel │ │ 🏠 Home
+                    │ │ │ 📝 Artikel │
+                    ┌──────────────────────────────────────────┐ │ │ 📂
+                    Kategori│ │ <strong>Kelola Artikel</strong> [+ Buat] │ │ │
+                    🖼️ Media │ │ │ │ │ ⚙️ Setting │ │ [ Filter ▼ ] [ Sort ▼ ] │
+                    │ │ │ │ ---------------------------------------- │ │ │ │ │
+                    1. Belajar Hiragana [Bahasa] [Published]│ │ │ │ │ 2.
+                    Festival Hanami [Budaya] [Draft] │ │ │ 🚪 Logout │
+                    └──────────────────────────────────────────┘ │
+                    └────────────┴────────────────────────────────────────────────┘
+                </div>
+            </div>
+
+            <!-- 3. DASHBOARD UTAMA -->
+            <div class="section">
+                <h2>📊 3. Komponen Dashboard Utama</h2>
+                <p>
+                    Halaman pertama saat admin login, berfungsi untuk memberikan
+                    <i>helicopter view</i> terhadap website.
+                </p>
+
+                <h3>Stat Cards</h3>
+                <div class="grid-cards">
+                    <div class="stat-card">
+                        <div class="icon">📝</div>
+                        <div class="value">42</div>
+                        <div class="label">Total Artikel</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">👁️</div>
+                        <div class="value">12.5K</div>
+                        <div class="label">Total Views</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">📂</div>
+                        <div class="value">8</div>
+                        <div class="label">Kategori</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">⏱️</div>
+                        <div class="value">5</div>
+                        <div class="label">Draft Tertunda</div>
+                    </div>
+                </div>
+
+                <h3>Elemen Lainnya:</h3>
+                <ul>
+                    <li>
+                        <strong>Grafik Kunjungan:</strong> Chart garis
+                        menunjukkan view per bulan.
+                    </li>
+                    <li>
+                        <strong>Artikel Terbaru:</strong> Tabel 5 artikel
+                        terakhir yang di-_publish_ atau di-_edit_.
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 4. DATABASE SCHEMA -->
+            <div class="section">
+                <h2>💾 4. Rancangan Database (Schema)</h2>
+                <p>
+                    Untuk menunjang fitur artikel, diperlukan beberapa tabel
+                    utama di Laravel:
+                </p>
+
+                <h3>Tabel <code>articles</code></h3>
+                <table>
+                    <tr>
+                        <th>Kolom</th>
+                        <th>Tipe Data</th>
+                        <th>Keterangan</th>
+                    </tr>
+                    <tr>
+                        <td><code>id</code></td>
+                        <td>BIGINT (PK)</td>
+                        <td>Primary Key</td>
+                    </tr>
+                    <tr>
+                        <td><code>title</code></td>
+                        <td>VARCHAR(255)</td>
+                        <td>Judul utama artikel</td>
+                    </tr>
+                    <tr>
+                        <td><code>slug</code></td>
+                        <td>VARCHAR(255)</td>
+                        <td>
+                            URL ramah SEO (contoh:
+                            <code>/belajar-hiragana</code>)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>content</code></td>
+                        <td>LONGTEXT</td>
+                        <td>Isi artikel berformat HTML (dari Rich Editor)</td>
+                    </tr>
+                    <tr>
+                        <td><code>thumbnail</code></td>
+                        <td>VARCHAR(255)</td>
+                        <td>Path lokasi gambar sampul</td>
+                    </tr>
+                    <tr>
+                        <td><code>category_id</code></td>
+                        <td>BIGINT (FK)</td>
+                        <td>Relasi ke tabel kategori</td>
+                    </tr>
+                    <tr>
+                        <td><code>status</code></td>
+                        <td>ENUM</td>
+                        <td>
+                            <code>'published'</code> atau <code>'draft'</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>views</code></td>
+                        <td>INTEGER</td>
+                        <td>Jumlah dilihat (default: 0)</td>
+                    </tr>
+                    <tr>
+                        <td><code>timestamps</code></td>
+                        <td>DATETIME</td>
+                        <td>
+                            <code>created_at</code> dan <code>updated_at</code>
+                        </td>
+                    </tr>
+                </table>
+
+                <h3>Tabel <code>categories</code></h3>
+                <table>
+                    <tr>
+                        <th>Kolom</th>
+                        <th>Tipe Data</th>
+                        <th>Keterangan</th>
+                    </tr>
+                    <tr>
+                        <td><code>id</code></td>
+                        <td>BIGINT (PK)</td>
+                        <td>Primary Key</td>
+                    </tr>
+                    <tr>
+                        <td><code>name</code></td>
+                        <td>VARCHAR(100)</td>
+                        <td>Nama Kategori (Bahasa, Budaya, dll)</td>
+                    </tr>
+                    <tr>
+                        <td><code>slug</code></td>
+                        <td>VARCHAR(100)</td>
+                        <td>URL Kategori</td>
+                    </tr>
+                    <tr>
+                        <td><code>color</code></td>
+                        <td>VARCHAR(20)</td>
+                        <td>Kode warna hex untuk badge (misal: #448646)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- 5. FORM BUILDER -->
+            <div class="section">
+                <h2>📝 5. Editor Artikel (Formulir)</h2>
+                <p>
+                    Halaman pembuatan artikel dibagi menjadi 2 kolom (Kiri 70%
+                    Konten, Kanan 30% Meta pengaturan).
+                </p>
+
+                <div class="mockup">
+                    <strong>[ KOLOM KIRI: KONTEN UTAMA ]</strong>
+                    Judul Artikel: [ Input Teks Panjang... ] Slug Tautan: [
+                    auto-generated-dari-judul ] Rich Text Editor (Gunakan
+                    TinyMCE / Trix / CKEditor) [ B I U H1 H2 🔗 Tautan 🖼️ Gambar
+                    ] ------------------------------------------------ Area
+                    untuk mengetik isi artikel secara bebas. Mendukung paragraf,
+                    list, gambar disisipkan.
+                    ------------------------------------------------
+
+                    <strong>[ KOLOM KANAN: PENGATURAN META ]</strong>
+                    Status Publikasi: (•) Published ( ) Draft Kategori: [
+                    Dropdown Pilih Kategori ▼] Thumbnail (Cover): [ Area Drag &
+                    Drop Gambar ] Ringkasan Pendek: [ Textarea untuk Excerpt ]
+                </div>
+            </div>
+
+            <!-- 6. UI/UX GUIDE -->
+            <div class="section">
+                <h2>🎨 6. Panduan UI/UX (Color Palette Admin)</h2>
+                <p>
+                    Tetap menggunakan identitas UKM Nihon, namun diatur agar
+                    lebih tegas dan bersih untuk area dashboard.
+                </p>
+
+                <div class="color-palette">
+                    <div class="color-box c-dark">
+                        <br />Sidebar<br />#1a2e24
+                    </div>
+                    <div class="color-box c-green">
+                        <br />Primary Btn<br />#448646
+                    </div>
+                    <div class="color-box c-light">
+                        <br />Accent/Hover<br />#8fd6b0
+                    </div>
+                    <div class="color-box c-accent">
+                        <br />Warning<br />#d6975e
+                    </div>
+                    <div class="color-box c-gray">
+                        <br />Background<br />#f1f5f9
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. ROADMAP -->
+            <div class="section">
+                <h2>🚀 7. Roadmap Implementasi (Urutan Pengerjaan)</h2>
+
+                <div class="roadmap">
+                    <div class="roadmap-item">
+                        <h4>Tahap 1: Fondasi Auth & Database</h4>
+                        <ul>
+                            <li>
+                                Install Auth Laravel (Breeze/UI) untuk fitur
+                                Login Admin.
+                            </li>
+                            <li>
+                                Buat Migration dan Model untuk
+                                <code>Article</code> dan <code>Category</code>.
+                            </li>
+                            <li>
+                                Setup layout dasar
+                                <code>admin.blade.php</code> (sidebar & header
+                                kosong).
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-item">
+                        <h4>Tahap 2: Manajemen Kategori</h4>
+                        <ul>
+                            <li>
+                                Buat halaman CRUD (Create, Read, Update, Delete)
+                                Kategori.
+                            </li>
+                            <li>
+                                Pastikan kategori bisa ditambah dan dihapus.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-item">
+                        <h4>Tahap 3: Inti Artikel (CRUD)</h4>
+                        <ul>
+                            <li>Buat Controller Artikel.</li>
+                            <li>
+                                Pasang Rich Text Editor (rekomendasi:
+                                TinyMCE/Trix).
+                            </li>
+                            <li>Fungsikan upload gambar Thumbnail.</li>
+                            <li>Buat tabel daftar artikel.</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-item">
+                        <h4>Tahap 4: Finalisasi & Integrasi</h4>
+                        <ul>
+                            <li>
+                                Buat Dashboard Statistik (menghitung jumlah
+                                artikel/kategori dari database).
+                            </li>
+                            <li>
+                                Tampilkan data artikel dari database ke halaman
+                                publik (Home & Halaman Artikel).
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

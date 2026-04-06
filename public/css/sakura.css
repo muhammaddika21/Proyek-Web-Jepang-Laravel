@@ -1,0 +1,856 @@
+/* =======================================================
+   SAKURA.CSS
+   Semua CSS terkait Pohon Sakura Pixel & Daun Jatuh
+   
+   DAFTAR ISI:
+   1. Pohon Sakura - Posisi Default (Desktop)
+   2. Pohon Sakura - Pixel Art (::before & ::after)
+   3. Pohon Sakura - Animasi Goyang
+   4. Daun Jatuh - Container & Kelopak
+   5. Daun Jatuh - Animasi Jatuh
+   6. RESPONSIVE - Tablet (≤ 1050px)
+   7. RESPONSIVE - Mobile (≤ 800px)
+======================================================= */
+
+/* =======================================================
+   1. POHON SAKURA - POSISI DEFAULT (DESKTOP)
+======================================================= */
+
+/* Wadah kolom kanan tempat pohon berada */
+.footer-right {
+  width: 350px;
+  justify-content: flex-end;
+  position: relative;
+  /* Tinggi baris footer yang ramping */
+}
+
+/* Posisi default pohon pixel (Desktop besar) */
+.pixel-sakura {
+  background: transparent;
+  position: absolute;
+  right: 90% !important;
+  top: -140px;
+  transform: scale(0.52);
+}
+
+/* Animasi goyang pohon (jika pakai .sakura-anim) */
+.sakura-anim {
+  height: 100%;
+  width: auto;
+  transform-origin: bottom center;
+  animation: sway 4s ease-in-out infinite alternate;
+}
+@keyframes sway {
+  from {
+    transform: rotate(2deg);
+  }
+  to {
+    transform: rotate(-2deg);
+  }
+}
+
+/* =======================================================
+   2. POHON SAKURA - PIXEL ART (BOX-SHADOW)
+======================================================= */
+
+/* Bagian Atas Pohon (Kanopi + Batang Atas) - koordinat Y 80px s/d 320px */
+.pixel-sakura::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  box-shadow:
+    250px 80px #f0b3dc,
+    260px 80px #fbd0f0,
+    270px 80px #f7b6e4,
+    280px 80px #f8b6e5,
+    290px 80px #fdbaef,
+    300px 80px #f4b6e2,
+    230px 90px #ffffff,
+    240px 90px #f7d4eb,
+    250px 90px #ffd4f7,
+    260px 90px #ffddff,
+    270px 90px #fd97e4,
+    280px 90px #ffa3f1,
+    290px 90px #ffbefe,
+    300px 90px #fab3e4,
+    310px 90px #fbaeea,
+    320px 90px #eb8bd1,
+    230px 100px #ffffff,
+    240px 100px #f4ddea,
+    250px 100px #f8c2ea,
+    260px 100px #febdec,
+    270px 100px #fa9ae2,
+    280px 100px #f98ee1,
+    290px 100px #fab7ea,
+    300px 100px #faa1e6,
+    310px 100px #ffcfff,
+    320px 100px #f9a0e9,
+    330px 100px #e984d1,
+    240px 110px #f3b5e3,
+    250px 110px #fcb4ed,
+    260px 110px #fdb1ed,
+    270px 110px #fa8fdc,
+    280px 110px #f174c8,
+    290px 110px #f8c0ee,
+    300px 110px #f68be1,
+    310px 110px #fab8e8,
+    320px 110px #ffb5f1,
+    330px 110px #f9a7e8,
+    340px 110px #f2b6de,
+    220px 120px #f2b8e0,
+    230px 120px #fab7eb,
+    240px 120px #fd96e3,
+    250px 120px #fe92e6,
+    260px 120px #f06cc8,
+    270px 120px #ef66c4,
+    280px 120px #f2a9dc,
+    290px 120px #f9b6e6,
+    300px 120px #faa5e4,
+    310px 120px #fba3e5,
+    320px 120px #f895de,
+    330px 120px #ffbef9,
+    340px 120px #f6b2e0,
+    370px 120px #d892c1,
+    380px 120px #fa94ee,
+    390px 120px #e889d0,
+    210px 130px #f5d1e9,
+    220px 130px #ffa1ea,
+    230px 130px #ffb8fb,
+    240px 130px #fd9ee5,
+    250px 130px #ed69c5,
+    260px 130px #f4a2db,
+    270px 130px #f4abe0,
+    280px 130px #f7a1e6,
+    290px 130px #fdafe7,
+    300px 130px #feb2e6,
+    310px 130px #fea9e5,
+    320px 130px #f9a9e4,
+    330px 130px #fec6f0,
+    340px 130px #fcadec,
+    350px 130px #ec8dd5,
+    360px 130px #c67fa9,
+    370px 130px #f49de1,
+    380px 130px #ffceff,
+    390px 130px #f6b7e7,
+    400px 130px #fcbcf0,
+    410px 130px #f2b6e4,
+    210px 140px #f9d1eb,
+    220px 140px #ffb2f4,
+    230px 140px #f98fdf,
+    240px 140px #f793e0,
+    250px 140px #f2ade2,
+    260px 140px #fcc0e9,
+    270px 140px #febdec,
+    280px 140px #f799e1,
+    290px 140px #ee70c5,
+    300px 140px #f991dc,
+    310px 140px #fba9e5,
+    320px 140px #f899e1,
+    330px 140px #fab9e9,
+    340px 140px #ffa9ed,
+    350px 140px #f77fda,
+    360px 140px #ef9adc,
+    370px 140px #ffcffb,
+    380px 140px #fcceef,
+    390px 140px #ffbaed,
+    400px 140px #ffc8ff,
+    410px 140px #f6b2e0,
+    200px 150px #f7d4eb,
+    210px 150px #fcc2f0,
+    220px 150px #fdb4ec,
+    230px 150px #fa84dd,
+    240px 150px #f563c8,
+    250px 150px #f796e1,
+    260px 150px #fcaee5,
+    270px 150px #fca9e5,
+    280px 150px #f795e2,
+    290px 150px #f6afe2,
+    300px 150px #f8b2e8,
+    310px 150px #f790e1,
+    320px 150px #faa3e4,
+    330px 150px #fcb1e5,
+    340px 150px #fba4e3,
+    350px 150px #ff7fe1,
+    360px 150px #ffa1f0,
+    370px 150px #fcd1ef,
+    380px 150px #fbb3e5,
+    390px 150px #feabe4,
+    400px 150px #feb1ea,
+    410px 150px #fcbbf0,
+    420px 150px #f0b9e3,
+    200px 160px #f6bae8,
+    210px 160px #ff9dee,
+    220px 160px #f16dc5,
+    230px 160px #f460c3,
+    240px 160px #f576d3,
+    250px 160px #fa9fe1,
+    260px 160px #fdade6,
+    270px 160px #f985da,
+    280px 160px #f26fca,
+    290px 160px #fccef0,
+    300px 160px #fbb8e9,
+    310px 160px #fba5e3,
+    320px 160px #fdb1e7,
+    330px 160px #feb2e5,
+    340px 160px #fca1e3,
+    350px 160px #f990e1,
+    360px 160px #fabfec,
+    370px 160px #ffb5e9,
+    380px 160px #fdace4,
+    390px 160px #fdaee5,
+    400px 160px #fdb1e5,
+    410px 160px #ffb3fc,
+    420px 160px #ef8ed7,
+    160px 170px #f5d2ec,
+    170px 170px #fddefb,
+    180px 170px #fbd4ef,
+    190px 170px #f7b8e4,
+    200px 170px #fcade4,
+    210px 170px #fea8e6,
+    220px 170px #f996dd,
+    230px 170px #f47fd6,
+    240px 170px #f9bced,
+    250px 170px #fbc7ef,
+    260px 170px #f695e0,
+    270px 170px #fa9ae2,
+    280px 170px #f582d7,
+    290px 170px #fbb1e6,
+    300px 170px #feb1e6,
+    310px 170px #fca8e4,
+    320px 170px #fa96e1,
+    330px 170px #f89fdc,
+    340px 170px #ee6dc5,
+    350px 170px #fe98e7,
+    360px 170px #d595c1,
+    370px 170px #a55d8d,
+    380px 170px #ffb5ec,
+    390px 170px #fdb2e8,
+    400px 170px #fb9fe4,
+    410px 170px #fb95e4,
+    420px 170px #fbb5f1,
+    430px 170px #f2b7de,
+    160px 180px #f29add,
+    170px 180px #ffa5fa,
+    180px 180px #ffb7f4,
+    190px 180px #ffbaf4,
+    200px 180px #ffb0e7,
+    210px 180px #fcace5,
+    220px 180px #f794e0,
+    230px 180px #f9baef,
+    240px 180px #fdbdec,
+    250px 180px #fcb4e9,
+    260px 180px #f9a6e4,
+    270px 180px #fbb2e7,
+    280px 180px #f9c0ed,
+    290px 180px #fcafe6,
+    300px 180px #fca9e5,
+    310px 180px #f582d7,
+    320px 180px #ef68c6,
+    330px 180px #f78edd,
+    340px 180px #f89edf,
+    350px 180px #ffa6ec,
+    360px 180px #c868ae,
+    370px 180px #873a6f,
+    380px 180px #ffa0ed,
+    390px 180px #fca8e8,
+    400px 180px #f374cf,
+    410px 180px #f27bca,
+    420px 180px #ffc9ff,
+    430px 180px #f6b3e2,
+    160px 190px #f5abe0,
+    170px 190px #fe78d8,
+    180px 190px #f063c1,
+    190px 190px #f269c5,
+    200px 190px #f466c3,
+    210px 190px #f069c2,
+    220px 190px #f160c1,
+    230px 190px #ed70c4,
+    240px 190px #f5a6e1,
+    250px 190px #feb4e9,
+    260px 190px #fec8ed,
+    270px 190px #fbb4e6,
+    280px 190px #fab3e8,
+    290px 190px #f784d9,
+    300px 190px #ec77c8,
+    310px 190px #f7bcec,
+    320px 190px #f7bee9,
+    330px 190px #f8b3ec,
+    340px 190px #f999e2,
+    350px 190px #ffa9ed,
+    360px 190px #ca62af,
+    370px 190px #904076,
+    380px 190px #f976d4,
+    390px 190px #ed83cd,
+    400px 190px #f9c3ec,
+    410px 190px #f7b5e3,
+    420px 190px #ffb2ec,
+    430px 190px #fba7ed,
+    440px 190px #e58dd1,
+    130px 200px #bf7fbf,
+    140px 200px #f2b1e1,
+    150px 200px #fbbaf3,
+    160px 200px #fab1e5,
+    170px 200px #fba2e0,
+    180px 200px #f89cde,
+    190px 200px #f97fda,
+    200px 200px #f15fbf,
+    210px 200px #f7abe2,
+    220px 200px #f7bae4,
+    230px 200px #8c3e70,
+    240px 200px #833e6b,
+    250px 200px #eda3d6,
+    260px 200px #fab3e4,
+    270px 200px #fcb2e5,
+    280px 200px #fba5e6,
+    290px 200px #f88adf,
+    300px 200px #f8b8e7,
+    310px 200px #fbb8e6,
+    320px 200px #fdbaea,
+    330px 200px #fcb6e7,
+    340px 200px #fea4ea,
+    350px 200px #d473bc,
+    360px 200px #9a3b78,
+    370px 200px #c94d9a,
+    380px 200px #78275a,
+    390px 200px #a76992,
+    400px 200px #ffd5f6,
+    410px 200px #ffbaee,
+    420px 200px #fe98e3,
+    430px 200px #e170c0,
+    440px 200px #dc8bc5,
+    130px 210px #eb8fd2,
+    140px 210px #f993e5,
+    150px 210px #ff93ed,
+    160px 210px #ff89e5,
+    170px 210px #ef72c8,
+    180px 210px #f981d6,
+    190px 210px #fb84df,
+    200px 210px #f5b0e7,
+    210px 210px #fbbde9,
+    220px 210px #fdbae8,
+    230px 210px #e59ad0,
+    240px 210px #d454a6,
+    250px 210px #893969,
+    260px 210px #8a4471,
+    270px 210px #f59fde,
+    280px 210px #ff89e1,
+    290px 210px #fa8fe1,
+    300px 210px #facbf0,
+    310px 210px #fdb0e5,
+    320px 210px #fdade6,
+    330px 210px #fdafe5,
+    340px 210px #ffa9ee,
+    350px 210px #d068b5,
+    360px 210px #8f306a,
+    370px 210px #f655bb,
+    380px 210px #d572b4,
+    390px 210px #e9bbdf,
+    400px 210px #fcaee6,
+    410px 210px #fdb8f3,
+    420px 210px #f1aedc,
+    430px 210px #f1aeda,
+    130px 220px #e796d0,
+    140px 220px #ec91d1,
+    150px 220px #eb65b8,
+    160px 220px #f963c8,
+    170px 220px #f3ace4,
+    180px 220px #ef7bca,
+    190px 220px #f05fbe,
+    200px 220px #f369c4,
+    210px 220px #f99ede,
+    220px 220px #fba9e5,
+    230px 220px #fa70ca,
+    240px 220px #f561c2,
+    250px 220px #e571c9,
+    260px 220px #e279c9,
+    270px 220px #ed68c0,
+    280px 220px #ec5ebc,
+    290px 220px #fc81de,
+    300px 220px #f892df,
+    310px 220px #f9abe3,
+    320px 220px #fba7e4,
+    330px 220px #fc89df,
+    340px 220px #fb87e0,
+    350px 220px #ec71cb,
+    360px 220px #e65fba,
+    370px 220px #fc7edd,
+    380px 220px #fe92e5,
+    390px 220px #fda7ea,
+    400px 220px #ff8feb,
+    410px 220px #f295db,
+    420px 220px #f295dc,
+    430px 220px #ffffff,
+    150px 230px #d08bad,
+    160px 230px #f6bae6,
+    170px 230px #fec1f7,
+    180px 230px #f9bfe8,
+    190px 230px #f7c1e9,
+    200px 230px #ef6dc2,
+    210px 230px #f464c0,
+    220px 230px #f563c1,
+    230px 230px #e958b5,
+    240px 230px #f596de,
+    250px 230px #fc95e7,
+    260px 230px #ffc8f7,
+    270px 230px #e9b2da,
+    280px 230px #924074,
+    290px 230px #e75eb9,
+    300px 230px #fc75d7,
+    310px 230px #f16cc7,
+    320px 230px #fd88e1,
+    330px 230px #fe7add,
+    340px 230px #c84e9e,
+    350px 230px #9e3375,
+    360px 230px #f87ecf,
+    370px 230px #f9bbef,
+    380px 230px #f788e0,
+    390px 230px #f986e0,
+    400px 230px #ff9ff1,
+    410px 230px #f9b2e3,
+    420px 230px #e9c6db,
+    430px 230px #ebbde0,
+    150px 240px #f0bbe2,
+    160px 240px #fba2ea,
+    170px 240px #fb84df,
+    180px 240px #fca7e6,
+    190px 240px #fdb6ea,
+    200px 240px #f9ace3,
+    210px 240px #ee98d5,
+    220px 240px #dc5aaf,
+    230px 240px #983774,
+    240px 240px #ec88d7,
+    250px 240px #ffc6f4,
+    260px 240px #fdb6ea,
+    270px 240px #fcb8e9,
+    280px 240px #cd8bb9,
+    290px 240px #8b3568,
+    300px 240px #f067c4,
+    310px 240px #fd7edd,
+    320px 240px #fe7bdc,
+    330px 240px #ca4f9f,
+    340px 240px #953471,
+    350px 240px #e854b3,
+    360px 240px #f284ca,
+    370px 240px #fbd3f1,
+    380px 240px #fac9ef,
+    390px 240px #fabdec,
+    400px 240px #fdace8,
+    410px 240px #fdbaf4,
+    420px 240px #efb4e1,
+    430px 240px #e5a1d4,
+    440px 240px #d46aaa,
+    150px 250px #dfbfdf,
+    160px 250px #f7b0e6,
+    170px 250px #ff79d9,
+    180px 250px #f972d3,
+    190px 250px #fc83dd,
+    200px 250px #faa6e4,
+    210px 250px #90547a,
+    220px 250px #7e3160,
+    230px 250px #d36cb6,
+    240px 250px #eb80d0,
+    250px 250px #ec9ed7,
+    260px 250px #fb8bdf,
+    270px 250px #f29bda,
+    280px 250px #813d66,
+    290px 250px #733859,
+    300px 250px #ed91cf,
+    310px 250px #fd62c6,
+    320px 250px #d14fa0,
+    330px 250px #983671,
+    340px 250px #eb5fbf,
+    350px 250px #fb94e3,
+    360px 250px #f7bce9,
+    370px 250px #f9b0e5,
+    380px 250px #fbb4e6,
+    390px 250px #fbb2e6,
+    400px 250px #fd9ee4,
+    410px 250px #ff86e8,
+    420px 250px #ff85e2,
+    430px 250px #f979d6,
+    440px 250px #de66af,
+    150px 260px #f0c3f0,
+    160px 260px #f4b9e3,
+    170px 260px #fc97e7,
+    180px 260px #ff70d3,
+    190px 260px #fe62cb,
+    200px 260px #ff80e0,
+    210px 260px #f197da,
+    220px 260px #e15fb3,
+    230px 260px #93346f,
+    240px 260px #7c3462,
+    250px 260px #8b3d70,
+    260px 260px #e95db8,
+    270px 260px #e761bb,
+    280px 260px #e576c7,
+    290px 260px #7d3864,
+    300px 260px #883a68,
+    310px 260px #cd4c9b,
+    320px 260px #872f63,
+    330px 260px #dd5cb1,
+    340px 260px #ff85e4,
+    350px 260px #fb8be3,
+    360px 260px #fa8de3,
+    370px 260px #fa93e0,
+    380px 260px #fe9fe4,
+    390px 260px #ff85e7,
+    400px 260px #f475cf,
+    410px 260px #ec5cba,
+    420px 260px #fa66cb,
+    430px 260px #e868bc,
+    440px 260px #df7f9f,
+    150px 270px #efbadf,
+    160px 270px #e8c2e3,
+    170px 270px #f3b3e0,
+    180px 270px #fbb4ef,
+    190px 270px #f589d9,
+    200px 270px #f160c0,
+    210px 270px #f562c3,
+    220px 270px #ff65ce,
+    230px 270px #ee5fbd,
+    240px 270px #ef82d2,
+    250px 270px #f47cd4,
+    260px 270px #ed71c9,
+    270px 270px #a03d7c,
+    280px 270px #ef7bd0,
+    290px 270px #d66fbb,
+    300px 270px #6b2b51,
+    310px 270px #6a2b52,
+    320px 270px #67294d,
+    330px 270px #a64385,
+    340px 270px #ff82e6,
+    350px 270px #ff8ce5,
+    360px 270px #ff98e6,
+    370px 270px #ff82e6,
+    380px 270px #f474d0,
+    390px 270px #f763c5,
+    400px 270px #e469b5,
+    410px 270px #aa7f7f,
+    420px 270px #a98d8d,
+    150px 280px #d4aad4,
+    180px 280px #ffffff,
+    200px 280px #d99dc3,
+    210px 280px #f189d5,
+    220px 280px #fb89e4,
+    230px 280px #ff82df,
+    240px 280px #ff9eec,
+    250px 280px #ff6fd3,
+    260px 280px #fd63c9,
+    270px 280px #d758a9,
+    280px 280px #72315a,
+    290px 280px #6d2d56,
+    300px 280px #6b2c52,
+    310px 280px #61294a,
+    320px 280px #823261,
+    330px 280px #df56ac,
+    340px 280px #ec5fbb,
+    350px 280px #e75db7,
+    360px 280px #df5ab1,
+    370px 280px #f964c8,
+    380px 280px #e365b6,
+    200px 290px #e993d3,
+    210px 290px #e1aed3,
+    230px 290px #e764b9,
+    240px 290px #f066be,
+    250px 290px #f886da,
+    260px 290px #f18bd9,
+    270px 290px #ffffff,
+    280px 290px #243c30,
+    290px 290px #683352,
+    300px 290px #6d2e54,
+    310px 290px #6d3155,
+    320px 290px #722f55,
+    330px 290px #6e2e54,
+    350px 290px #693456,
+    360px 290px #6a3152,
+    200px 300px #ffffff,
+    280px 300px #aaaaaa,
+    290px 300px #7a4767,
+    300px 300px #72365a,
+    310px 300px #804c6d,
+    320px 300px #712e55,
+    330px 300px #652d4e,
+    350px 300px #633d55,
+    360px 300px #613552,
+    270px 310px #555555,
+    330px 310px #6b2e52,
+    340px 310px #603d54,
+    350px 310px #613a54,
+    270px 320px #6d5461,
+    280px 320px #693153,
+    320px 320px #6b2d52,
+    330px 320px #6d2f54,
+    340px 320px #623550;
+  transform-origin: 330px 320px;
+  animation: gentleSway 6s ease-in-out infinite;
+}
+
+/* Bagian Bawah Pohon (Batang Bawah + Alas) - koordinat Y 310px s/d 420px */
+.pixel-sakura::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  box-shadow:
+    280px 310px #684257,
+    290px 310px #672b4e,
+    300px 310px #713258,
+    310px 310px #7b4667,
+    320px 310px #6f2e54,
+    290px 320px #713458,
+    300px 320px #6c2c51,
+    310px 320px #6a2c50,
+    270px 330px #6d3c54,
+    280px 330px #6b3358,
+    290px 330px #834d6f,
+    300px 330px #6b2e52,
+    310px 330px #6a2b4f,
+    320px 330px #712c54,
+    330px 330px #672f51,
+    270px 340px #613c54,
+    280px 340px #6b3357,
+    290px 340px #834e71,
+    300px 340px #6a2e52,
+    310px 340px #6c2e52,
+    320px 340px #77385e,
+    330px 340px #672f51,
+    270px 350px #3f1f1f,
+    280px 350px #693055,
+    290px 350px #7d4367,
+    300px 350px #6a2c51,
+    310px 350px #6e3256,
+    320px 350px #82456b,
+    330px 350px #682e50,
+    270px 360px #7c5d6e,
+    280px 360px #713b5e,
+    290px 360px #6b2b52,
+    300px 360px #68294f,
+    310px 360px #6a2c51,
+    320px 360px #702d55,
+    330px 360px #692e51,
+    230px 370px #d8c6cf,
+    240px 370px #feedfb,
+    250px 370px #f0e1ec,
+    260px 370px #856c7f,
+    270px 370px #815572,
+    280px 370px #7d466a,
+    290px 370px #6a2d51,
+    300px 370px #72375b,
+    310px 370px #6b2c51,
+    320px 370px #6d2a51,
+    330px 370px #682f51,
+    340px 370px #9c7b8e,
+    350px 370px #fbe5f4,
+    360px 370px #fbe3f4,
+    370px 370px #d4c2ce,
+    210px 380px #d9c7d0,
+    220px 380px #e4cdde,
+    230px 380px #d9bdd1,
+    240px 380px #c79ab7,
+    250px 380px #b384a3,
+    260px 380px #7b4467,
+    270px 380px #70345a,
+    280px 380px #612148,
+    290px 380px #6c3256,
+    300px 380px #6f385b,
+    310px 380px #63254a,
+    320px 380px #682c51,
+    330px 380px #612248,
+    340px 380px #8a5375,
+    350px 380px #c59db8,
+    360px 380px #dab2cd,
+    370px 380px #dec3d6,
+    380px 380px #e8cfe2,
+    390px 380px #d9c7d9,
+    190px 390px #dac2d3,
+    200px 390px #e6c8dc,
+    210px 390px #dcbfd4,
+    220px 390px #f2d0e8,
+    230px 390px #debcd4,
+    240px 390px #936080,
+    250px 390px #895476,
+    260px 390px #915d7e,
+    270px 390px #925c7d,
+    280px 390px #956483,
+    290px 390px #a37693,
+    300px 390px #915d7d,
+    310px 390px #966684,
+    320px 390px #a17693,
+    330px 390px #915e7d,
+    340px 390px #946282,
+    350px 390px #9a6e8b,
+    360px 390px #ae86a0,
+    370px 390px #e6c6dd,
+    380px 390px #f5d3eb,
+    390px 390px #dbbfd5,
+    400px 390px #e6cbdf,
+    410px 390px #dcc2d3,
+    190px 400px #dac1d2,
+    200px 400px #e4c8db,
+    210px 400px #e0c1d8,
+    220px 400px #f4d1eb,
+    230px 400px #e0c1d6,
+    240px 400px #e4c7dd,
+    250px 400px #e6c9df,
+    260px 400px #e6c9df,
+    270px 400px #e7c8df,
+    280px 400px #e7c8de,
+    290px 400px #e5c6dd,
+    300px 400px #e7c8df,
+    310px 400px #e6c8de,
+    320px 400px #e4c7dd,
+    330px 400px #e5c9df,
+    340px 400px #e6c8de,
+    350px 400px #e5c6dd,
+    360px 400px #e2c2d9,
+    370px 400px #e3c2da,
+    380px 400px #f7d4ee,
+    390px 400px #ddbfd5,
+    400px 400px #e8cde0,
+    410px 400px #dac3d5,
+    210px 410px #d9c0d2,
+    220px 410px #e5c7dc,
+    230px 410px #dfc0d6,
+    240px 410px #f5d1ea,
+    250px 410px #f0cde6,
+    260px 410px #f0cde6,
+    270px 410px #efcee6,
+    280px 410px #f0cde6,
+    290px 410px #f0cde6,
+    300px 410px #efcee6,
+    310px 410px #f0cde6,
+    320px 410px #f0cde6,
+    330px 410px #f0cee6,
+    340px 410px #efcde6,
+    350px 410px #f0cde6,
+    360px 410px #f7d4ed,
+    370px 410px #ddbed4,
+    380px 410px #ebcce1,
+    390px 410px #d7c2d1,
+    230px 420px #dac2d3,
+    240px 420px #e4c7db,
+    250px 420px #dcc1d5,
+    260px 420px #dcc1d3,
+    270px 420px #dbc0d3,
+    280px 420px #dac1d3,
+    290px 420px #dabfd3,
+    300px 420px #dac1d3,
+    310px 420px #dcc1d5,
+    320px 420px #dcbfd3,
+    330px 420px #dcc1d5,
+    340px 420px #dbc0d3,
+    350px 420px #dbc0d4,
+    360px 420px #e9cbe2,
+    370px 420px #d9c2d6;
+}
+
+/* =======================================================
+   3. POHON SAKURA - ANIMASI GOYANG
+======================================================= */
+
+/* Goyangan pelan (default) */
+@keyframes gentleSway {
+  0%,
+  100% {
+    transform: skewX(-2deg);
+  }
+  50% {
+    transform: skewX(2deg);
+  }
+}
+
+/* Goyangan cepat (saat hover) */
+@keyframes fastSway {
+  0%,
+  100% {
+    transform: skewX(-4deg);
+  }
+  50% {
+    transform: skewX(4deg);
+  }
+}
+
+/* Efek hover: goyangan makin kencang */
+.pixel-sakura:hover::before {
+  animation: fastSway 4s ease-in-out infinite;
+}
+
+/* =======================================================
+   4. DAUN JATUH - CONTAINER & KELOPAK
+======================================================= */
+
+/* Wadah kelopak jatuh (menutupi seluruh footer) */
+.sakura-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Setiap kelopak yang di-spawn oleh JS */
+.sakura {
+  position: absolute;
+  /* Menggunakan koordinat dinamis dari JS */
+  top: var(--start-top);
+  right: var(--start-right);
+  font-size: 14px;
+  user-select: none;
+  opacity: 0;
+  /* Gunakan forwards agar tidak melompat balik di akhir */
+  animation: sakuraFall var(--spawn-speed, 7s) linear forwards;
+  animation-delay: var(--delay, 0s);
+  z-index: 1;
+}
+
+/* =======================================================
+   5. DAUN JATUH - ANIMASI JATUH
+======================================================= */
+
+@keyframes sakuraFall {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    /* Jatuh melayang ke arah kiri bawah (efek angin) */
+    transform: translate(-50px, 300px) rotate(270deg);
+    opacity: 0;
+    top: -100px;
+  }
+}
+
+/* =======================================================
+   6. RESPONSIVE - TABLET (≤ 1050px)
+======================================================= */
+
+@media (max-width: 1050px) {
+  .pixel-sakura {
+    transform: scale(0.45);
+    top: -120px;
+  }
+}
+
+/* =======================================================
+   7. RESPONSIVE - MOBILE (≤ 800px)
+======================================================= */
+
+@media (max-width: 800px) {
+    .footer-right {
+        min-height: 250px;
+        margin-bottom: 60px;
+    }
+
+    .pixel-sakura {
+        position: relative !important;
+        margin: 0 !important;
+        transform: scale(0.55) !important;
+        right: 50% !important;
+    }
+}
+

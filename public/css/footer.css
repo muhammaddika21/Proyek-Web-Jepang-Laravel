@@ -1,0 +1,221 @@
+/* =======================================================
+   FOOTER STYLES — Copy dari original style.css
+   Background: gradient hijau post-migration
+======================================================= */
+
+/* Container Utama Footer */
+.main-footer {
+    background: linear-gradient(to bottom, #296751, #1a4035);
+    color: #f8f7ef;
+    padding-top: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Flexbox 3 kolom */
+.footer-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 0 2rem 2rem 2rem;
+}
+
+/* Kolom Footer */
+.footer-col {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+/* Kolom Kiri: Logo + Teks */
+.footer-left {
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.footer-logo {
+    max-width: 200px;
+    min-width: 70px;
+    max-height: 200px;
+    min-height: 100px;
+    object-fit: contain;
+}
+
+.footer-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    color: #f8f7ef;
+}
+
+.footer-text-wrapper h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.footer-text-wrapper p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Kolom Tengah: Social Media */
+.footer-center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.social-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #f8f7ef;
+}
+
+/* Container Social Icons */
+.social-icons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Sembunyikan label di desktop */
+.social-label {
+    display: none;
+}
+
+/* Social Button — Bulat (Desktop) */
+.social-btn {
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.4rem;
+    color: white;
+    text-decoration: none;
+    transition: 0.28s ease;
+}
+
+/* Hover — Original Effect */
+.social-btn:hover {
+    background: white;
+    color: #4da76d;
+    transform: translateY(-6px) scale(1.12);
+    box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+/* Garis & Copyright */
+.footer-bottom-row {
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    text-align: center;
+    padding: 1.5rem 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem;
+    color: #f8f7ef;
+}
+
+.footer-bottom-row p {
+    margin: 0;
+}
+
+/* =======================================================
+   RESPONSIVE: TABLET (≤ 768px)
+======================================================= */
+@media (max-width: 768px) {
+    .footer-top-row {
+        flex-direction: column;
+        text-align: center;
+        gap: 2rem;
+    }
+
+    .footer-left, .footer-center, .footer-right {
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+/* =======================================================
+   RESPONSIVE: MOBILE (≤ 800px)
+======================================================= */
+@media (max-width: 800px) {
+    .footer-top-row {
+        flex-direction: column;
+        gap: 2.5rem;
+        text-align: center;
+        padding-bottom: 0;
+    }
+
+    .footer-col {
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Brand section */
+    .footer-left {
+        flex-direction: row;
+        display: flex;
+        justify-content: center;
+    }
+
+    .footer-text-wrapper {
+        text-align: left;
+    }
+
+    /* Social section */
+    .footer-center {
+        width: 100%;
+    }
+
+    .social-icons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Social Buttons → CAPSULES */
+    .social-btn {
+        width: 220px;
+        height: 50px;
+        border-radius: 50px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding-left: 20px;
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Munculkan label */
+    .social-label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+    }
+
+    /* Mobile hover */
+    .social-btn:hover,
+    .social-btn:active {
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        width: 230px;
+    }
+
+    .social-btn:hover .social-label,
+    .social-btn:active .social-label,
+    .social-btn:hover i,
+    .social-btn:active i {
+        color: #8fd6b0 !important;
+        transition: color 0.2s ease;
+    }
+}
