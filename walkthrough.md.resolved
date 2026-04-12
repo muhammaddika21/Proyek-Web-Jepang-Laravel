@@ -1,0 +1,2995 @@
+# Walkthrough: Perbaikan Admin Dashboard
+
+## Perubahan yang Dilakukan
+
+### 1. 🐛 Fix Bug Edit Artikel
+**Masalah:** Saat klik tombol Edit (✏️) di Kelola Artikel, yang terbuka adalah form **buat artikel baru**, bukan edit artikel yang sudah ada.
+
+**Penyebab:** Form di `create.blade.php` dan `create-bahasa.blade.php` selalu menggunakan `action="store"` (POST baru).
+
+**Solusi:** Kedua view sekarang mendeteksi `isset($article)`:
+- Form action otomatis berubah ke `route('admin.articles.update', $article)` + `@method('PUT')`
+- Semua field (judul, slug, excerpt, kategori, konten Quill, kosakata, kuis) otomatis terisi data lama
+- Judul halaman berubah dari "Buat Artikel" → "Edit: NamaArtikel"
+
+```diff:create.blade.php
+@extends('layouts.app')
+
+@section('content')
+
+  {{-- Breadcrumb --}}
+  <div class="mb-6">
+    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
+      <a href="/articles" class="hover:text-brand-500">Kelola Artikel</a>
+      <span>›</span>
+      <span class="text-gray-800 dark:text-white/90 font-medium">Buat Artikel Umum</span>
+    </div>
+    <h2 class="text-xl font-bold text-gray-800 dark:text-white/90 sm:text-2xl">🏯 Buat Artikel Umum</h2>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Untuk konten Budaya, Event, atau Pengetahuan Umum tentang Jepang.</p>
+  </div>
+
+  <form action="#" method="POST" enctype="multipart/form-data">
+    @csrf
+
+    <div class="grid grid-cols-1 xl:grid-cols-10 gap-6">
+
+      {{-- =================== KOLOM KIRI (70%) =================== --}}
+      <div class="xl:col-span-7 space-y-6">
+
+        {{-- Section: Info Dasar --}}
+        {{-- 🟡 5. AUTO SLUG: Judul otomatis jadi slug --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{
+            title: '',
+            slug: '',
+            autoSlug: true,
+            generateSlug(text) {
+              return text.toLowerCase()
+                .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            }
+          }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">Informasi Dasar</h3>
+          </div>
+          <div class="p-6 space-y-5">
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Judul Artikel</label>
+              <input type="text" name="title" x-model="title"
+                @input="if(autoSlug) slug = generateSlug(title)"
+                placeholder="Misal: Festival Hanami di Taman Ueno"
+                class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+            </div>
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Slug (URL)
+                <span class="text-xs text-gray-400 font-normal ml-1" x-show="autoSlug">— auto-generate dari judul</span>
+              </label>
+              <input type="text" name="slug" x-model="slug"
+                @input="autoSlug = false"
+                placeholder="festival-hanami-taman-ueno"
+                class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 font-mono">
+              <p class="text-[10px] text-gray-400 mt-1" x-show="slug">Akan tampil di: <span class="text-brand-500">ukmnihon.com/artikel/<span x-text="slug"></span></span></p>
+            </div>
+          </div>
+        </div>
+
+        {{-- Section: Rich Text Editor --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">Konten Artikel</h3>
+          </div>
+          <div class="p-6">
+            <div class="rounded-lg border border-gray-300 dark:border-gray-700 overflow-hidden">
+              {{-- Toolbar --}}
+              <div class="flex items-center gap-1 flex-wrap border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2">
+                <button type="button" class="px-2 py-1 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">B</button>
+                <button type="button" class="px-2 py-1 text-xs italic text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">I</button>
+                <button type="button" class="px-2 py-1 text-xs underline text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">U</button>
+                <span class="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1"></span>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">H1</button>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">H2</button>
+                <span class="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1"></span>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">🔗 Link</button>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">🖼️ Gambar</button>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">📋 List</button>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">❝ Quote</button>
+              </div>
+              <textarea name="content" rows="12" placeholder="Tulis isi artikel di sini..."
+                class="w-full border-0 bg-transparent px-4 py-3 text-sm text-gray-800 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:outline-hidden focus:ring-0"></textarea>
+            </div>
+          </div>
+        </div>
+
+        {{-- Section: Media Upload --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{ mediaType: 'image' }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📎 Media Tambahan</h3>
+            <p class="text-xs text-gray-500 mt-1">Sisipkan gambar, video, audio, atau link YouTube.</p>
+          </div>
+          <div class="p-6">
+            {{-- Tab Media --}}
+            <div class="flex gap-2 mb-5 flex-wrap">
+              <button type="button" @click="mediaType = 'image'"
+                :class="mediaType === 'image' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-colors">🖼️ Gambar</button>
+              <button type="button" @click="mediaType = 'video'"
+                :class="mediaType === 'video' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-colors">🎬 Video</button>
+              <button type="button" @click="mediaType = 'youtube'"
+                :class="mediaType === 'youtube' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-colors">▶️ YouTube</button>
+              <button type="button" @click="mediaType = 'audio'"
+                :class="mediaType === 'audio' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-colors">🎵 Audio / MP3</button>
+            </div>
+
+            {{-- Upload Area: Image --}}
+            <div x-show="mediaType === 'image'" x-transition>
+              <div class="flex items-center justify-center w-full h-40 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-pointer hover:border-brand-400 transition-colors">
+                <div class="text-center">
+                  <svg class="mx-auto w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M18 13.5V6.75A2.25 2.25 0 0015.75 4.5h-13.5A2.25 2.25 0 000 6.75v10.5A2.25 2.25 0 002.25 19.5h15" /></svg>
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Drag & drop gambar atau <span class="text-brand-500 font-medium">klik untuk upload</span></p>
+                  <p class="text-[10px] text-gray-400">JPG, PNG, WebP — Maks 5MB</p>
+                </div>
+              </div>
+            </div>
+
+            {{-- Upload Area: Video --}}
+            <div x-show="mediaType === 'video'" x-transition>
+              <div class="flex items-center justify-center w-full h-40 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-pointer hover:border-brand-400 transition-colors">
+                <div class="text-center">
+                  <svg class="mx-auto w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Upload video — <span class="text-brand-500 font-medium">MP4, WebM</span></p>
+                  <p class="text-[10px] text-gray-400">Maks 50MB</p>
+                </div>
+              </div>
+            </div>
+
+            {{-- Input: YouTube --}}
+            <div x-show="mediaType === 'youtube'" x-transition>
+              <x-forms.input label="Link YouTube" name="youtube_url" placeholder="https://www.youtube.com/watch?v=..." />
+              <p class="text-xs text-gray-400 mt-1.5">Video akan ditanamkan (embed) secara otomatis di halaman artikel.</p>
+            </div>
+
+            {{-- Upload Area: Audio --}}
+            <div x-show="mediaType === 'audio'" x-transition>
+              <div class="flex items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-pointer hover:border-brand-400 transition-colors">
+                <div class="text-center">
+                  <p class="text-3xl mb-1">🎵</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload audio — <span class="text-brand-500 font-medium">MP3, WAV, OGG</span></p>
+                  <p class="text-[10px] text-gray-400">Maks 20MB</p>
+                </div>
+              </div>
+              <x-forms.input label="Label Audio" name="audio_label" placeholder="Misal: Lagu Sakura Sakura" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {{-- =================== KOLOM KANAN (30%) =================== --}}
+      <div class="xl:col-span-3 space-y-6">
+
+        {{-- Status --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">Status Publikasi</label>
+          <div class="space-y-2">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="status" value="published" checked class="text-brand-500 focus:ring-brand-500">
+              <span class="text-sm text-gray-800 dark:text-white/90">Published</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="status" value="draft" class="text-brand-500 focus:ring-brand-500">
+              <span class="text-sm text-gray-800 dark:text-white/90">Draft</span>
+            </label>
+          </div>
+        </div>
+
+        {{-- Kategori --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Kategori</label>
+          <select name="category"
+            class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">
+            <option>Pilih Kategori...</option>
+            <option>Budaya</option>
+            <option>Event</option>
+            <option>Pengetahuan Umum</option>
+            <option>Kuliner</option>
+            <option>Kesenian</option>
+          </select>
+        </div>
+
+        {{-- Thumbnail --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Thumbnail / Cover</label>
+          <div class="flex items-center justify-center w-full h-36 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-pointer hover:border-brand-400 transition-colors">
+            <div class="text-center">
+              <svg class="mx-auto w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
+              <p class="mt-1 text-xs text-gray-500">Drag & Drop atau Klik</p>
+            </div>
+          </div>
+        </div>
+
+        {{-- Excerpt --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Ringkasan Pendek</label>
+          <textarea name="excerpt" rows="3" placeholder="Tulis deskripsi singkat untuk SEO..."
+            class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden"></textarea>
+        </div>
+
+        {{-- Buttons --}}
+        <div class="flex gap-3">
+          <x-ui.button variant="outline" type="button" tag="a" href="/articles">
+            Batal
+          </x-ui.button>
+          <x-ui.button type="submit">
+            Simpan Artikel
+          </x-ui.button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+@endsection
+===
+@extends('layouts.admin')
+
+@push('styles')
+{{-- Quill Snow Theme --}}
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+<style>
+  /* Quill editor dark mode support */
+  .dark .ql-toolbar {
+    background-color: #1d2939;
+    border-color: #374151 !important;
+  }
+  .dark .ql-container {
+    background-color: #111827;
+    border-color: #374151 !important;
+    color: rgba(255,255,255,0.9);
+  }
+  .dark .ql-toolbar .ql-stroke { stroke: #9ca3af; }
+  .dark .ql-toolbar .ql-fill { fill: #9ca3af; }
+  .dark .ql-toolbar .ql-picker-label { color: #9ca3af; }
+  .dark .ql-toolbar button:hover .ql-stroke,
+  .dark .ql-toolbar button.ql-active .ql-stroke { stroke: #ffffff; }
+  .dark .ql-toolbar button:hover .ql-fill,
+  .dark .ql-toolbar button.ql-active .ql-fill { fill: #ffffff; }
+  .dark .ql-editor.ql-blank::before { color: rgba(255,255,255,0.3); }
+  .dark .ql-picker-options { background-color: #1d2939; border-color: #374151; }
+  .dark .ql-picker-item { color: #9ca3af; }
+  .ql-editor { min-height: 280px; font-size: 14px; line-height: 1.7; }
+  .ql-toolbar.ql-snow { border-radius: 0.5rem 0.5rem 0 0; }
+  .ql-container.ql-snow { border-radius: 0 0 0.5rem 0.5rem; }
+
+  /* Media Upload Area */
+  .media-drop-zone {
+    transition: all 0.2s ease;
+  }
+  .media-drop-zone.drag-over {
+    border-color: #448646;
+    background-color: rgba(68, 134, 70, 0.08);
+  }
+  .media-drop-zone.has-file {
+    border-color: #448646;
+    background-color: rgba(68, 134, 70, 0.05);
+  }
+  .file-preview-item {
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+@endpush
+
+@section('content')
+
+  {{-- Breadcrumb --}}
+  <div class="mb-6">
+    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
+      <a href="/admin/articles" class="hover:text-brand-500">Kelola Artikel</a>
+      <span>›</span>
+      <span class="text-gray-800 dark:text-white/90 font-medium">{{ isset($article) ? 'Edit Artikel' : 'Buat Artikel Umum' }}</span>
+    </div>
+    <h2 class="text-xl font-bold text-gray-800 dark:text-white/90 sm:text-2xl">🏯 {{ isset($article) ? 'Edit Artikel: ' . $article->title : 'Buat Artikel Umum' }}</h2>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Untuk konten Budaya, Event, atau Pengetahuan Umum tentang Jepang.</p>
+  </div>
+
+  <form action="{{ isset($article) ? route('admin.articles.update', $article) : route('admin.articles.store') }}" method="POST" enctype="multipart/form-data" id="article-form">
+    @csrf
+    @if(isset($article)) @method('PUT') @endif
+    <input type="hidden" name="type" value="umum">
+
+    <div class="grid grid-cols-1 xl:grid-cols-10 gap-6">
+
+      {{-- =================== KOLOM KIRI (70%) =================== --}}
+      <div class="xl:col-span-7 space-y-6">
+
+        {{-- Section: Info Dasar --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{
+            title: '{{ old('title', isset($article) ? $article->title : '') }}',
+            slug: '{{ old('slug', isset($article) ? $article->slug : '') }}',
+            autoSlug: {{ isset($article) ? 'false' : 'true' }},
+            generateSlug(text) {
+              return text.toLowerCase()
+                .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            }
+          }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">Informasi Dasar</h3>
+          </div>
+          <div class="p-6 space-y-5">
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Judul Artikel</label>
+              <input type="text" name="title" x-model="title"
+                @input="if(autoSlug) slug = generateSlug(title)"
+                placeholder="Misal: Festival Hanami di Taman Ueno"
+                class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+            </div>
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Slug (URL)
+                <span class="text-xs text-gray-400 font-normal ml-1" x-show="autoSlug">— auto-generate dari judul</span>
+              </label>
+              <input type="text" name="slug" x-model="slug"
+                @input="autoSlug = false"
+                placeholder="festival-hanami-taman-ueno"
+                class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 font-mono">
+              <p class="text-[10px] text-gray-400 mt-1" x-show="slug">Akan tampil di: <span class="text-brand-500">ukmnihon.com/artikel/<span x-text="slug"></span></span></p>
+            </div>
+          </div>
+        </div>
+
+        {{-- Section: Rich Text Editor (Quill.js) --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📝 Konten Artikel</h3>
+            <p class="text-xs text-gray-500 mt-1">Tulis isi artikel dengan editor rich text. Mendukung format, link, gambar, dan list.</p>
+          </div>
+          <div class="p-6">
+            {{-- Hidden textarea untuk menyimpan konten HTML ke server --}}
+            <textarea name="content" id="content-input" style="display:none;">{{ old('content', isset($article) ? $article->content : '') }}</textarea>
+            {{-- Quill Editor Container --}}
+            <div id="quill-editor-umum" class="rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700"></div>
+          </div>
+        </div>
+
+        {{-- Section: Media Upload --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{
+            mediaType: 'image',
+            imageFiles: [],
+            videoFile: null,
+            audioFile: null,
+            formatBytes(bytes) {
+              if (bytes < 1024) return bytes + ' B';
+              if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+              return (bytes / 1048576).toFixed(1) + ' MB';
+            },
+            handleImageDrop(e) {
+              const files = Array.from(e.dataTransfer?.files || e.target.files || []);
+              files.forEach(f => {
+                if (f.type.startsWith('image/') && this.imageFiles.length < 5) {
+                  const reader = new FileReader();
+                  reader.onload = ev => this.imageFiles.push({ name: f.name, size: f.size, preview: ev.target.result, file: f });
+                  reader.readAsDataURL(f);
+                }
+              });
+            },
+            handleVideoChange(e) {
+              const f = e.target.files[0];
+              if (f) this.videoFile = { name: f.name, size: f.size };
+            },
+            handleAudioChange(e) {
+              const f = e.target.files[0];
+              if (f) this.audioFile = { name: f.name, size: f.size };
+            },
+            removeImage(i) { this.imageFiles.splice(i, 1); }
+          }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📎 Media Tambahan</h3>
+            <p class="text-xs text-gray-500 mt-1">Sisipkan gambar, video, audio, atau link YouTube.</p>
+          </div>
+          <div class="p-6">
+            {{-- Tab Media --}}
+            <div class="flex gap-2 mb-5 flex-wrap">
+              <button type="button" @click="mediaType = 'image'"
+                :class="mediaType === 'image' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5">
+                🖼️ Gambar
+              </button>
+              <button type="button" @click="mediaType = 'video'"
+                :class="mediaType === 'video' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5">
+                🎬 Video
+              </button>
+              <button type="button" @click="mediaType = 'youtube'"
+                :class="mediaType === 'youtube' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5">
+                ▶️ YouTube
+              </button>
+              <button type="button" @click="mediaType = 'audio'"
+                :class="mediaType === 'audio' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5">
+                🎵 Audio / MP3
+              </button>
+            </div>
+
+            {{-- Upload Area: Image --}}
+            <div x-show="mediaType === 'image'" x-transition>
+              <label
+                class="media-drop-zone flex flex-col items-center justify-center w-full min-h-[140px] rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors"
+                :class="imageFiles.length > 0 ? 'has-file' : ''"
+                @dragover.prevent="$el.classList.add('drag-over')"
+                @dragleave.prevent="$el.classList.remove('drag-over')"
+                @drop.prevent="$el.classList.remove('drag-over'); handleImageDrop($event)"
+                for="image-upload">
+                <input type="file" id="image-upload" name="media_images[]" multiple accept="image/jpeg,image/png,image/webp,image/gif"
+                  class="sr-only" @change="handleImageDrop($event)">
+                <div class="text-center py-4" x-show="imageFiles.length === 0">
+                  <svg class="mx-auto w-10 h-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M18 13.5V6.75A2.25 2.25 0 0015.75 4.5h-13.5A2.25 2.25 0 000 6.75v10.5A2.25 2.25 0 002.25 19.5h15" />
+                  </svg>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Drag & drop gambar atau <span class="text-brand-500 font-medium">klik untuk upload</span></p>
+                  <p class="text-[10px] text-gray-400 mt-1">JPG, PNG, WebP — Maks 5MB per file, hingga 5 gambar</p>
+                </div>
+                {{-- Image previews --}}
+                <div x-show="imageFiles.length > 0" class="w-full p-3">
+                  <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-2">
+                    <template x-for="(img, i) in imageFiles" :key="i">
+                      <div class="relative file-preview-item group aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <img :src="img.preview" class="w-full h-full object-cover">
+                        <button type="button" @click.prevent="removeImage(i)"
+                          class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none">✕</button>
+                      </div>
+                    </template>
+                    <label for="image-upload" class="aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center cursor-pointer hover:border-brand-400 transition-colors" x-show="imageFiles.length < 5">
+                      <span class="text-2xl text-gray-400">+</span>
+                    </label>
+                  </div>
+                  <p class="text-[10px] text-gray-400 text-center" x-text="imageFiles.length + ' gambar dipilih'"></p>
+                </div>
+              </label>
+            </div>
+
+            {{-- Upload Area: Video --}}
+            <div x-show="mediaType === 'video'" x-transition>
+              <label
+                class="media-drop-zone flex items-center justify-center w-full h-40 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors"
+                :class="videoFile ? 'has-file' : ''"
+                for="video-upload">
+                <input type="file" id="video-upload" name="media_video" accept="video/mp4,video/webm,video/ogg"
+                  class="sr-only" @change="handleVideoChange($event)">
+                <div class="text-center" x-show="!videoFile">
+                  <svg class="mx-auto w-10 h-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+                  </svg>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload video — <span class="text-brand-500 font-medium">klik untuk pilih</span></p>
+                  <p class="text-[10px] text-gray-400 mt-1">MP4, WebM — Maks 50MB</p>
+                </div>
+                <div x-show="videoFile" class="flex items-center gap-3 px-4">
+                  <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-brand-500/10 shrink-0">
+                    <span class="text-2xl">🎬</span>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <p class="text-sm font-medium text-gray-800 dark:text-white/90 truncate" x-text="videoFile?.name"></p>
+                    <p class="text-xs text-gray-500" x-text="formatBytes(videoFile?.size || 0)"></p>
+                    <button type="button" @click.prevent="videoFile = null; $el.closest('label').querySelector('input').value = ''"
+                      class="text-xs text-red-500 hover:text-red-600 mt-1">Hapus</button>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            {{-- Input: YouTube --}}
+            <div x-show="mediaType === 'youtube'" x-transition>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Link YouTube</label>
+              <div class="flex items-center gap-2">
+                <span class="flex items-center justify-center w-11 h-11 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 shrink-0">
+                  <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                </span>
+                <input type="url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=..."
+                  class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+              </div>
+              <p class="text-xs text-gray-400 mt-1.5">Video akan ditanamkan (embed) secara otomatis di halaman artikel.</p>
+            </div>
+
+            {{-- Upload Area: Audio --}}
+            <div x-show="mediaType === 'audio'" x-transition>
+              <label
+                class="media-drop-zone flex items-center justify-center w-full h-36 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors"
+                :class="audioFile ? 'has-file' : ''"
+                for="audio-upload">
+                <input type="file" id="audio-upload" name="media_audio" accept="audio/mpeg,audio/wav,audio/ogg"
+                  class="sr-only" @change="handleAudioChange($event)">
+                <div class="text-center" x-show="!audioFile">
+                  <span class="text-3xl mb-2 block">🎵</span>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload audio — <span class="text-brand-500 font-medium">MP3, WAV, OGG</span></p>
+                  <p class="text-[10px] text-gray-400 mt-1">Maks 20MB</p>
+                </div>
+                <div x-show="audioFile" class="flex items-center gap-3 px-4">
+                  <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-brand-500/10 shrink-0">
+                    <span class="text-2xl">🎧</span>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <p class="text-sm font-medium text-gray-800 dark:text-white/90 truncate" x-text="audioFile?.name"></p>
+                    <p class="text-xs text-gray-500" x-text="formatBytes(audioFile?.size || 0)"></p>
+                    <button type="button" @click.prevent="audioFile = null; $el.closest('label').querySelector('input').value = ''"
+                      class="text-xs text-red-500 hover:text-red-600 mt-1">Hapus</button>
+                  </div>
+                </div>
+              </label>
+              <div class="mt-3">
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Label Audio</label>
+                <input type="text" name="audio_label" placeholder="Misal: Lagu Sakura Sakura"
+                  class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {{-- =================== KOLOM KANAN (30%) =================== --}}
+      <div class="xl:col-span-3 space-y-6">
+
+        {{-- Status Info --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">Status Publikasi</label>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Status ditentukan berdasarkan tombol yang Anda klik di bawah:
+          </p>
+          <div class="mt-3 space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-yellow-50 text-yellow-600 dark:bg-yellow-500/15 dark:text-yellow-400">Draft</span>
+              <span class="text-xs text-gray-500">→ Klik "Simpan Draft"</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400">Published</span>
+              <span class="text-xs text-gray-500">→ Klik "Publish"</span>
+            </div>
+          </div>
+          @if(isset($article))
+          <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+            <p class="text-xs text-gray-500">Status saat ini:
+              <span class="font-semibold {{ $article->status === 'published' ? 'text-green-500' : 'text-yellow-500' }}">{{ ucfirst($article->status) }}</span>
+            </p>
+          </div>
+          @endif
+        </div>
+
+        {{-- Kategori --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Kategori</label>
+          <select name="category_id"
+            class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">
+            <option value="">Pilih Kategori...</option>
+            @foreach($categories as $cat)
+              <option value="{{ $cat->id }}" {{ old('category_id', isset($article) ? $article->category_id : '') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+            @endforeach
+          </select>
+        </div>
+
+        {{-- Thumbnail --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5"
+          x-data="{ thumbPreview: null }"
+          @drop.prevent="
+            const f = $event.dataTransfer.files[0];
+            if (f?.type.startsWith('image/')) {
+              const r = new FileReader();
+              r.onload = e => thumbPreview = e.target.result;
+              r.readAsDataURL(f);
+            }
+          "
+          @dragover.prevent>
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Thumbnail / Cover</label>
+          <label for="cover-image"
+            class="relative flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors overflow-hidden"
+            :class="thumbPreview ? 'h-44' : 'h-32'">
+            <input type="file" id="cover-image" name="cover_image" accept="image/*" class="sr-only"
+              @change="const f=$event.target.files[0]; if(f){const r=new FileReader();r.onload=e=>thumbPreview=e.target.result;r.readAsDataURL(f)}">
+            <img x-show="thumbPreview" :src="thumbPreview" class="absolute inset-0 w-full h-full object-cover rounded-xl">
+            <div class="relative z-10 text-center py-4" x-show="!thumbPreview">
+              <svg class="mx-auto w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Drag & drop atau <span class="text-brand-500">klik</span></p>
+            </div>
+            <button x-show="thumbPreview" type="button"
+              @click.prevent="thumbPreview = null; document.getElementById('cover-image').value = ''"
+              class="absolute top-2 right-2 z-20 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs leading-none">✕</button>
+          </label>
+          <p class="text-[10px] text-gray-400 mt-1">JPG, PNG, WebP — Maks 2MB</p>
+        </div>
+
+        {{-- Excerpt --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Ringkasan Pendek</label>
+          <textarea name="excerpt" rows="3" placeholder="Tulis deskripsi singkat untuk SEO..."
+            class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">{{ old('excerpt', isset($article) ? $article->excerpt : '') }}</textarea>
+        </div>
+
+        {{-- Buttons --}}
+        <div class="flex gap-3">
+          <a href="{{ route('admin.articles.index') }}"
+            class="flex-1 text-center rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+            Batal
+          </a>
+          <button type="submit" name="action" value="draft"
+            class="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 transition-colors">
+            Simpan Draft
+          </button>
+          <button type="submit" name="action" value="publish"
+            class="flex-1 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors">
+            Publish
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+@endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Detect dark mode
+    const isDark = document.documentElement.classList.contains('dark');
+
+    const quill = new Quill('#quill-editor-umum', {
+      theme: 'snow',
+      placeholder: 'Tulis isi artikel di sini...',
+      modules: {
+        toolbar: [
+          [{ 'header': [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+          [{ 'indent': '-1'}, { 'indent': '+1' }],
+          ['blockquote', 'code-block'],
+          ['link', 'image'],
+          ['clean']
+        ]
+      }
+    });
+
+    // Sync konten Quill ke hidden textarea saat form di-submit
+    const form = document.getElementById('article-form');
+    form.addEventListener('submit', function() {
+      document.getElementById('content-input').value = quill.root.innerHTML;
+    });
+
+    // Populate dari old() jika ada validasi error
+    @if(old('content') || (isset($article) && $article->content))
+      quill.root.innerHTML = {!! json_encode(old('content', isset($article) ? $article->content : '')) !!};
+    @endif
+  });
+</script>
+@endpush
+```
+
+```diff:create-bahasa.blade.php
+@extends('layouts.app')
+
+@section('content')
+
+  {{-- Breadcrumb --}}
+  <div class="mb-6">
+    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
+      <a href="/articles" class="hover:text-brand-500">Kelola Artikel</a>
+      <span>›</span>
+      <span class="text-gray-800 dark:text-white/90 font-medium">Buat Artikel Bahasa</span>
+    </div>
+    <h2 class="text-xl font-bold text-gray-800 dark:text-white/90 sm:text-2xl">🎌 Buat Artikel Bahasa Jepang</h2>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Pembelajaran gaya Tae Kim — konten + tabel referensi + audio + kuis review.</p>
+  </div>
+
+  <form action="#" method="POST" enctype="multipart/form-data">
+    @csrf
+
+    <div class="grid grid-cols-1 xl:grid-cols-10 gap-6">
+
+      {{-- =================== KOLOM KIRI (70%) =================== --}}
+      <div class="xl:col-span-7 space-y-6">
+
+        {{-- ===== SECTION A: Info Dasar ===== --}}
+        {{-- 🟡 5. AUTO SLUG: Judul otomatis jadi slug --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{
+            title: '',
+            slug: '',
+            autoSlug: true,
+            generateSlug(text) {
+              return text.toLowerCase()
+                .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            }
+          }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📌 Informasi Dasar</h3>
+          </div>
+          <div class="p-6 space-y-5">
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Judul Artikel</label>
+              <input type="text" name="title" x-model="title"
+                @input="if(autoSlug) slug = generateSlug(title)"
+                placeholder="Misal: Kata Tunjuk dalam Bahasa Jepang"
+                class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+            </div>
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Slug (URL)
+                <span class="text-xs text-gray-400 font-normal ml-1" x-show="autoSlug">— auto-generate dari judul</span>
+              </label>
+              <input type="text" name="slug" x-model="slug"
+                @input="autoSlug = false"
+                placeholder="kata-tunjuk-bahasa-jepang"
+                class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 font-mono">
+              <p class="text-[10px] text-gray-400 mt-1" x-show="slug">Akan tampil di: <span class="text-brand-500">ukmnihon.com/bahasa/<span x-text="slug"></span></span></p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Kategori Bahasa</label>
+                <select name="language_category"
+                  class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">
+                  <option>Pilih...</option>
+                  <option>Writing (Hiragana/Katakana)</option>
+                  <option>Kanji</option>
+                  <option>Grammar</option>
+                  <option>Vocabulary</option>
+                  <option>Conversation</option>
+                  <option>Reading Comprehension</option>
+                </select>
+              </div>
+              <div>
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Level</label>
+                <select name="level"
+                  class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">
+                  <option>Pemula (N5)</option>
+                  <option>Menengah (N4-N3)</option>
+                  <option>Lanjut (N2-N1)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{-- ===== SECTION B: Konten Pembelajaran ===== --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📖 Konten Pembelajaran</h3>
+            <p class="text-xs text-gray-500 mt-1">Tulis penjelasan materi, grammar, contoh kalimat. Gaya Tae Kim.</p>
+          </div>
+          <div class="p-6">
+            <div class="rounded-lg border border-gray-300 dark:border-gray-700 overflow-hidden">
+              {{-- Toolbar --}}
+              <div class="flex items-center gap-1 flex-wrap border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2">
+                <button type="button" class="px-2 py-1 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">B</button>
+                <button type="button" class="px-2 py-1 text-xs italic text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">I</button>
+                <button type="button" class="px-2 py-1 text-xs underline text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">U</button>
+                <span class="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1"></span>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">H1</button>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">H2</button>
+                <span class="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1"></span>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">🔗</button>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">🖼️</button>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">📋</button>
+                <button type="button" class="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded font-mono">ルビ Furigana</button>
+              </div>
+              <textarea name="content" rows="14" placeholder="Tulis penjelasan materi di sini...
+
+Contoh:
+## Kata Tunjuk (Demonstrative)
+Dalam bahasa Jepang, ada tiga kata tunjuk utama:
+- これ (kore) — ini (dekat pembicara)
+- それ (sore) — itu (dekat pendengar)
+- あれ (are) — itu (jauh dari keduanya)
+
+### Contoh Kalimat
+これは本です。(Kore wa hon desu.) — Ini adalah buku."
+                class="w-full border-0 bg-transparent px-4 py-3 text-sm text-gray-800 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:outline-hidden focus:ring-0"></textarea>
+            </div>
+          </div>
+        </div>
+
+        {{-- ===== SECTION C: Tabel Kosakata / Karakter ===== --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{
+            rows: [
+              { kanji: '', furigana: '', meaning: '', example: '' }
+            ],
+            addRow() {
+              this.rows.push({ kanji: '', furigana: '', meaning: '', example: '' });
+            },
+            removeRow(index) {
+              if (this.rows.length > 1) this.rows.splice(index, 1);
+            }
+          }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📋 Tabel Kosakata / Referensi</h3>
+            <p class="text-xs text-gray-500 mt-1">Tabel karakter, kosakata, atau pola kalimat. Bisa ditambah/dihapus.</p>
+          </div>
+          <div class="p-6">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left border-b border-gray-200 dark:border-gray-700">
+                    <th class="pb-3 pr-3 font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">Kanji / Karakter</th>
+                    <th class="pb-3 pr-3 font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">Furigana / Romaji</th>
+                    <th class="pb-3 pr-3 font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">Arti (Indonesia)</th>
+                    <th class="pb-3 pr-3 font-medium text-gray-500 dark:text-gray-400 min-w-[180px]">Contoh Kalimat</th>
+                    <th class="pb-3 w-10"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="(row, index) in rows" :key="index">
+                    <tr class="border-b border-gray-100 dark:border-gray-800">
+                      <td class="py-2 pr-2">
+                        <input x-model="row.kanji" type="text" placeholder="これ"
+                          class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-1 focus:ring-brand-500/10 focus:outline-hidden" style="font-size: 16px;">
+                      </td>
+                      <td class="py-2 pr-2">
+                        <input x-model="row.furigana" type="text" placeholder="kore"
+                          class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-1 focus:ring-brand-500/10 focus:outline-hidden">
+                      </td>
+                      <td class="py-2 pr-2">
+                        <input x-model="row.meaning" type="text" placeholder="ini"
+                          class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-1 focus:ring-brand-500/10 focus:outline-hidden">
+                      </td>
+                      <td class="py-2 pr-2">
+                        <input x-model="row.example" type="text" placeholder="これは本です"
+                          class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-1 focus:ring-brand-500/10 focus:outline-hidden">
+                      </td>
+                      <td class="py-2">
+                        <button type="button" @click="removeRow(index)" class="text-red-400 hover:text-red-500 p-1">
+                          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <button type="button" @click="addRow()"
+              class="mt-4 flex items-center gap-2 text-sm font-medium text-brand-500 hover:text-brand-600 transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+              Tambah Baris
+            </button>
+          </div>
+        </div>
+
+        {{-- ===== SECTION D: Media (Gambar, Video, YouTube, Audio) ===== --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{ mediaType: 'audio' }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📎 Media Tambahan</h3>
+            <p class="text-xs text-gray-500 mt-1">Upload gambar, video, audio, atau embed YouTube.</p>
+          </div>
+          <div class="p-6">
+            <div class="flex gap-2 mb-5 flex-wrap">
+              <button type="button" @click="mediaType = 'audio'"
+                :class="mediaType === 'audio' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-colors">🎵 Audio / MP3</button>
+              <button type="button" @click="mediaType = 'image'"
+                :class="mediaType === 'image' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-colors">🖼️ Gambar</button>
+              <button type="button" @click="mediaType = 'video'"
+                :class="mediaType === 'video' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-colors">🎬 Video</button>
+              <button type="button" @click="mediaType = 'youtube'"
+                :class="mediaType === 'youtube' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-colors">▶️ YouTube</button>
+            </div>
+
+            {{-- Audio --}}
+            <div x-show="mediaType === 'audio'" x-transition>
+              <div class="flex items-center justify-center w-full h-28 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-pointer hover:border-brand-400 transition-colors">
+                <div class="text-center">
+                  <p class="text-2xl mb-1">🎧</p>
+                  <p class="text-xs text-gray-500">Upload MP3 / WAV — Maks 20MB</p>
+                </div>
+              </div>
+              <x-forms.input label="Label Audio" name="audio_label" placeholder="Misal: Percakapan di Restoran" />
+            </div>
+            {{-- Image --}}
+            <div x-show="mediaType === 'image'" x-transition>
+              <div class="flex items-center justify-center w-full h-28 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-pointer hover:border-brand-400 transition-colors">
+                <div class="text-center">
+                  <p class="text-2xl mb-1">🖼️</p>
+                  <p class="text-xs text-gray-500">Upload gambar JPG / PNG — Maks 5MB</p>
+                </div>
+              </div>
+            </div>
+            {{-- Video --}}
+            <div x-show="mediaType === 'video'" x-transition>
+              <div class="flex items-center justify-center w-full h-28 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-pointer hover:border-brand-400 transition-colors">
+                <div class="text-center">
+                  <p class="text-2xl mb-1">🎬</p>
+                  <p class="text-xs text-gray-500">Upload video MP4 / WebM — Maks 50MB</p>
+                </div>
+              </div>
+            </div>
+            {{-- YouTube --}}
+            <div x-show="mediaType === 'youtube'" x-transition>
+              <x-forms.input label="Link YouTube" name="youtube_url" placeholder="https://www.youtube.com/watch?v=..." />
+            </div>
+          </div>
+        </div>
+
+        {{-- ===== SECTION E: Kuis Review Interaktif ===== --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{
+            quizzes: [
+              {
+                question: '',
+                options: ['', '', '', ''],
+                correctAnswer: 0
+              }
+            ],
+            addQuiz() {
+              this.quizzes.push({
+                question: '',
+                options: ['', '', '', ''],
+                correctAnswer: 0
+              });
+            },
+            removeQuiz(index) {
+              if (this.quizzes.length > 1) this.quizzes.splice(index, 1);
+            },
+            addOption(qIndex) {
+              this.quizzes[qIndex].options.push('');
+            },
+            removeOption(qIndex, oIndex) {
+              if (this.quizzes[qIndex].options.length > 2) {
+                this.quizzes[qIndex].options.splice(oIndex, 1);
+              }
+            }
+          }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">🧠 Kuis Review</h3>
+            <p class="text-xs text-gray-500 mt-1">Soal latihan interaktif di akhir artikel. Pilihan ganda.</p>
+          </div>
+          <div class="p-6 space-y-6">
+            <template x-for="(quiz, qIndex) in quizzes" :key="qIndex">
+              <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-5 bg-gray-50/50 dark:bg-white/[0.02]">
+                {{-- Quiz Header --}}
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-sm font-bold text-gray-800 dark:text-white/90">
+                    Soal #<span x-text="qIndex + 1"></span>
+                  </h4>
+                  <button type="button" @click="removeQuiz(qIndex)" class="text-red-400 hover:text-red-500 text-xs font-medium">
+                    Hapus Soal
+                  </button>
+                </div>
+
+                {{-- Pertanyaan --}}
+                <div class="mb-4">
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Pertanyaan</label>
+                  <textarea x-model="quiz.question" rows="2" placeholder='Misal: Ketika seseorang bertanya "それは何ですか" sambil menunjuk benda di dekat Anda, Anda harus menjawab dengan:'
+                    class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden"></textarea>
+                </div>
+
+                {{-- Pilihan Jawaban --}}
+                <div class="space-y-3">
+                  <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-400">Pilihan Jawaban</label>
+                  <template x-for="(option, oIndex) in quiz.options" :key="oIndex">
+                    <div class="flex items-center gap-3">
+                      {{-- Radio untuk tandai jawaban benar --}}
+                      <input type="radio" :name="'correct_' + qIndex" :value="oIndex"
+                        x-model.number="quiz.correctAnswer"
+                        class="text-green-500 focus:ring-green-500"
+                        title="Tandai sebagai jawaban benar">
+                      {{-- Input opsi --}}
+                      <input x-model="quiz.options[oIndex]" type="text"
+                        :placeholder="'Opsi ' + String.fromCharCode(65 + oIndex)"
+                        class="flex-1 rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-1 focus:ring-brand-500/10 focus:outline-hidden">
+                      {{-- Hapus opsi --}}
+                      <button type="button" @click="removeOption(qIndex, oIndex)"
+                        class="text-gray-400 hover:text-red-400 transition-colors"
+                        x-show="quiz.options.length > 2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                  </template>
+                  <button type="button" @click="addOption(qIndex)"
+                    class="text-xs text-brand-500 hover:text-brand-600 font-medium">
+                    + Tambah Opsi
+                  </button>
+                </div>
+                <p class="mt-3 text-[10px] text-gray-400">🟢 Klik radio di kiri untuk menandai jawaban yang benar.</p>
+              </div>
+            </template>
+
+            {{-- Tombol Tambah Soal --}}
+            <button type="button" @click="addQuiz()"
+              class="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-brand-300 dark:border-brand-700 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/5 transition-colors font-medium text-sm">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+              Tambah Soal Lagi
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      {{-- =================== KOLOM KANAN (30%) =================== --}}
+      <div class="xl:col-span-3 space-y-6">
+
+        {{-- Status --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">Status Publikasi</label>
+          <div class="space-y-2">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="status" value="published" checked class="text-brand-500 focus:ring-brand-500">
+              <span class="text-sm text-gray-800 dark:text-white/90">Published</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="status" value="draft" class="text-brand-500 focus:ring-brand-500">
+              <span class="text-sm text-gray-800 dark:text-white/90">Draft</span>
+            </label>
+          </div>
+        </div>
+
+        {{-- Thumbnail --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Thumbnail / Cover</label>
+          <div class="flex items-center justify-center w-full h-36 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-pointer hover:border-brand-400 transition-colors">
+            <div class="text-center">
+              <svg class="mx-auto w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
+              <p class="mt-1 text-xs text-gray-500">Drag & Drop</p>
+            </div>
+          </div>
+        </div>
+
+        {{-- Excerpt --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Ringkasan Pendek</label>
+          <textarea name="excerpt" rows="3" placeholder="Penjelasan singkat 1-2 kalimat..."
+            class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden"></textarea>
+        </div>
+
+        {{-- Estimasi Waktu --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <x-forms.input label="Estimasi Waktu Baca" name="read_time" placeholder="5 menit" />
+        </div>
+
+        {{-- Info Kuis --}}
+        <div class="rounded-xl border border-blue-200 bg-blue-50 dark:border-blue-500/30 dark:bg-blue-500/10 p-4">
+          <div class="flex items-start gap-2">
+            <span class="text-blue-500 mt-0.5">ℹ️</span>
+            <div>
+              <p class="text-xs font-medium text-blue-800 dark:text-blue-300">Kuis akan muncul di akhir artikel</p>
+              <p class="text-[10px] text-blue-600/70 dark:text-blue-400/70 mt-1">Pembaca harus menyelesaikan kuis sebelum dianggap "selesai" membaca artikel.</p>
+            </div>
+          </div>
+        </div>
+
+        {{-- Buttons --}}
+        <div class="flex gap-3">
+          <x-ui.button variant="outline" type="button" tag="a" href="/articles">
+            Batal
+          </x-ui.button>
+          <x-ui.button type="submit">
+            Simpan Artikel
+          </x-ui.button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+@endsection
+===
+@extends('layouts.admin')
+
+@push('styles')
+{{-- Quill Snow Theme --}}
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+<style>
+  /* Quill editor dark mode support */
+  .dark .ql-toolbar {
+    background-color: #1d2939;
+    border-color: #374151 !important;
+  }
+  .dark .ql-container {
+    background-color: #111827;
+    border-color: #374151 !important;
+    color: rgba(255,255,255,0.9);
+  }
+  .dark .ql-toolbar .ql-stroke { stroke: #9ca3af; }
+  .dark .ql-toolbar .ql-fill { fill: #9ca3af; }
+  .dark .ql-toolbar .ql-picker-label { color: #9ca3af; }
+  .dark .ql-toolbar button:hover .ql-stroke,
+  .dark .ql-toolbar button.ql-active .ql-stroke { stroke: #ffffff; }
+  .dark .ql-toolbar button:hover .ql-fill,
+  .dark .ql-toolbar button.ql-active .ql-fill { fill: #ffffff; }
+  .dark .ql-editor.ql-blank::before { color: rgba(255,255,255,0.3); }
+  .dark .ql-picker-options { background-color: #1d2939; border-color: #374151; }
+  .dark .ql-picker-item { color: #9ca3af; }
+  .ql-editor { min-height: 320px; font-size: 14px; line-height: 1.8; }
+  .ql-toolbar.ql-snow { border-radius: 0.5rem 0.5rem 0 0; }
+  .ql-container.ql-snow { border-radius: 0 0 0.5rem 0.5rem; }
+
+  /* Quill furigana/Japanese font support */
+  .ql-editor {
+    font-family: 'Noto Sans JP', -apple-system, sans-serif;
+  }
+
+  /* Media Upload Area */
+  .media-drop-zone { transition: all 0.2s ease; }
+  .media-drop-zone.drag-over {
+    border-color: #448646;
+    background-color: rgba(68, 134, 70, 0.08);
+  }
+  .media-drop-zone.has-file {
+    border-color: #448646;
+    background-color: rgba(68, 134, 70, 0.05);
+  }
+  .file-preview-item { animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+@endpush
+
+@section('content')
+
+  {{-- Breadcrumb --}}
+  <div class="mb-6">
+    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
+      <a href="/admin/articles" class="hover:text-brand-500">Kelola Artikel</a>
+      <span>›</span>
+      <span class="text-gray-800 dark:text-white/90 font-medium">{{ isset($article) ? 'Edit Artikel Bahasa' : 'Buat Artikel Bahasa' }}</span>
+    </div>
+    <h2 class="text-xl font-bold text-gray-800 dark:text-white/90 sm:text-2xl">🎌 {{ isset($article) ? 'Edit: ' . $article->title : 'Buat Artikel Bahasa Jepang' }}</h2>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Pembelajaran gaya Tae Kim — konten + tabel referensi + audio + kuis review.</p>
+  </div>
+
+  <form action="{{ isset($article) ? route('admin.articles.update', $article) : route('admin.articles.store') }}" method="POST" enctype="multipart/form-data" id="bahasa-form">
+    @csrf
+    @if(isset($article)) @method('PUT') @endif
+    <input type="hidden" name="type" value="bahasa">
+
+    <div class="grid grid-cols-1 xl:grid-cols-10 gap-6">
+
+      {{-- =================== KOLOM KIRI (70%) =================== --}}
+      <div class="xl:col-span-7 space-y-6">
+
+        {{-- ===== SECTION A: Info Dasar ===== --}}
+        {{-- 🟡 5. AUTO SLUG: Judul otomatis jadi slug --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{
+            title: '{{ old('title', isset($article) ? addslashes($article->title) : '') }}',
+            slug: '{{ old('slug', isset($article) ? $article->slug : '') }}',
+            autoSlug: {{ isset($article) ? 'false' : 'true' }},
+            generateSlug(text) {
+              return text.toLowerCase()
+                .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            }
+          }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📌 Informasi Dasar</h3>
+          </div>
+          <div class="p-6 space-y-5">
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Judul Artikel</label>
+              <input type="text" name="title" x-model="title"
+                @input="if(autoSlug) slug = generateSlug(title)"
+                placeholder="Misal: Kata Tunjuk dalam Bahasa Jepang"
+                class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+            </div>
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Slug (URL)
+                <span class="text-xs text-gray-400 font-normal ml-1" x-show="autoSlug">— auto-generate dari judul</span>
+              </label>
+              <input type="text" name="slug" x-model="slug"
+                @input="autoSlug = false"
+                placeholder="kata-tunjuk-bahasa-jepang"
+                class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 font-mono">
+              <p class="text-[10px] text-gray-400 mt-1" x-show="slug">Akan tampil di: <span class="text-brand-500">ukmnihon.com/bahasa/<span x-text="slug"></span></span></p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Kategori Bahasa</label>
+                <select name="category_id"
+                  class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">
+                  <option value="">Pilih...</option>
+                  @foreach($categories as $cat)
+                    <option value="{{ $cat->id }}" {{ old('category_id', isset($article) ? $article->category_id : '') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                  @endforeach
+                </select>
+              </div>
+              <div>
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Level Kemahiran</label>
+                <select name="kemahiran_level"
+                  class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">
+                  <option value="">Pilih...</option>
+                  <option value="pemula"   {{ old('kemahiran_level', isset($article) ? $article->kemahiran_level : '') === 'pemula'   ? 'selected' : '' }}>🌱 Pemula</option>
+                  <option value="menengah" {{ old('kemahiran_level', isset($article) ? $article->kemahiran_level : '') === 'menengah' ? 'selected' : '' }}>🌿 Menengah</option>
+                  <option value="mahir"    {{ old('kemahiran_level', isset($article) ? $article->kemahiran_level : '') === 'mahir'    ? 'selected' : '' }}>🌳 Mahir</option>
+                </select>
+            </div>
+          </div>
+        </div>
+
+        {{-- ===== SECTION B: Konten Pembelajaran (Quill.js) ===== --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📖 Konten Pembelajaran</h3>
+            <p class="text-xs text-gray-500 mt-1">Tulis penjelasan materi, grammar, contoh kalimat. Mendukung furigana dan karakter Jepang.</p>
+          </div>
+          <div class="p-6">
+            {{-- Hidden textarea untuk menyimpan konten HTML ke server (dikirim sebagai 'content', controller akan simpan ke grammar_explanation untuk tipe bahasa) --}}
+            <textarea name="content" id="content-bahasa-input" style="display:none;">{{ old('content', isset($article) ? $article->grammar_explanation : '') }}</textarea>
+            {{-- Quill Editor Container --}}
+            <div id="quill-editor-bahasa"></div>
+          </div>
+        </div>
+
+        {{-- ===== SECTION C: Tabel Kosakata / Karakter ===== --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{
+            rows: {!! isset($article) && $article->vocabulary_list
+              ? json_encode(collect($article->vocabulary_list)->map(fn($v) => ['kanji' => $v['kata'] ?? '', 'furigana' => $v['romaji'] ?? '', 'meaning' => $v['arti'] ?? '', 'example' => $v['contoh'] ?? ''])->toArray())
+              : json_encode([['kanji' => '', 'furigana' => '', 'meaning' => '', 'example' => '']]) !!},
+            addRow() {
+              this.rows.push({ kanji: '', furigana: '', meaning: '', example: '' });
+            },
+            removeRow(index) {
+              if (this.rows.length > 1) this.rows.splice(index, 1);
+            }
+          }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📋 Tabel Kosakata / Referensi</h3>
+            <p class="text-xs text-gray-500 mt-1">Tabel karakter, kosakata, atau pola kalimat. Bisa ditambah/dihapus.</p>
+          </div>
+          <div class="p-6">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left border-b border-gray-200 dark:border-gray-700">
+                    <th class="pb-3 pr-3 font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">Kanji / Karakter</th>
+                    <th class="pb-3 pr-3 font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">Furigana / Romaji</th>
+                    <th class="pb-3 pr-3 font-medium text-gray-500 dark:text-gray-400 min-w-[120px]">Arti (Indonesia)</th>
+                    <th class="pb-3 pr-3 font-medium text-gray-500 dark:text-gray-400 min-w-[180px]">Contoh Kalimat</th>
+                    <th class="pb-3 w-10"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="(row, index) in rows" :key="index">
+                    <tr class="border-b border-gray-100 dark:border-gray-800">
+                      <td class="py-2 pr-2">
+                        <input x-model="row.kanji" type="text" placeholder="これ"
+                          :name="'vocabulary_list[' + index + '][kata]'"
+                          class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-1 focus:ring-brand-500/10 focus:outline-hidden" style="font-size: 16px;">
+                      </td>
+                      <td class="py-2 pr-2">
+                        <input x-model="row.furigana" type="text" placeholder="kore"
+                          :name="'vocabulary_list[' + index + '][romaji]'"
+                          class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-1 focus:ring-brand-500/10 focus:outline-hidden">
+                      </td>
+                      <td class="py-2 pr-2">
+                        <input x-model="row.meaning" type="text" placeholder="ini"
+                          :name="'vocabulary_list[' + index + '][arti]'"
+                          class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-1 focus:ring-brand-500/10 focus:outline-hidden">
+                      </td>
+                      <td class="py-2 pr-2">
+                        <input x-model="row.example" type="text" placeholder="これは本です"
+                          :name="'vocabulary_list[' + index + '][contoh]'"
+                          class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-1 focus:ring-brand-500/10 focus:outline-hidden">
+                      </td>
+                      <td class="py-2">
+                        <button type="button" @click="removeRow(index)" class="text-red-400 hover:text-red-500 p-1">
+                          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <button type="button" @click="addRow()"
+              class="mt-4 flex items-center gap-2 text-sm font-medium text-brand-500 hover:text-brand-600 transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+              Tambah Baris
+            </button>
+          </div>
+        </div>
+
+        {{-- ===== SECTION D: Media (Audio, Gambar, Video, YouTube) ===== --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{
+            mediaType: 'audio',
+            audioFile: null,
+            imageFiles: [],
+            videoFile: null,
+            formatBytes(bytes) {
+              if (bytes < 1024) return bytes + ' B';
+              if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+              return (bytes / 1048576).toFixed(1) + ' MB';
+            },
+            handleAudioChange(e) {
+              const f = e.target.files[0];
+              if (f) this.audioFile = { name: f.name, size: f.size };
+            },
+            handleImageDrop(e) {
+              const files = Array.from(e.dataTransfer?.files || e.target.files || []);
+              files.forEach(f => {
+                if (f.type.startsWith('image/') && this.imageFiles.length < 5) {
+                  const reader = new FileReader();
+                  reader.onload = ev => this.imageFiles.push({ name: f.name, size: f.size, preview: ev.target.result });
+                  reader.readAsDataURL(f);
+                }
+              });
+            },
+            handleVideoChange(e) {
+              const f = e.target.files[0];
+              if (f) this.videoFile = { name: f.name, size: f.size };
+            },
+            removeImage(i) { this.imageFiles.splice(i, 1); }
+          }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📎 Media Tambahan</h3>
+            <p class="text-xs text-gray-500 mt-1">Upload gambar, video, audio, atau embed YouTube.</p>
+          </div>
+          <div class="p-6">
+            <div class="flex gap-2 mb-5 flex-wrap">
+              <button type="button" @click="mediaType = 'audio'"
+                :class="mediaType === 'audio' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">🎵 Audio / MP3</button>
+              <button type="button" @click="mediaType = 'image'"
+                :class="mediaType === 'image' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">🖼️ Gambar</button>
+              <button type="button" @click="mediaType = 'video'"
+                :class="mediaType === 'video' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">🎬 Video</button>
+              <button type="button" @click="mediaType = 'youtube'"
+                :class="mediaType === 'youtube' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">▶️ YouTube</button>
+            </div>
+
+            {{-- Audio --}}
+            <div x-show="mediaType === 'audio'" x-transition>
+              <label
+                class="media-drop-zone flex items-center justify-center w-full h-36 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors"
+                :class="audioFile ? 'has-file' : ''"
+                for="audio-upload-bahasa">
+                <input type="file" id="audio-upload-bahasa" name="media_audio" accept="audio/mpeg,audio/wav,audio/ogg"
+                  class="sr-only" @change="handleAudioChange($event)">
+                <div class="text-center" x-show="!audioFile">
+                  <span class="text-3xl mb-2 block">🎧</span>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload audio — <span class="text-brand-500 font-medium">klik untuk pilih</span></p>
+                  <p class="text-[10px] text-gray-400 mt-1">MP3 / WAV — Maks 20MB</p>
+                </div>
+                <div x-show="audioFile" class="flex items-center gap-3 px-4">
+                  <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-brand-500/10 shrink-0">
+                    <span class="text-2xl">🎧</span>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <p class="text-sm font-medium text-gray-800 dark:text-white/90 truncate" x-text="audioFile?.name"></p>
+                    <p class="text-xs text-gray-500" x-text="formatBytes(audioFile?.size || 0)"></p>
+                    <button type="button" @click.prevent="audioFile = null; document.getElementById('audio-upload-bahasa').value = ''"
+                      class="text-xs text-red-500 hover:text-red-600 mt-1">Hapus</button>
+                  </div>
+                </div>
+              </label>
+              <div class="mt-3">
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Label Audio</label>
+                <input type="text" name="audio_label" placeholder="Misal: Percakapan di Restoran"
+                  class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+              </div>
+            </div>
+
+            {{-- Image --}}
+            <div x-show="mediaType === 'image'" x-transition>
+              <label
+                class="media-drop-zone flex flex-col items-center justify-center w-full min-h-[140px] rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors"
+                :class="imageFiles.length > 0 ? 'has-file' : ''"
+                @dragover.prevent="$el.classList.add('drag-over')"
+                @dragleave.prevent="$el.classList.remove('drag-over')"
+                @drop.prevent="$el.classList.remove('drag-over'); handleImageDrop($event)"
+                for="image-upload-bahasa">
+                <input type="file" id="image-upload-bahasa" name="media_images[]" multiple accept="image/*"
+                  class="sr-only" @change="handleImageDrop($event)">
+                <div class="text-center py-4" x-show="imageFiles.length === 0">
+                  <svg class="mx-auto w-10 h-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M18 13.5V6.75A2.25 2.25 0 0015.75 4.5h-13.5A2.25 2.25 0 000 6.75v10.5A2.25 2.25 0 002.25 19.5h15" />
+                  </svg>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Drag & drop gambar atau <span class="text-brand-500 font-medium">klik untuk upload</span></p>
+                  <p class="text-[10px] text-gray-400 mt-1">JPG, PNG, WebP — Maks 5MB per file</p>
+                </div>
+                <div x-show="imageFiles.length > 0" class="w-full p-3">
+                  <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-2">
+                    <template x-for="(img, i) in imageFiles" :key="i">
+                      <div class="relative file-preview-item group aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <img :src="img.preview" class="w-full h-full object-cover">
+                        <button type="button" @click.prevent="removeImage(i)"
+                          class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none">✕</button>
+                      </div>
+                    </template>
+                    <label for="image-upload-bahasa" class="aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center cursor-pointer hover:border-brand-400 transition-colors" x-show="imageFiles.length < 5">
+                      <span class="text-2xl text-gray-400">+</span>
+                    </label>
+                  </div>
+                  <p class="text-[10px] text-gray-400 text-center" x-text="imageFiles.length + ' gambar dipilih'"></p>
+                </div>
+              </label>
+            </div>
+
+            {{-- Video --}}
+            <div x-show="mediaType === 'video'" x-transition>
+              <label
+                class="media-drop-zone flex items-center justify-center w-full h-36 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors"
+                :class="videoFile ? 'has-file' : ''"
+                for="video-upload-bahasa">
+                <input type="file" id="video-upload-bahasa" name="media_video" accept="video/mp4,video/webm"
+                  class="sr-only" @change="handleVideoChange($event)">
+                <div class="text-center" x-show="!videoFile">
+                  <span class="text-3xl mb-2 block">🎬</span>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload video — <span class="text-brand-500 font-medium">klik untuk pilih</span></p>
+                  <p class="text-[10px] text-gray-400 mt-1">MP4 / WebM — Maks 50MB</p>
+                </div>
+                <div x-show="videoFile" class="flex items-center gap-3 px-4">
+                  <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-brand-500/10 shrink-0">
+                    <span class="text-2xl">🎬</span>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <p class="text-sm font-medium text-gray-800 dark:text-white/90 truncate" x-text="videoFile?.name"></p>
+                    <p class="text-xs text-gray-500" x-text="formatBytes(videoFile?.size || 0)"></p>
+                    <button type="button" @click.prevent="videoFile = null; document.getElementById('video-upload-bahasa').value = ''"
+                      class="text-xs text-red-500 hover:text-red-600 mt-1">Hapus</button>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            {{-- YouTube --}}
+            <div x-show="mediaType === 'youtube'" x-transition>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Link YouTube</label>
+              <div class="flex items-center gap-2">
+                <span class="flex items-center justify-center w-11 h-11 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 shrink-0">
+                  <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                </span>
+                <input type="url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=..."
+                  class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+              </div>
+              <p class="text-xs text-gray-400 mt-1.5">Video akan ditanamkan (embed) di halaman artikel.</p>
+            </div>
+          </div>
+        </div>
+
+        {{-- ===== SECTION E: Kuis Review Interaktif ===== --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+          x-data="{
+            quizzes: {!! isset($article) && $article->quiz_questions
+              ? json_encode(collect($article->quiz_questions)->map(fn($q) => ['question' => $q['question'] ?? '', 'options' => $q['options'] ?? ['', '', '', ''], 'correctAnswer' => $q['answer'] ?? 0])->toArray())
+              : json_encode([['question' => '', 'options' => ['', '', '', ''], 'correctAnswer' => 0]]) !!},
+            addQuiz() {
+              this.quizzes.push({
+                question: '',
+                options: ['', '', '', ''],
+                correctAnswer: 0
+              });
+            },
+            removeQuiz(index) {
+              if (this.quizzes.length > 1) this.quizzes.splice(index, 1);
+            },
+            addOption(qIndex) {
+              this.quizzes[qIndex].options.push('');
+            },
+            removeOption(qIndex, oIndex) {
+              if (this.quizzes[qIndex].options.length > 2) {
+                this.quizzes[qIndex].options.splice(oIndex, 1);
+              }
+            }
+          }">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">🧠 Kuis Review</h3>
+            <p class="text-xs text-gray-500 mt-1">Soal latihan interaktif di akhir artikel. Pilihan ganda.</p>
+          </div>
+          <div class="p-6 space-y-6">
+            <template x-for="(quiz, qIndex) in quizzes" :key="qIndex">
+              <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-5 bg-gray-50/50 dark:bg-white/[0.02]">
+                {{-- Quiz Header --}}
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-sm font-bold text-gray-800 dark:text-white/90">
+                    Soal #<span x-text="qIndex + 1"></span>
+                  </h4>
+                  <button type="button" @click="removeQuiz(qIndex)" class="text-red-400 hover:text-red-500 text-xs font-medium">
+                    Hapus Soal
+                  </button>
+                </div>
+
+                {{-- Pertanyaan --}}
+                <div class="mb-4">
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Pertanyaan</label>
+                  <textarea x-model="quiz.question" rows="2" placeholder='Misal: Ketika seseorang bertanya "それは何ですか" sambil menunjuk benda di dekat Anda, Anda harus menjawab dengan:'
+                    :name="'quiz_questions[' + qIndex + '][question]'"
+                    class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden"></textarea>
+                </div>
+
+                {{-- Hidden input untuk jawaban benar --}}
+                <input type="hidden" :name="'quiz_questions[' + qIndex + '][answer]'" :value="quiz.correctAnswer">
+
+                {{-- Pilihan Jawaban --}}
+                <div class="space-y-3">
+                  <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-400">Pilihan Jawaban</label>
+                  <template x-for="(option, oIndex) in quiz.options" :key="oIndex">
+                    <div class="flex items-center gap-3">
+                      {{-- Radio untuk tandai jawaban benar --}}
+                      <input type="radio" :name="'correct_' + qIndex" :value="oIndex"
+                        x-model.number="quiz.correctAnswer"
+                        class="text-green-500 focus:ring-green-500"
+                        title="Tandai sebagai jawaban benar">
+                      {{-- Input opsi (name attribute agar terkirim ke server) --}}
+                      <input x-model="quiz.options[oIndex]" type="text"
+                        :name="'quiz_questions[' + qIndex + '][options][' + oIndex + ']'"
+                        :placeholder="'Opsi ' + String.fromCharCode(65 + oIndex)"
+                        class="flex-1 rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-1 focus:ring-brand-500/10 focus:outline-hidden">
+                      {{-- Hapus opsi --}}
+                      <button type="button" @click="removeOption(qIndex, oIndex)"
+                        class="text-gray-400 hover:text-red-400 transition-colors"
+                        x-show="quiz.options.length > 2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                  </template>
+                  <button type="button" @click="addOption(qIndex)"
+                    class="text-xs text-brand-500 hover:text-brand-600 font-medium">
+                    + Tambah Opsi
+                  </button>
+                </div>
+                <p class="mt-3 text-[10px] text-gray-400">🟢 Klik radio di kiri untuk menandai jawaban yang benar.</p>
+              </div>
+            </template>
+
+            {{-- Tombol Tambah Soal --}}
+            <button type="button" @click="addQuiz()"
+              class="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-brand-300 dark:border-brand-700 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/5 transition-colors font-medium text-sm">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+              Tambah Soal Lagi
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      {{-- =================== KOLOM KANAN (30%) =================== --}}
+      <div class="xl:col-span-3 space-y-6">
+
+        {{-- Status Info --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">Status Publikasi</label>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Status ditentukan berdasarkan tombol yang Anda klik di bawah:
+          </p>
+          <div class="mt-3 space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-yellow-50 text-yellow-600 dark:bg-yellow-500/15 dark:text-yellow-400">Draft</span>
+              <span class="text-xs text-gray-500">→ Klik "Simpan Draft"</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400">Published</span>
+              <span class="text-xs text-gray-500">→ Klik "Publish"</span>
+            </div>
+          </div>
+          @if(isset($article))
+          <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+            <p class="text-xs text-gray-500">Status saat ini:
+              <span class="font-semibold {{ $article->status === 'published' ? 'text-green-500' : 'text-yellow-500' }}">{{ ucfirst($article->status) }}</span>
+            </p>
+          </div>
+          @endif
+        </div>
+
+        {{-- Thumbnail --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5"
+          x-data="{ thumbPreview: null }">
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Thumbnail / Cover</label>
+          <label for="cover-image-bahasa"
+            class="relative flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors overflow-hidden"
+            :class="thumbPreview ? 'h-44' : 'h-32'">
+            <input type="file" id="cover-image-bahasa" name="cover_image" accept="image/*" class="sr-only"
+              @change="const f=$event.target.files[0]; if(f){const r=new FileReader();r.onload=e=>thumbPreview=e.target.result;r.readAsDataURL(f)}">
+            <img x-show="thumbPreview" :src="thumbPreview" class="absolute inset-0 w-full h-full object-cover rounded-xl">
+            <div class="relative z-10 text-center py-4" x-show="!thumbPreview">
+              <svg class="mx-auto w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Drag & drop atau <span class="text-brand-500">klik</span></p>
+            </div>
+            <button x-show="thumbPreview" type="button"
+              @click.prevent="thumbPreview = null; document.getElementById('cover-image-bahasa').value = ''"
+              class="absolute top-2 right-2 z-20 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs leading-none">✕</button>
+          </label>
+          <p class="text-[10px] text-gray-400 mt-1">JPG, PNG, WebP — Maks 2MB</p>
+        </div>
+
+        {{-- Excerpt --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Ringkasan Pendek</label>
+          <textarea name="excerpt" rows="3" placeholder="Penjelasan singkat 1-2 kalimat..."
+            class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">{{ old('excerpt', isset($article) ? $article->excerpt : '') }}</textarea>
+        </div>
+
+        {{-- Estimasi Waktu --}}
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
+          <x-forms.input label="Estimasi Waktu Baca" name="read_time" placeholder="5 menit" />
+        </div>
+
+        {{-- Info Kuis --}}
+        <div class="rounded-xl border border-blue-200 bg-blue-50 dark:border-blue-500/30 dark:bg-blue-500/10 p-4">
+          <div class="flex items-start gap-2">
+            <span class="text-blue-500 mt-0.5">ℹ️</span>
+            <div>
+              <p class="text-xs font-medium text-blue-800 dark:text-blue-300">Kuis akan muncul di akhir artikel</p>
+              <p class="text-[10px] text-blue-600/70 dark:text-blue-400/70 mt-1">Pembaca harus menyelesaikan kuis sebelum dianggap "selesai" membaca artikel.</p>
+            </div>
+          </div>
+        </div>
+
+        {{-- Buttons --}}
+        <div class="flex gap-3">
+          <a href="{{ route('admin.articles.index') }}"
+            class="flex-1 text-center rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+            Batal
+          </a>
+          <button type="submit" name="action" value="draft"
+            class="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 transition-colors">
+            Simpan Draft
+          </button>
+          <button type="submit" name="action" value="publish"
+            class="flex-1 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors">
+            Publish
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+@endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const quill = new Quill('#quill-editor-bahasa', {
+      theme: 'snow',
+      placeholder: 'Tulis penjelasan materi di sini...\n\nContoh:\n## Kata Tunjuk (Demonstrative)\nDalam bahasa Jepang, ada tiga kata tunjuk: これ (kore) — ini, それ (sore) — itu, あれ (are) — itu (jauh)',
+      modules: {
+        toolbar: [
+          [{ 'header': [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'script': 'sub'}, { 'script': 'super' }],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+          [{ 'indent': '-1'}, { 'indent': '+1' }],
+          ['blockquote', 'code-block'],
+          ['link', 'image'],
+          [{ 'align': [] }],
+          ['clean']
+        ]
+      }
+    });
+
+    // Sync Quill content ke hidden textarea saat submit
+    const form = document.getElementById('bahasa-form');
+    form.addEventListener('submit', function() {
+      document.getElementById('content-bahasa-input').value = quill.root.innerHTML;
+    });
+
+    // Populate dari old() jika ada validasi error
+    @if(old('content') || (isset($article) && $article->grammar_explanation))
+      quill.root.innerHTML = {!! json_encode(old('content', isset($article) ? $article->grammar_explanation : '')) !!};
+    @endif
+  });
+</script>
+@endpush
+```
+
+---
+
+### 2. 🔄 Fix Sorting Terbaru / Terlama
+**Masalah:** `->latest()` dipanggil DUA kali di `index()` sehingga sorting "Terlama" tidak pernah bekerja.
+
+**Solusi:** Hapus `->latest()` dari query awal. Sekarang sorting **hanya** diatur oleh block `match`.
+
+```diff:ArticleController.php
+===
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Article;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
+class ArticleController extends Controller
+{
+    // =============================================
+    // INDEX — Halaman Kelola Artikel
+    // =============================================
+    public function index(Request $request)
+    {
+        $query = Article::with(['category', 'user']);
+
+        // Filter: Search judul
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter: Tipe (bahasa / umum)
+        if ($request->filled('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
+        }
+
+        // Filter: Kategori
+        if ($request->filled('category') && $request->category !== 'all') {
+            $query->whereHas('category', fn($q) => $q->where('slug', $request->category));
+        }
+
+        // Filter: Status
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Sorting
+        $sort = $request->get('sort', 'newest');
+        match($sort) {
+            'oldest' => $query->oldest(),
+            'views'  => $query->orderByDesc('view_count'),
+            default  => $query->latest(),
+        };
+
+        $articles   = $query->paginate(10)->withQueryString();
+        $categories = Category::all();
+
+        // Statistik untuk header dashboard
+        $stats = [
+            'total'     => Article::count(),
+            'published' => Article::where('status', 'published')->count(),
+            'draft'     => Article::where('status', 'draft')->count(),
+            'bahasa'    => Article::where('type', 'bahasa')->count(),
+        ];
+
+        return view('admin.articles.index', compact('articles', 'categories', 'stats'));
+    }
+
+    // =============================================
+    // CREATE — Form Artikel Umum
+    // =============================================
+    public function create()
+    {
+        $categories = Category::where('type', 'umum')->get();
+        return view('admin.articles.create', compact('categories'));
+    }
+
+    // =============================================
+    // CREATE BAHASA — Form Artikel Bahasa
+    // =============================================
+    public function createBahasa()
+    {
+        $categories = Category::where('type', 'bahasa')->get();
+        return view('admin.articles.create-bahasa', compact('categories'));
+    }
+
+    // =============================================
+    // STORE — Simpan Artikel Baru
+    // =============================================
+    public function store(Request $request)
+    {
+        $type = $request->input('type', 'umum');
+
+        // Tentukan status berdasarkan tombol yang ditekan
+        // Jika user klik "Simpan Draft" (action=draft), SELALU simpan sebagai draft
+        // Jika user klik "Publish" (action=publish), simpan sebagai published
+        $status = $request->input('action') === 'draft' ? 'draft' : 'published';
+
+        // Validasi dasar
+        $rules = [
+            'title'       => 'required|string|max:255',
+            'slug'        => 'nullable|string|max:255|unique:articles,slug',
+            'category_id' => 'nullable|exists:categories,id',
+            'excerpt'     => 'nullable|string|max:500',
+            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ];
+
+        // Validasi tambahan untuk artikel bahasa
+        if ($type === 'bahasa') {
+            $rules['kemahiran_level'] = 'nullable|in:pemula,menengah,mahir';
+        }
+        $rules['additional_images.*'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048';
+        $rules['audio_file'] = 'nullable|mimes:mp3,wav,ogg,m4a|max:20480';
+
+        $request->validate($rules);
+
+        // Handle upload cover image
+        $coverPath = null;
+        if ($request->hasFile('cover_image')) {
+            $coverPath = $request->file('cover_image')->store('articles/covers', 'public');
+        }
+
+        // Buat slug jika kosong
+        $slug = $request->filled('slug')
+            ? Str::slug($request->slug)
+            : Str::slug($request->title);
+
+        // Pastikan slug unik
+        $slug = $this->makeUniqueSlug($slug);
+
+        // Untuk artikel bahasa, konten dari Quill editor masuk ke grammar_explanation
+        $content = $request->content;
+        $grammarExplanation = null;
+        if ($type === 'bahasa') {
+            $grammarExplanation = $content; // Quill content → grammar_explanation
+            $content = null;
+        }
+
+        // Handle upload media tambahan (multiple images)
+        $additionalImages = [];
+        if ($request->hasFile('additional_images')) {
+            foreach ($request->file('additional_images') as $img) {
+                $additionalImages[] = $img->store('articles/media', 'public');
+            }
+        }
+
+        // Handle upload audio
+        $audioPath = null;
+        if ($request->hasFile('audio_file')) {
+            $audioPath = $request->file('audio_file')->store('articles/audio', 'public');
+        }
+
+        // Buat artikel
+        $article = Article::create([
+            'user_id'              => Auth::id(),
+            'category_id'         => $request->category_id,
+            'title'               => $request->title,
+            'slug'                => $slug,
+            'type'                => $type,
+            'excerpt'             => $request->excerpt,
+            'content'             => $content,
+            'cover_image'         => $coverPath,
+            'cover_image_caption' => $request->cover_image_caption,
+            'additional_images'   => !empty($additionalImages) ? $additionalImages : null,
+            'audio_file'          => $audioPath,
+            'audio_label'         => $request->audio_label,
+            'japanese_title'      => $request->japanese_title,
+            'romaji_title'        => $request->romaji_title,
+            'kemahiran_level'     => $request->kemahiran_level,
+            'grammar_explanation' => $grammarExplanation,
+            'vocabulary_list'     => $this->parseVocabList($request->vocabulary_list),
+            'quiz_questions'      => $this->parseQuiz($request->quiz_questions),
+            'status'              => $status,
+            'read_time'           => $request->read_time,
+        ]);
+
+        $label = $type === 'bahasa' ? 'Artikel Bahasa' : 'Artikel Umum';
+        $statusLabel = $status === 'draft' ? '(Draft)' : '(Published)';
+
+        return redirect()->route('admin.articles.index')
+            ->with('success', "✅ {$label} \"{$article->title}\" berhasil disimpan! {$statusLabel}");
+    }
+
+    // =============================================
+    // EDIT — Form Edit Artikel
+    // =============================================
+    public function edit(Article $article)
+    {
+        $categories = Category::where('type', $article->type)->get();
+        $view = $article->type === 'bahasa' ? 'admin.articles.create-bahasa' : 'admin.articles.create';
+        return view($view, compact('article', 'categories'));
+    }
+
+    // =============================================
+    // UPDATE — Simpan Perubahan Artikel
+    // =============================================
+    public function update(Request $request, Article $article)
+    {
+        // Tentukan status berdasarkan tombol yang ditekan
+        $status = $request->input('action') === 'draft' ? 'draft' : 'published';
+
+        $rules = [
+            'title'       => 'required|string|max:255',
+            'slug'        => 'nullable|string|max:255|unique:articles,slug,' . $article->id,
+            'category_id' => 'nullable|exists:categories,id',
+            'excerpt'     => 'nullable|string|max:500',
+            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'additional_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'audio_file'  => 'nullable|mimes:mp3,wav,ogg,m4a|max:20480',
+        ];
+
+        if ($article->type === 'bahasa') {
+            $rules['kemahiran_level'] = 'nullable|in:pemula,menengah,mahir';
+        }
+
+        $request->validate($rules);
+
+        // Handle cover image baru
+        if ($request->hasFile('cover_image')) {
+            if ($article->cover_image) {
+                Storage::disk('public')->delete($article->cover_image);
+            }
+            $coverPath = $request->file('cover_image')->store('articles/covers', 'public');
+        } else {
+            $coverPath = $article->cover_image;
+        }
+
+        // Handle additional images
+        $additionalImages = $article->additional_images ?? [];
+        if ($request->hasFile('additional_images')) {
+            foreach ($request->file('additional_images') as $img) {
+                $additionalImages[] = $img->store('articles/media', 'public');
+            }
+        }
+
+        // Handle audio file
+        $audioPath = $article->audio_file;
+        if ($request->hasFile('audio_file')) {
+            if ($article->audio_file) {
+                Storage::disk('public')->delete($article->audio_file);
+            }
+            $audioPath = $request->file('audio_file')->store('articles/audio', 'public');
+        }
+
+        $slug = $request->filled('slug')
+            ? Str::slug($request->slug)
+            : $article->slug;
+
+        // Untuk artikel bahasa, konten dari Quill editor masuk ke grammar_explanation
+        $content = $request->content;
+        $grammarExplanation = null;
+        if ($article->type === 'bahasa') {
+            $grammarExplanation = $content;
+            $content = null;
+        }
+
+        $article->update([
+            'category_id'         => $request->category_id,
+            'title'               => $request->title,
+            'slug'                => $slug,
+            'excerpt'             => $request->excerpt,
+            'content'             => $content,
+            'cover_image'         => $coverPath,
+            'cover_image_caption' => $request->cover_image_caption,
+            'additional_images'   => !empty($additionalImages) ? $additionalImages : null,
+            'audio_file'          => $audioPath,
+            'audio_label'         => $request->audio_label,
+            'youtube_url'         => $request->youtube_url,
+            'japanese_title'      => $request->japanese_title,
+            'romaji_title'        => $request->romaji_title,
+            'kemahiran_level'     => $request->kemahiran_level,
+            'grammar_explanation' => $grammarExplanation,
+            'vocabulary_list'     => $this->parseVocabList($request->vocabulary_list),
+            'quiz_questions'      => $this->parseQuiz($request->quiz_questions),
+            'status'              => $status,
+            'read_time'           => $request->read_time,
+        ]);
+
+        $statusLabel = $status === 'draft' ? '(Draft)' : '(Published)';
+
+        return redirect()->route('admin.articles.index')
+            ->with('success', "✅ Artikel \"{$article->title}\" berhasil diperbarui! {$statusLabel}");
+    }
+
+    // =============================================
+    // DESTROY — Hapus Artikel
+    // =============================================
+    // =============================================
+    // SHOW — Preview Artikel
+    // =============================================
+    public function show(Article $article)
+    {
+        $article->load(['category', 'user']);
+        return view('admin.articles.show', compact('article'));
+    }
+
+    // =============================================
+    // DESTROY — Hapus Artikel
+    // =============================================
+    public function destroy(Article $article)
+    {
+        // Hapus cover image dari storage
+        if ($article->cover_image) {
+            Storage::disk('public')->delete($article->cover_image);
+        }
+
+        $title = $article->title;
+        $article->delete();
+
+        return redirect()->route('admin.articles.index')
+            ->with('success', "🗑️ Artikel \"{$title}\" berhasil dihapus.");
+    }
+
+    // =============================================
+    // TOGGLE STATUS — Publish / Draft cepat
+    // =============================================
+    public function toggleStatus(Article $article)
+    {
+        $article->update([
+            'status' => $article->status === 'published' ? 'draft' : 'published',
+        ]);
+
+        $label = $article->status === 'published' ? 'dipublikasikan' : 'dikembalikan ke draft';
+        return back()->with('success', "✅ Artikel berhasil {$label}.");
+    }
+
+    // =============================================
+    // Helper: Buat slug unik
+    // =============================================
+    private function makeUniqueSlug(string $slug, ?int $exceptId = null): string
+    {
+        $original = $slug;
+        $counter  = 1;
+
+        while (
+            Article::where('slug', $slug)
+                ->when($exceptId, fn($q) => $q->where('id', '!=', $exceptId))
+                ->exists()
+        ) {
+            $slug = "{$original}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    // =============================================
+    // Helper: Parse vocabulary list dari form
+    // =============================================
+    private function parseVocabList($raw): ?array
+    {
+        if (empty($raw) || !is_array($raw)) return null;
+
+        $result = array_filter(array_map(function ($item) {
+            if (empty($item['kata']) && empty($item['arti'])) return null;
+            return [
+                'kata'    => $item['kata']    ?? '',
+                'romaji'  => $item['romaji']  ?? '',
+                'arti'    => $item['arti']    ?? '',
+                'contoh'  => $item['contoh']  ?? '',
+            ];
+        }, $raw));
+
+        return !empty($result) ? array_values($result) : null;
+    }
+
+    // =============================================
+    // Helper: Parse quiz questions dari form
+    // =============================================
+    private function parseQuiz($raw): ?array
+    {
+        if (empty($raw) || !is_array($raw)) return null;
+
+        $result = array_filter(array_map(function ($item) {
+            if (empty($item['question'])) return null;
+            // Filter out empty options
+            $options = array_values(array_filter($item['options'] ?? [], fn($o) => trim($o) !== ''));
+            return [
+                'question' => $item['question']        ?? '',
+                'options'  => $options,
+                'answer'   => (int)($item['answer']     ?? 0),
+            ];
+        }, $raw));
+
+        return !empty($result) ? array_values($result) : null;
+    }
+}
+```
+
+---
+
+### 3. 📎 Preview Media Tambahan di show.blade.php
+**Perubahan total** pada halaman Preview Artikel:
+- **Galeri Foto:** Grid gambar dengan hover effect menampilkan nama file asli
+- **Audio Player:** Player HTML5 dengan label dan nama file
+- **YouTube Embed:** Otomatis extract video ID dan tampilkan iframe embed
+- **Sidebar "Checklist Media":** Menampilkan ✓ hijau jika media ada, dengan nama file
+
+```diff:show.blade.php
+@extends('layouts.admin')
+
+@push('styles')
+<style>
+  /* Article content rendering */
+  .article-content h1 { font-size: 1.8em; font-weight: 800; margin: 1em 0 0.5em; }
+  .article-content h2 { font-size: 1.4em; font-weight: 700; margin: 1em 0 0.4em; }
+  .article-content h3 { font-size: 1.15em; font-weight: 600; margin: 0.8em 0 0.3em; }
+  .article-content p { margin-bottom: 0.8em; line-height: 1.8; }
+  .article-content ul, .article-content ol { padding-left: 1.5em; margin-bottom: 0.8em; }
+  .article-content li { margin-bottom: 0.3em; }
+  .article-content blockquote {
+    border-left: 4px solid #448646;
+    padding: 0.8em 1em;
+    margin: 1em 0;
+    background: rgba(68, 134, 70, 0.05);
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+  .article-content pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1em;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1em 0;
+  }
+  .article-content code {
+    background: rgba(0,0,0,0.1);
+    padding: 0.15em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+  }
+  .article-content img {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    margin: 1em 0;
+  }
+  .article-content a {
+    color: #448646;
+    text-decoration: underline;
+  }
+  .dark .article-content { color: rgba(255,255,255,0.85); }
+  .dark .article-content blockquote { background: rgba(68, 134, 70, 0.1); }
+  .dark .article-content code { background: rgba(255,255,255,0.1); }
+
+  /* Quiz interactive */
+  .quiz-option { transition: all 0.2s ease; }
+  .quiz-option:hover { transform: translateX(4px); }
+  .quiz-option.correct { background: rgba(34, 197, 94, 0.15) !important; border-color: #22c55e !important; }
+  .quiz-option.wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: #ef4444 !important; }
+</style>
+@endpush
+
+@section('content')
+
+  {{-- Breadcrumb --}}
+  <div class="mb-6">
+    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
+      <a href="{{ route('admin.articles.index') }}" class="hover:text-brand-500">Kelola Artikel</a>
+      <span>›</span>
+      <span class="text-gray-800 dark:text-white/90 font-medium">Preview</span>
+    </div>
+  </div>
+
+  {{-- Action Bar --}}
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ $article->status_badge }}">
+        {{ ucfirst($article->status) }}
+      </span>
+      <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ $article->type_badge }}">
+        {{ $article->type === 'bahasa' ? '🎌 Bahasa' : '🏯 Umum' }}
+      </span>
+      @if($article->category)
+        <span class="text-xs text-gray-500 dark:text-gray-400">📁 {{ $article->category->name }}</span>
+      @endif
+    </div>
+    <div class="flex items-center gap-2">
+      {{-- Toggle Status --}}
+      <form method="POST" action="{{ route('admin.articles.toggleStatus', $article) }}">
+        @csrf @method('PATCH')
+        <button type="submit"
+          class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors
+            {{ $article->status === 'published'
+              ? 'border-yellow-300 text-yellow-700 hover:bg-yellow-50 dark:border-yellow-500/30 dark:text-yellow-400 dark:hover:bg-yellow-500/10'
+              : 'border-green-300 text-green-700 hover:bg-green-50 dark:border-green-500/30 dark:text-green-400 dark:hover:bg-green-500/10' }}">
+          @if($article->status === 'published')
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Jadikan Draft
+          @else
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Publish
+          @endif
+        </button>
+      </form>
+      {{-- Edit --}}
+      <a href="{{ route('admin.articles.edit', $article) }}"
+        class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-2 text-xs font-medium text-white hover:bg-brand-600 transition-colors">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+        Edit
+      </a>
+      {{-- Delete --}}
+      <form method="POST" action="{{ route('admin.articles.destroy', $article) }}"
+        onsubmit="return confirm('Yakin hapus artikel ini?')">
+        @csrf @method('DELETE')
+        <button type="submit"
+          class="inline-flex items-center gap-1.5 rounded-lg border border-red-300 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-500/30 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          Hapus
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-10 gap-6">
+
+    {{-- =================== KOLOM KIRI (70%) =================== --}}
+    <div class="xl:col-span-7 space-y-6">
+
+      {{-- Cover Image --}}
+      @if($article->cover_image)
+      <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
+        <img src="{{ asset('storage/' . $article->cover_image) }}"
+          alt="{{ $article->title }}"
+          class="w-full h-64 sm:h-80 object-cover">
+        @if($article->cover_image_caption)
+          <div class="px-4 py-2 bg-gray-50 dark:bg-gray-800/50 text-xs text-gray-500 dark:text-gray-400 text-center italic">
+            {{ $article->cover_image_caption }}
+          </div>
+        @endif
+      </div>
+      @endif
+
+      {{-- Title & Meta --}}
+      <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+          {{ $article->title }}
+        </h1>
+        @if($article->japanese_title || $article->romaji_title)
+        <div class="mt-2 space-y-1">
+          @if($article->japanese_title)
+            <p class="text-lg text-gray-600 dark:text-gray-300" style="font-family: 'Noto Sans JP', sans-serif;">{{ $article->japanese_title }}</p>
+          @endif
+          @if($article->romaji_title)
+            <p class="text-sm text-gray-400 italic">{{ $article->romaji_title }}</p>
+          @endif
+        </div>
+        @endif
+        <div class="mt-4 flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+          <span>✍️ {{ $article->user?->name ?? 'Admin' }}</span>
+          <span>📅 {{ $article->created_at->format('d M Y, H:i') }}</span>
+          @if($article->read_time)
+            <span>⏱️ {{ $article->read_time }} menit baca</span>
+          @endif
+          @if($article->view_count > 0)
+            <span>👁️ {{ $article->view_count }}x dilihat</span>
+          @endif
+          @if($article->jlpt_level)
+            <span class="inline-flex rounded-full bg-purple-50 dark:bg-purple-500/15 px-2 py-0.5 font-semibold text-purple-600 dark:text-purple-400">
+              JLPT N{{ 6 - $article->jlpt_level }}
+            </span>
+          @endif
+        </div>
+        @if($article->excerpt)
+          <p class="mt-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed border-l-4 border-brand-300 dark:border-brand-700 pl-4 italic">
+            {{ $article->excerpt }}
+          </p>
+        @endif
+      </div>
+
+      {{-- Content --}}
+      @php
+        $contentHtml = $article->type === 'bahasa' ? $article->grammar_explanation : $article->content;
+      @endphp
+      @if($contentHtml)
+      <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
+            {{ $article->type === 'bahasa' ? '📖 Konten Pembelajaran' : '📝 Konten Artikel' }}
+          </h3>
+        </div>
+        <div class="p-6 article-content text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+          {!! $contentHtml !!}
+        </div>
+      </div>
+      @endif
+
+      {{-- Vocabulary Table (Bahasa only) --}}
+      @if($article->type === 'bahasa' && $article->vocabulary_list && count($article->vocabulary_list) > 0)
+      <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📋 Tabel Kosakata / Referensi</h3>
+          <p class="text-xs text-gray-500 mt-1">{{ count($article->vocabulary_list) }} entri kosakata</p>
+        </div>
+        <div class="p-6">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-200 dark:border-gray-700 text-left">
+                  <th class="pb-3 pr-3 font-semibold text-gray-600 dark:text-gray-300">Kanji / Karakter</th>
+                  <th class="pb-3 pr-3 font-semibold text-gray-600 dark:text-gray-300">Romaji</th>
+                  <th class="pb-3 pr-3 font-semibold text-gray-600 dark:text-gray-300">Arti</th>
+                  <th class="pb-3 font-semibold text-gray-600 dark:text-gray-300">Contoh</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach($article->vocabulary_list as $vocab)
+                <tr class="border-b border-gray-100 dark:border-gray-800">
+                  <td class="py-3 pr-3 text-lg" style="font-family: 'Noto Sans JP', sans-serif;">{{ $vocab['kata'] ?? '' }}</td>
+                  <td class="py-3 pr-3 text-gray-500 dark:text-gray-400">{{ $vocab['romaji'] ?? '' }}</td>
+                  <td class="py-3 pr-3 font-medium text-gray-800 dark:text-white">{{ $vocab['arti'] ?? '' }}</td>
+                  <td class="py-3 text-gray-500 dark:text-gray-400 italic" style="font-family: 'Noto Sans JP', sans-serif;">{{ $vocab['contoh'] ?? '' }}</td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      @endif
+
+      {{-- Quiz (Bahasa only) --}}
+      @if($article->type === 'bahasa' && $article->quiz_questions && count($article->quiz_questions) > 0)
+      <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+        x-data="{ answers: {}, revealed: {} }">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          <h3 class="text-base font-medium text-gray-800 dark:text-white/90">🧠 Kuis Review</h3>
+          <p class="text-xs text-gray-500 mt-1">{{ count($article->quiz_questions) }} soal — klik jawaban untuk mengecek</p>
+        </div>
+        <div class="p-6 space-y-6">
+          @foreach($article->quiz_questions as $qIndex => $quiz)
+          <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-5 bg-gray-50/50 dark:bg-white/[0.02]">
+            <h4 class="text-sm font-bold text-gray-800 dark:text-white/90 mb-4">
+              Soal #{{ $qIndex + 1 }}: {{ $quiz['question'] ?? '' }}
+            </h4>
+            <div class="space-y-2">
+              @foreach($quiz['options'] ?? [] as $oIndex => $option)
+              <button type="button"
+                @click="answers[{{ $qIndex }}] = {{ $oIndex }}; revealed[{{ $qIndex }}] = true"
+                class="quiz-option w-full text-left px-4 py-3 rounded-lg border text-sm transition-all"
+                :class="{
+                  'border-gray-200 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-600 bg-white dark:bg-gray-800': !revealed[{{ $qIndex }}],
+                  'correct': revealed[{{ $qIndex }}] && {{ $oIndex }} === {{ $quiz['answer'] ?? 0 }},
+                  'wrong': revealed[{{ $qIndex }}] && answers[{{ $qIndex }}] === {{ $oIndex }} && {{ $oIndex }} !== {{ $quiz['answer'] ?? 0 }},
+                  'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800': revealed[{{ $qIndex }}] && answers[{{ $qIndex }}] !== {{ $oIndex }} && {{ $oIndex }} !== {{ $quiz['answer'] ?? 0 }},
+                }">
+                <span class="font-semibold mr-2">{{ chr(65 + $oIndex) }}.</span>
+                {{ $option }}
+                <template x-if="revealed[{{ $qIndex }}] && {{ $oIndex }} === {{ $quiz['answer'] ?? 0 }}">
+                  <span class="float-right text-green-500">✓ Benar</span>
+                </template>
+                <template x-if="revealed[{{ $qIndex }}] && answers[{{ $qIndex }}] === {{ $oIndex }} && {{ $oIndex }} !== {{ $quiz['answer'] ?? 0 }}">
+                  <span class="float-right text-red-500">✗ Salah</span>
+                </template>
+              </button>
+              @endforeach
+            </div>
+          </div>
+          @endforeach
+        </div>
+      </div>
+      @endif
+
+    </div>
+
+    {{-- =================== KOLOM KANAN (30%) =================== --}}
+    <div class="xl:col-span-3 space-y-6">
+
+      {{-- Info Card --}}
+      <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5 space-y-4">
+        <h3 class="text-sm font-bold text-gray-800 dark:text-white/90">📊 Info Artikel</h3>
+
+        <div class="space-y-3 text-xs">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">ID</span>
+            <span class="font-mono font-medium text-gray-800 dark:text-white">#{{ $article->id }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Slug</span>
+            <span class="font-mono text-brand-500 text-[11px] truncate max-w-[150px]">{{ $article->slug }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Tipe</span>
+            <span class="inline-flex rounded-full px-2 py-0.5 font-semibold {{ $article->type_badge }}">{{ ucfirst($article->type) }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Status</span>
+            <span class="inline-flex rounded-full px-2 py-0.5 font-semibold {{ $article->status_badge }}">{{ ucfirst($article->status) }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Kategori</span>
+            <span class="font-medium text-gray-800 dark:text-white">{{ $article->category?->name ?? '-' }}</span>
+          </div>
+          @if($article->jlpt_level)
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">JLPT Level</span>
+            <span class="font-medium text-purple-600 dark:text-purple-400">N{{ 6 - $article->jlpt_level }}</span>
+          </div>
+          @endif
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Dibuat</span>
+            <span class="text-gray-800 dark:text-white">{{ $article->created_at->format('d M Y H:i') }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Diubah</span>
+            <span class="text-gray-800 dark:text-white">{{ $article->updated_at->format('d M Y H:i') }}</span>
+          </div>
+          @if($article->published_at)
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Dipublish</span>
+            <span class="text-green-600 dark:text-green-400">{{ $article->published_at->format('d M Y H:i') }}</span>
+          </div>
+          @endif
+        </div>
+      </div>
+
+      {{-- Data Summary --}}
+      <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5 space-y-4">
+        <h3 class="text-sm font-bold text-gray-800 dark:text-white/90">📦 Data Tersimpan</h3>
+        <div class="space-y-3 text-xs">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Cover Image</span>
+            <span class="{{ $article->cover_image ? 'text-green-500' : 'text-gray-400' }}">
+              {{ $article->cover_image ? '✅ Ada' : '❌ Kosong' }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Konten</span>
+            @php
+              $hasContent = $article->type === 'bahasa' ? !empty($article->grammar_explanation) : !empty($article->content);
+            @endphp
+            <span class="{{ $hasContent ? 'text-green-500' : 'text-gray-400' }}">
+              {{ $hasContent ? '✅ Ada' : '❌ Kosong' }}
+            </span>
+          </div>
+          @if($article->type === 'bahasa')
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Kosakata</span>
+            <span class="{{ $article->vocabulary_list ? 'text-green-500' : 'text-gray-400' }}">
+              {{ $article->vocabulary_list ? '✅ ' . count($article->vocabulary_list) . ' entri' : '❌ Kosong' }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Kuis</span>
+            <span class="{{ $article->quiz_questions ? 'text-green-500' : 'text-gray-400' }}">
+              {{ $article->quiz_questions ? '✅ ' . count($article->quiz_questions) . ' soal' : '❌ Kosong' }}
+            </span>
+          </div>
+          @endif
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 dark:text-gray-400">Excerpt</span>
+            <span class="{{ $article->excerpt ? 'text-green-500' : 'text-gray-400' }}">
+              {{ $article->excerpt ? '✅ Ada' : '❌ Kosong' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {{-- Back button --}}
+      <a href="{{ route('admin.articles.index') }}"
+        class="flex items-center justify-center gap-2 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+        ← Kembali ke Kelola Artikel
+      </a>
+
+    </div>
+  </div>
+
+@endsection
+===
+@extends('layouts.admin')
+
+@section('content')
+
+  {{-- Header & Breadcrumb --}}
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+        <a href="{{ route('admin.articles.index') }}" class="hover:text-brand-500">Kelola Artikel</a>
+        <span>›</span>
+        <span class="font-medium text-gray-800 dark:text-white/90">Preview Artikel</span>
+      </div>
+      <h2 class="text-xl font-bold text-gray-800 dark:text-white/90 sm:text-2xl">
+        {{ $article->type === 'bahasa' ? '🎌' : '🏯' }} Preview Artikel
+      </h2>
+    </div>
+    <div class="flex items-center gap-3 flex-wrap">
+      @if($article->type === 'bahasa' && $article->kemahiran_level)
+        @php
+          $levelConfig = [
+            'pemula'   => ['🌱', 'bg-green-50 text-green-700 dark:bg-green-500/15 dark:text-green-400'],
+            'menengah' => ['🌿', 'bg-yellow-50 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400'],
+            'mahir'    => ['🌳', 'bg-red-50 text-red-700 dark:bg-red-500/15 dark:text-red-400'],
+          ];
+          $lc = $levelConfig[$article->kemahiran_level] ?? ['📚', 'bg-gray-100 text-gray-600'];
+        @endphp
+        <span class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold {{ $lc[1] }}">
+          {{ $lc[0] }} {{ ucfirst($article->kemahiran_level) }}
+        </span>
+      @endif
+      <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ $article->status_badge }}">
+        {{ ucfirst($article->status) }}
+      </span>
+      <a href="{{ route('admin.articles.edit', $article) }}"
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:hover:bg-white/5 transition-colors">
+        ✏️ Edit Artikel
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+
+    {{-- =============== MAIN CONTENT =============== --}}
+    <div class="xl:col-span-8 space-y-6">
+
+      {{-- Cover Image --}}
+      @if($article->cover_image)
+        <div class="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+          <img src="{{ asset('storage/' . $article->cover_image) }}"
+            alt="Cover {{ $article->title }}"
+            class="w-full h-auto object-cover max-h-[420px]">
+          @if($article->cover_image_caption)
+            <div class="px-6 py-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40">
+              <p class="text-xs italic text-gray-500 dark:text-gray-400 text-center">{{ $article->cover_image_caption }}</p>
+            </div>
+          @endif
+        </div>
+      @endif
+
+      {{-- Article Header & Content --}}
+      <div class="rounded-2xl border border-gray-200 bg-white px-8 py-8 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="flex items-center gap-2 mb-4 flex-wrap">
+          <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold {{ $article->type_badge }}">
+            {{ $article->type === 'bahasa' ? '🎌 Bahasa' : '🏯 Umum' }}
+          </span>
+          @if($article->category)
+            <span class="text-gray-400">•</span>
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">{{ $article->category->name }}</span>
+          @endif
+          @if($article->read_time)
+            <span class="text-gray-400">•</span>
+            <span class="text-xs text-gray-400">⏱ {{ $article->read_time }} menit baca</span>
+          @endif
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white leading-tight mb-4">{{ $article->title }}</h1>
+
+        @if($article->type === 'bahasa' && ($article->japanese_title || $article->romaji_title))
+          <div class="mb-6 p-5 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
+            @if($article->japanese_title)
+              <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ $article->japanese_title }}</p>
+            @endif
+            @if($article->romaji_title)
+              <p class="text-sm italic text-gray-500 dark:text-gray-400 mt-1">{{ $article->romaji_title }}</p>
+            @endif
+          </div>
+        @endif
+
+        @if($article->excerpt)
+          <div class="mb-6 border-l-4 border-brand-500 pl-4 py-1">
+            <p class="text-base text-gray-600 dark:text-gray-400 font-medium leading-relaxed italic">{{ $article->excerpt }}</p>
+          </div>
+        @endif
+
+        @php $konten = $article->type === 'bahasa' ? $article->grammar_explanation : $article->content; @endphp
+        @if($konten)
+          <div class="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed">
+            {!! $konten !!}
+          </div>
+        @else
+          <div class="flex flex-col items-center py-10 text-gray-400">
+            <span class="text-4xl mb-2">📄</span>
+            <p class="text-sm italic">Belum ada konten artikel.</p>
+          </div>
+        @endif
+      </div>
+
+      {{-- ============================================= --}}
+      {{-- SECTION: MEDIA TAMBAHAN (Gambar, Audio, YouTube) --}}
+      {{-- ============================================= --}}
+      @if(($article->additional_images && count($article->additional_images) > 0) || $article->audio_file || $article->youtube_url)
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-bold text-gray-800 dark:text-white/90">📎 Media Tambahan</h3>
+            <p class="text-xs text-gray-500 mt-1">Semua media yang telah ditambahkan ke artikel ini.</p>
+          </div>
+          <div class="p-6 space-y-8">
+
+            {{-- === Galeri Foto === --}}
+            @if($article->additional_images && count($article->additional_images) > 0)
+              <div>
+                <div class="flex items-center gap-2 mb-4">
+                  <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-sm">🖼️</span>
+                  <div>
+                    <h4 class="text-sm font-bold text-gray-800 dark:text-white">Galeri Foto</h4>
+                    <p class="text-xs text-gray-500">{{ count($article->additional_images) }} gambar terlampir</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  @foreach($article->additional_images as $index => $imgPath)
+                    <div class="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 aspect-[4/3]">
+                      <img src="{{ asset('storage/' . $imgPath) }}"
+                        alt="Foto tambahan {{ $index + 1 }}"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                      {{-- Overlay info --}}
+                      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p class="text-[10px] text-white font-mono truncate">{{ basename($imgPath) }}</p>
+                      </div>
+                    </div>
+                  @endforeach
+                </div>
+              </div>
+            @endif
+
+            {{-- === Audio Player === --}}
+            @if($article->audio_file)
+              <div>
+                <div class="flex items-center gap-2 mb-4">
+                  <span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center text-sm">🎵</span>
+                  <div>
+                    <h4 class="text-sm font-bold text-gray-800 dark:text-white">
+                      {{ $article->audio_label ?: 'Audio' }}
+                    </h4>
+                    <p class="text-xs text-gray-500 font-mono">{{ basename($article->audio_file) }}</p>
+                  </div>
+                </div>
+                <div class="rounded-xl border border-purple-200 dark:border-purple-500/30 bg-purple-50 dark:bg-purple-500/5 p-4">
+                  <audio controls class="w-full">
+                    <source src="{{ asset('storage/' . $article->audio_file) }}" type="audio/mpeg">
+                    <source src="{{ asset('storage/' . $article->audio_file) }}" type="audio/ogg">
+                    Browser Anda tidak mendukung pemutar audio.
+                  </audio>
+                </div>
+              </div>
+            @endif
+
+            {{-- === YouTube Embed === --}}
+            @if($article->youtube_url)
+              @php
+                // Extract YouTube video ID
+                preg_match('/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $article->youtube_url, $matches);
+                $ytId = $matches[1] ?? null;
+              @endphp
+              <div>
+                <div class="flex items-center gap-2 mb-4">
+                  <span class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-sm">▶️</span>
+                  <div>
+                    <h4 class="text-sm font-bold text-gray-800 dark:text-white">Video YouTube</h4>
+                    <a href="{{ $article->youtube_url }}" target="_blank" class="text-xs text-brand-500 hover:underline truncate block max-w-xs">{{ $article->youtube_url }}</a>
+                  </div>
+                </div>
+                @if($ytId)
+                  <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 aspect-video">
+                    <iframe src="https://www.youtube.com/embed/{{ $ytId }}"
+                      class="w-full h-full"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen>
+                    </iframe>
+                  </div>
+                @else
+                  <div class="rounded-xl border border-yellow-200 bg-yellow-50 dark:border-yellow-500/30 dark:bg-yellow-500/10 p-4">
+                    <p class="text-xs text-yellow-700 dark:text-yellow-400">⚠️ URL YouTube tidak valid. Pastikan formatnya benar.</p>
+                  </div>
+                @endif
+              </div>
+            @endif
+
+          </div>
+        </div>
+      @endif
+
+      {{-- Kosakata Table --}}
+      @if($article->type === 'bahasa' && $article->vocabulary_list && count($article->vocabulary_list) > 0)
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800 bg-blue-50/30 dark:bg-transparent">
+            <h3 class="text-base font-bold text-gray-800 dark:text-white/90">📖 Daftar Kosakata</h3>
+            <p class="text-xs text-gray-500 mt-1">{{ count($article->vocabulary_list) }} entri kosakata</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.02]">
+                  <th class="px-6 py-3 text-left font-semibold text-gray-500 dark:text-gray-400">Kanji / Kata</th>
+                  <th class="px-6 py-3 text-left font-semibold text-gray-500 dark:text-gray-400">Romaji</th>
+                  <th class="px-6 py-3 text-left font-semibold text-gray-500 dark:text-gray-400">Arti</th>
+                  @if(collect($article->vocabulary_list)->contains(fn($v) => !empty($v['contoh'])))
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 dark:text-gray-400">Contoh</th>
+                  @endif
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                @foreach($article->vocabulary_list as $vocab)
+                  <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                    <td class="px-6 py-3 font-bold text-gray-800 dark:text-white text-lg">{{ $vocab['kata'] ?? '-' }}</td>
+                    <td class="px-6 py-3 text-gray-500 italic dark:text-gray-400">{{ $vocab['romaji'] ?? '-' }}</td>
+                    <td class="px-6 py-3 text-gray-800 dark:text-gray-300">{{ $vocab['arti'] ?? '-' }}</td>
+                    @if(collect($article->vocabulary_list)->contains(fn($v) => !empty($v['contoh'])))
+                      <td class="px-6 py-3 text-gray-500 dark:text-gray-400 font-medium">{{ $vocab['contoh'] ?? '' }}</td>
+                    @endif
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      @endif
+
+      {{-- Kuis Review --}}
+      @if($article->type === 'bahasa' && $article->quiz_questions && count($article->quiz_questions) > 0)
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800 bg-emerald-50/30 dark:bg-transparent">
+            <h3 class="text-base font-bold text-gray-800 dark:text-white/90">🧠 Kuis Review</h3>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ count($article->quiz_questions) }} soal — <span class="text-emerald-600 dark:text-emerald-400 font-semibold">kunci jawaban berwarna hijau</span>
+            </p>
+          </div>
+          <div class="p-6 space-y-6">
+            @foreach($article->quiz_questions as $index => $quiz)
+              <div class="p-5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-white/[0.02]">
+                <p class="font-bold text-gray-800 dark:text-white mb-4 text-base">
+                  Soal #{{ $index + 1 }}: {{ $quiz['question'] }}
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  @foreach($quiz['options'] as $oIndex => $opt)
+                    @php $isCorrect = (int)$quiz['answer'] === $oIndex; @endphp
+                    <div class="flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors
+                      {{ $isCorrect
+                        ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 dark:border-emerald-500/40'
+                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-white/[0.02]' }}">
+                      <span class="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold
+                        {{ $isCorrect
+                          ? 'bg-emerald-500 text-white'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400' }}">
+                        {{ chr(65 + $oIndex) }}
+                      </span>
+                      <span class="text-sm {{ $isCorrect
+                        ? 'font-bold text-emerald-700 dark:text-emerald-300'
+                        : 'text-gray-700 dark:text-gray-300' }}">
+                        {{ $opt }}
+                      </span>
+                      @if($isCorrect)
+                        <span class="ml-auto text-emerald-500 dark:text-emerald-400">
+                          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                          </svg>
+                        </span>
+                      @endif
+                    </div>
+                  @endforeach
+                </div>
+              </div>
+            @endforeach
+          </div>
+        </div>
+      @endif
+
+    </div>
+
+    {{-- =============== SIDEBAR INFO =============== --}}
+    <div class="xl:col-span-4 space-y-6">
+
+      {{-- Meta Info Card --}}
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <h4 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Informasi Artikel</h4>
+        <div class="space-y-3">
+          <div class="flex items-start justify-between gap-3 text-sm">
+            <span class="text-gray-500">Penulis</span>
+            <span class="font-medium text-gray-800 dark:text-white text-right">{{ $article->user?->name ?? 'Admin' }}</span>
+          </div>
+          <div class="flex items-start justify-between gap-3 text-sm">
+            <span class="text-gray-500">Dibuat</span>
+            <span class="font-medium text-gray-800 dark:text-white text-right">{{ $article->created_at->format('d M Y, H:i') }}</span>
+          </div>
+          <div class="flex items-start justify-between gap-3 text-sm">
+            <span class="text-gray-500">Diperbarui</span>
+            <span class="font-medium text-gray-800 dark:text-white text-right">{{ $article->updated_at->format('d M Y, H:i') }}</span>
+          </div>
+          @if($article->published_at)
+            <div class="flex items-start justify-between gap-3 text-sm">
+              <span class="text-gray-500">Dipublikasikan</span>
+              <span class="font-medium text-gray-800 dark:text-white text-right">{{ $article->published_at->format('d M Y, H:i') }}</span>
+            </div>
+          @endif
+          <hr class="my-2 dark:border-gray-800">
+          <div class="text-sm">
+            <p class="text-gray-500 mb-1.5">Slug:</p>
+            <code class="block w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs text-brand-500 break-all">{{ $article->slug }}</code>
+          </div>
+          <div class="text-sm">
+            <p class="text-gray-500 mb-1.5">URL Publik kelak:</p>
+            <code class="block w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs text-gray-500 break-all">
+              /{{ $article->type === 'bahasa' ? 'bahasa' : 'artikel' }}/{{ $article->slug }}
+            </code>
+          </div>
+        </div>
+      </div>
+
+      {{-- Media Checklist Card --}}
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <h4 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Checklist Media</h4>
+        <div class="space-y-3">
+          {{-- Cover Image --}}
+          <div class="flex items-center gap-3 text-sm">
+            <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->cover_image ? 'bg-green-100 dark:bg-green-500/20 text-green-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">🖼️</span>
+            <div class="flex-1 min-w-0">
+              <p class="{{ $article->cover_image ? 'text-gray-800 dark:text-white' : 'text-gray-400' }}">Cover Image</p>
+              @if($article->cover_image)
+                <p class="text-[10px] text-gray-400 font-mono truncate">{{ basename($article->cover_image) }}</p>
+              @endif
+            </div>
+            @if($article->cover_image)
+              <span class="text-xs font-bold text-green-600 dark:text-green-400">✓</span>
+            @else
+              <span class="text-xs text-gray-400">—</span>
+            @endif
+          </div>
+
+          {{-- Additional Images --}}
+          <div class="flex items-center gap-3 text-sm">
+            <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->additional_images ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">🗂️</span>
+            <div class="flex-1 min-w-0">
+              <p class="{{ $article->additional_images ? 'text-gray-800 dark:text-white' : 'text-gray-400' }}">Foto Tambahan</p>
+            </div>
+            @if($article->additional_images)
+              <span class="text-xs font-bold text-blue-600 dark:text-blue-400">{{ count($article->additional_images) }} foto</span>
+            @else
+              <span class="text-xs text-gray-400">—</span>
+            @endif
+          </div>
+
+          {{-- Audio --}}
+          <div class="flex items-center gap-3 text-sm">
+            <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->audio_file ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">🎵</span>
+            <div class="flex-1 min-w-0">
+              <p class="{{ $article->audio_file ? 'text-gray-800 dark:text-white' : 'text-gray-400' }}">
+                {{ $article->audio_label ?: 'Audio' }}
+              </p>
+              @if($article->audio_file)
+                <p class="text-[10px] text-gray-400 font-mono truncate">{{ basename($article->audio_file) }}</p>
+              @endif
+            </div>
+            @if($article->audio_file)
+              <span class="text-xs font-bold text-purple-600 dark:text-purple-400">✓</span>
+            @else
+              <span class="text-xs text-gray-400">—</span>
+            @endif
+          </div>
+
+          {{-- YouTube --}}
+          <div class="flex items-center gap-3 text-sm">
+            <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->youtube_url ? 'bg-red-100 dark:bg-red-500/20 text-red-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">▶️</span>
+            <div class="flex-1 min-w-0">
+              <p class="{{ $article->youtube_url ? 'text-gray-800 dark:text-white' : 'text-gray-400' }}">YouTube</p>
+              @if($article->youtube_url)
+                <p class="text-[10px] text-gray-400 truncate">{{ $article->youtube_url }}</p>
+              @endif
+            </div>
+            @if($article->youtube_url)
+              <span class="text-xs font-bold text-red-600 dark:text-red-400">✓</span>
+            @else
+              <span class="text-xs text-gray-400">—</span>
+            @endif
+          </div>
+        </div>
+      </div>
+
+      {{-- Quick Actions Card --}}
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <h4 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Aksi Cepat</h4>
+        <div class="space-y-3">
+          <form method="POST" action="{{ route('admin.articles.toggleStatus', $article) }}">
+            @csrf @method('PATCH')
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors
+              {{ $article->status === 'published'
+                ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:hover:bg-yellow-500/20'
+                : 'bg-emerald-500 text-white hover:bg-emerald-600' }}">
+              {{ $article->status === 'published' ? '⚠️ Kembalikan ke Draft' : '✅ Publikasikan Sekarang' }}
+            </button>
+          </form>
+          <a href="{{ route('admin.articles.edit', $article) }}"
+            class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors">
+            ✏️ Edit Artikel
+          </a>
+          <a href="{{ route('admin.articles.index') }}"
+            class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors">
+            ← Kembali ke Daftar
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+@endsection
+
+```
+
+---
+
+### 4. 🗄️ Database & Model
+- Tambah kolom `youtube_url` di migration
+- Update fillable di `Article` model
+
+---
+
+## ✅ Checklist Verifikasi Manual
+
+### Persiapan Awal
+Jalankan perintah ini di CMD:
+```cmd
+cd /d "c:\stis\NON KULIAH\Project\Web dev\CODELARAVELBARU\nihon-learn-laravel"
+php artisan migrate
+php artisan storage:link
+```
+
+> [!IMPORTANT]
+> Pastikan `php artisan serve` dan `npm run dev` sudah berjalan!
+
+---
+
+### Tes 1: Edit Artikel yang Sudah Ada
+1. Buka `http://localhost:8000/admin/articles`
+2. Klik tombol ✏️ (Edit) pada salah satu artikel yang sudah ada (misal "ddd")
+3. **Yang harus terjadi:**
+   - Judul halaman berubah: "🎌 Edit: ddd" (bukan "Buat Artikel Bahasa")
+   - Field **Judul** sudah terisi "ddd"
+   - Field **Slug** sudah terisi 
+   - **Konten Quill** sudah terisi (jika sebelumnya ada isi)
+   - **Tabel Kosakata** sudah terisi baris-baris yang pernah diisi
+   - **Soal Kuis** sudah terisi dengan opsi dan jawaban benar yang benar
+4. Ubah judul menjadi "ddd edited" → klik **Simpan Draft**
+5. **Yang harus terjadi:** Kembali ke halaman Kelola Artikel, judul berubah menjadi "ddd edited"
+
+---
+
+### Tes 2: Sorting Terbaru vs Terlama
+1. Di halaman Kelola Artikel, perhatikan urutan artikel saat ini (default: Terbaru)
+2. Ubah dropdown sorting ke **↑ Terlama**
+3. **Yang harus terjadi:** Artikel paling tua muncul di atas (tanggal paling lama di baris pertama)
+4. Ubah kembali ke **↓ Terbaru**
+5. **Yang harus terjadi:** Artikel terbaru kembali di atas
+
+---
+
+### Tes 3: Buat Artikel Baru + Upload Media
+1. Klik **+ Buat Artikel Baru** → pilih **Artikel Bahasa**
+2. Isi: Judul, Kategori, Level Kemahiran (pilih Pemula/Menengah/Mahir)
+3. Tulis sesuatu di Quill editor
+4. Di bagian **Media Tambahan**:
+   - Tab **🎵 Audio**: Upload file MP3
+   - Tab **🖼️ Gambar**: Upload 2-3 gambar
+   - Tab **▶️ YouTube**: Paste link YouTube (misal `https://www.youtube.com/watch?v=dQw4w9WgXcQ`)
+5. Isi kosakata (2 baris) dan kuis (1 soal)
+6. Klik **Publish**
+7. **Yang harus terjadi:** Redirect ke Kelola Artikel dengan pesan sukses hijau
+
+---
+
+### Tes 4: Preview Artikel dengan Media
+1. Klik tombol 👁️ (Preview) pada artikel yang baru saja dibuat
+2. **Yang harus terjadi di badan artikel:**
+   - Muncul section **📎 Media Tambahan**
+   - **Galeri Foto**: Grid gambar muncul, hover menampilkan nama file
+   - **Audio**: Player MP3 muncul dan bisa diputar, nama file tertera
+   - **YouTube**: Video ter-embed dan bisa diputar langsung
+3. **Yang harus terjadi di sidebar:**
+   - Card **Checklist Media** menampilkan ✓ hijau untuk semua media yang ada
+   - Nama file tampil di bawah setiap item
+
+---
+
+### Tes 5: Kuis → Kunci Jawaban Berwarna
+1. Di halaman Preview, scroll ke bagian **🧠 Kuis Review**
+2. **Yang harus terjadi:**
+   - Jawaban yang benar memiliki:
+     - **Background hijau** (emerald)
+     - **Huruf bulat hijau** (A/B/C/D)
+     - **Teks tebal hijau**
+     - **Ikon centang ✓** di kanan
+   - Jawaban yang salah tetap berwarna abu-abu biasa

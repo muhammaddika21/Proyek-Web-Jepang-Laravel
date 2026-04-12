@@ -17,7 +17,7 @@ class ArticleController extends Controller
     // =============================================
     public function index(Request $request)
     {
-        $query = Article::with(['category', 'user'])->latest();
+        $query = Article::with(['category', 'user']);
 
         // Filter: Search judul
         if ($request->filled('search')) {
@@ -39,12 +39,12 @@ class ArticleController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Sorting
+        // Sorting berdasarkan updated_at (agar artikel yang baru diedit muncul di atas)
         $sort = $request->get('sort', 'newest');
         match($sort) {
-            'oldest' => $query->oldest(),
+            'oldest' => $query->orderBy('updated_at', 'asc'),
             'views'  => $query->orderByDesc('view_count'),
-            default  => $query->latest(),
+            default  => $query->orderBy('updated_at', 'desc'),
         };
 
         $articles   = $query->paginate(10)->withQueryString();
@@ -55,6 +55,7 @@ class ArticleController extends Controller
             'total'     => Article::count(),
             'published' => Article::where('status', 'published')->count(),
             'draft'     => Article::where('status', 'draft')->count(),
+            'umum'      => Article::where('type', 'umum')->count(),
             'bahasa'    => Article::where('type', 'bahasa')->count(),
         ];
 
@@ -86,25 +87,28 @@ class ArticleController extends Controller
     {
         $type = $request->input('type', 'umum');
 
+        // Tentukan status berdasarkan tombol yang ditekan
+        // Jika user klik "Simpan Draft" (action=draft), SELALU simpan sebagai draft
+        // Jika user klik "Publish" (action=publish), simpan sebagai published
+        $status = $request->input('action') === 'draft' ? 'draft' : 'published';
+
         // Validasi dasar
         $rules = [
             'title'       => 'required|string|max:255',
             'slug'        => 'nullable|string|max:255|unique:articles,slug',
             'category_id' => 'nullable|exists:categories,id',
             'excerpt'     => 'nullable|string|max:500',
-            'status'      => 'required|in:draft,published',
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
 
         // Validasi tambahan untuk artikel bahasa
         if ($type === 'bahasa') {
-            $rules['grammar_explanation'] = 'nullable|string';
-            $rules['jlpt_level']          = 'nullable|integer|between:1,5';
-        } else {
-            $rules['content'] = 'nullable|string';
+            $rules['kemahiran_level'] = 'nullable|in:pemula,menengah,mahir';
         }
+        $rules['additional_images.*'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048';
+        $rules['audio_file'] = 'nullable|mimes:mp3,wav,ogg,m4a|max:20480';
 
-        $validated = $request->validate($rules);
+        $request->validate($rules);
 
         // Handle upload cover image
         $coverPath = null;
@@ -120,32 +124,58 @@ class ArticleController extends Controller
         // Pastikan slug unik
         $slug = $this->makeUniqueSlug($slug);
 
+        // Untuk artikel bahasa, konten dari Quill editor masuk ke grammar_explanation
+        // Strip base64 images (dari paste clipboard) agar tidak melebihi batas database
+        $content = $this->stripBase64Images($request->content);
+        $grammarExplanation = null;
+        if ($type === 'bahasa') {
+            $grammarExplanation = $content; // Quill content → grammar_explanation
+            $content = null;
+        }
+
+        // Handle upload media tambahan (multiple images)
+        $additionalImages = [];
+        if ($request->hasFile('additional_images')) {
+            foreach ($request->file('additional_images') as $img) {
+                $additionalImages[] = $img->store('articles/media', 'public');
+            }
+        }
+
+        // Handle upload audio
+        $audioPath = null;
+        if ($request->hasFile('audio_file')) {
+            $audioPath = $request->file('audio_file')->store('articles/audio', 'public');
+        }
+
         // Buat artikel
         $article = Article::create([
             'user_id'              => Auth::id(),
-            'category_id'          => $request->category_id,
-            'title'                => $request->title,
-            'slug'                 => $slug,
-            'type'                 => $type,
-            'excerpt'              => $request->excerpt,
-            'content'              => $type === 'umum' ? $request->content : null,
-            'cover_image'          => $coverPath,
-            'cover_image_caption'  => $request->cover_image_caption,
-            'japanese_title'       => $request->japanese_title,
-            'romaji_title'         => $request->romaji_title,
-            'jlpt_level'           => $request->jlpt_level,
-            'grammar_explanation'  => $type === 'bahasa' ? $request->grammar_explanation : null,
-            'vocabulary_list'      => $this->parseVocabList($request->vocabulary_list),
-            'quiz_questions'       => $this->parseQuiz($request->quiz_questions),
-            'status'               => $request->status,
-            'read_time'            => $request->read_time,
+            'category_id'         => $request->category_id,
+            'title'               => $request->title,
+            'slug'                => $slug,
+            'type'                => $type,
+            'excerpt'             => $request->excerpt,
+            'content'             => $content,
+            'cover_image'         => $coverPath,
+            'cover_image_caption' => $request->cover_image_caption,
+            'additional_images'   => !empty($additionalImages) ? $additionalImages : null,
+            'audio_file'          => $audioPath,
+            'audio_label'         => $request->audio_label,
+            'japanese_title'      => $request->japanese_title,
+            'romaji_title'        => $request->romaji_title,
+            'kemahiran_level'     => $request->kemahiran_level,
+            'grammar_explanation' => $grammarExplanation,
+            'vocabulary_list'     => $this->parseVocabList($request->vocabulary_list),
+            'quiz_questions'      => $this->parseQuiz($request->quiz_questions),
+            'status'              => $status,
+            'read_time'           => $request->read_time,
         ]);
 
-        $route = $type === 'bahasa' ? 'admin.articles.createBahasa' : 'admin.articles.create';
         $label = $type === 'bahasa' ? 'Artikel Bahasa' : 'Artikel Umum';
+        $statusLabel = $status === 'draft' ? '(Draft)' : '(Published)';
 
         return redirect()->route('admin.articles.index')
-            ->with('success', "✅ {$label} \"{$article->title}\" berhasil disimpan!");
+            ->with('success', "✅ {$label} \"{$article->title}\" berhasil disimpan! {$statusLabel}");
     }
 
     // =============================================
@@ -154,7 +184,7 @@ class ArticleController extends Controller
     public function edit(Article $article)
     {
         $categories = Category::where('type', $article->type)->get();
-        $view = $article->type === 'bahasa' ? 'admin.articles.create-bahasa' : 'admin.articles.create';
+        $view = $article->type === 'bahasa' ? 'admin.articles.edit-bahasa' : 'admin.articles.create';
         return view($view, compact('article', 'categories'));
     }
 
@@ -163,20 +193,27 @@ class ArticleController extends Controller
     // =============================================
     public function update(Request $request, Article $article)
     {
+        // Tentukan status berdasarkan tombol yang ditekan
+        $status = $request->input('action') === 'draft' ? 'draft' : 'published';
+
         $rules = [
             'title'       => 'required|string|max:255',
             'slug'        => 'nullable|string|max:255|unique:articles,slug,' . $article->id,
             'category_id' => 'nullable|exists:categories,id',
             'excerpt'     => 'nullable|string|max:500',
-            'status'      => 'required|in:draft,published',
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'additional_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'audio_file'  => 'nullable|mimes:mp3,wav,ogg,m4a|max:20480',
         ];
+
+        if ($article->type === 'bahasa') {
+            $rules['kemahiran_level'] = 'nullable|in:pemula,menengah,mahir';
+        }
 
         $request->validate($rules);
 
         // Handle cover image baru
         if ($request->hasFile('cover_image')) {
-            // Hapus gambar lama
             if ($article->cover_image) {
                 Storage::disk('public')->delete($article->cover_image);
             }
@@ -185,30 +222,74 @@ class ArticleController extends Controller
             $coverPath = $article->cover_image;
         }
 
+        // Handle additional images
+        $additionalImages = $article->additional_images ?? [];
+        if ($request->hasFile('additional_images')) {
+            foreach ($request->file('additional_images') as $img) {
+                $additionalImages[] = $img->store('articles/media', 'public');
+            }
+        }
+
+        // Handle audio file
+        $audioPath = $article->audio_file;
+        if ($request->hasFile('audio_file')) {
+            if ($article->audio_file) {
+                Storage::disk('public')->delete($article->audio_file);
+            }
+            $audioPath = $request->file('audio_file')->store('articles/audio', 'public');
+        }
+
         $slug = $request->filled('slug')
             ? Str::slug($request->slug)
             : $article->slug;
 
+        // Untuk artikel bahasa, konten dari Quill editor masuk ke grammar_explanation
+        // Strip base64 images (dari paste clipboard) agar tidak melebihi batas database
+        $content = $this->stripBase64Images($request->content);
+        $grammarExplanation = null;
+        if ($article->type === 'bahasa') {
+            $grammarExplanation = $content;
+            $content = null;
+        }
+
         $article->update([
-            'category_id'          => $request->category_id,
-            'title'                => $request->title,
-            'slug'                 => $slug,
-            'excerpt'              => $request->excerpt,
-            'content'              => $article->type === 'umum' ? $request->content : null,
-            'cover_image'          => $coverPath,
-            'cover_image_caption'  => $request->cover_image_caption,
-            'japanese_title'       => $request->japanese_title,
-            'romaji_title'         => $request->romaji_title,
-            'jlpt_level'           => $request->jlpt_level,
-            'grammar_explanation'  => $article->type === 'bahasa' ? $request->grammar_explanation : null,
-            'vocabulary_list'      => $this->parseVocabList($request->vocabulary_list),
-            'quiz_questions'       => $this->parseQuiz($request->quiz_questions),
-            'status'               => $request->status,
-            'read_time'            => $request->read_time,
+            'category_id'         => $request->category_id,
+            'title'               => $request->title,
+            'slug'                => $slug,
+            'excerpt'             => $request->excerpt,
+            'content'             => $content,
+            'cover_image'         => $coverPath,
+            'cover_image_caption' => $request->cover_image_caption,
+            'additional_images'   => !empty($additionalImages) ? $additionalImages : null,
+            'audio_file'          => $audioPath,
+            'audio_label'         => $request->audio_label,
+            'youtube_url'         => $request->youtube_url,
+            'japanese_title'      => $request->japanese_title,
+            'romaji_title'        => $request->romaji_title,
+            'kemahiran_level'     => $request->kemahiran_level,
+            'grammar_explanation' => $grammarExplanation,
+            'vocabulary_list'     => $this->parseVocabList($request->vocabulary_list),
+            'quiz_questions'      => $this->parseQuiz($request->quiz_questions),
+            'status'              => $status,
+            'read_time'           => $request->read_time,
         ]);
 
+        $statusLabel = $status === 'draft' ? '(Draft)' : '(Published)';
+
         return redirect()->route('admin.articles.index')
-            ->with('success', "✅ Artikel \"{$article->title}\" berhasil diperbarui!");
+            ->with('success', "✅ Artikel \"{$article->title}\" berhasil diperbarui! {$statusLabel}");
+    }
+
+    // =============================================
+    // DESTROY — Hapus Artikel
+    // =============================================
+    // =============================================
+    // SHOW — Preview Artikel
+    // =============================================
+    public function show(Article $article)
+    {
+        $article->load(['category', 'user']);
+        return view('admin.articles.show', compact('article'));
     }
 
     // =============================================
@@ -268,14 +349,17 @@ class ArticleController extends Controller
     {
         if (empty($raw) || !is_array($raw)) return null;
 
-        return array_filter(array_map(function ($item) {
+        $result = array_filter(array_map(function ($item) {
             if (empty($item['kata']) && empty($item['arti'])) return null;
             return [
-                'kata'   => $item['kata']   ?? '',
-                'romaji' => $item['romaji'] ?? '',
-                'arti'   => $item['arti']   ?? '',
+                'kata'    => $item['kata']    ?? '',
+                'romaji'  => $item['romaji']  ?? '',
+                'arti'    => $item['arti']    ?? '',
+                'contoh'  => $item['contoh']  ?? '',
             ];
         }, $raw));
+
+        return !empty($result) ? array_values($result) : null;
     }
 
     // =============================================
@@ -285,13 +369,35 @@ class ArticleController extends Controller
     {
         if (empty($raw) || !is_array($raw)) return null;
 
-        return array_filter(array_map(function ($item) {
+        $result = array_filter(array_map(function ($item) {
             if (empty($item['question'])) return null;
+            // Filter out empty options
+            $options = array_values(array_filter($item['options'] ?? [], fn($o) => trim($o) !== ''));
             return [
                 'question' => $item['question']        ?? '',
-                'options'  => $item['options']          ?? [],
+                'options'  => $options,
                 'answer'   => (int)($item['answer']     ?? 0),
             ];
         }, $raw));
+
+        return !empty($result) ? array_values($result) : null;
+    }
+
+    // =============================================
+    // Helper: Strip base64 images dari konten Quill
+    // Gambar yang di-copy paste dari Word/clipboard
+    // menjadi base64 sangat besar dan bisa crash.
+    // Kita ganti dengan placeholder peringatan.
+    // =============================================
+    private function stripBase64Images(?string $content): ?string
+    {
+        if (empty($content)) return $content;
+
+        // Ganti <img src="data:image/...;base64,..."> dengan peringatan
+        return preg_replace(
+            '/<img[^>]+src=["\']data:image\/[^;]+;base64,[^"\']+["\'][^>]*>/i',
+            '<p style="color:#e67e22;font-style:italic;">[⚠️ Gambar yang di-paste langsung tidak didukung. Gunakan fitur &quot;Media Tambahan&quot; untuk upload gambar.]</p>',
+            $content
+        );
     }
 }

@@ -58,14 +58,15 @@
     <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
       <a href="{{ route('admin.articles.index') }}" class="hover:text-brand-500">Kelola Artikel</a>
       <span>›</span>
-      <span class="text-gray-800 dark:text-white/90 font-medium">Buat Artikel Bahasa</span>
+      <span class="text-gray-800 dark:text-white/90 font-medium">Edit Artikel Bahasa</span>
     </div>
-    <h2 class="text-xl font-bold text-gray-800 dark:text-white/90 sm:text-2xl">🎌 Buat Artikel Bahasa Jepang</h2>
+    <h2 class="text-xl font-bold text-gray-800 dark:text-white/90 sm:text-2xl">🎌 Edit: {{ $article->title }}</h2>
     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Pembelajaran gaya Tae Kim — konten + tabel referensi + audio + kuis review.</p>
   </div>
 
-  <form action="{{ route('admin.articles.store') }}" method="POST" enctype="multipart/form-data" id="bahasa-form">
+  <form action="{{ route('admin.articles.update', $article) }}" method="POST" enctype="multipart/form-data" id="bahasa-edit-form">
     @csrf
+    @method('PUT')
     <input type="hidden" name="type" value="bahasa">
 
     <div class="grid grid-cols-1 xl:grid-cols-10 gap-6">
@@ -76,9 +77,9 @@
         {{-- ===== SECTION A: Info Dasar ===== --}}
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
           x-data="{
-            title: '{{ old('title', '') }}',
-            slug: '{{ old('slug', '') }}',
-            autoSlug: true,
+            title: '{{ old('title', addslashes($article->title)) }}',
+            slug: '{{ old('slug', $article->slug) }}',
+            autoSlug: false,
             generateSlug(text) {
               return text.toLowerCase()
                 .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
@@ -117,7 +118,7 @@
                   class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">
                   <option value="">Pilih...</option>
                   @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                    <option value="{{ $cat->id }}" {{ old('category_id', $article->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                   @endforeach
                 </select>
               </div>
@@ -126,9 +127,9 @@
                 <select name="kemahiran_level"
                   class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">
                   <option value="">Pilih...</option>
-                  <option value="pemula"   {{ old('kemahiran_level') === 'pemula'   ? 'selected' : '' }}>🌱 Pemula</option>
-                  <option value="menengah" {{ old('kemahiran_level') === 'menengah' ? 'selected' : '' }}>🌿 Menengah</option>
-                  <option value="mahir"    {{ old('kemahiran_level') === 'mahir'    ? 'selected' : '' }}>🌳 Mahir</option>
+                  <option value="pemula"   {{ old('kemahiran_level', $article->kemahiran_level) === 'pemula'   ? 'selected' : '' }}>🌱 Pemula</option>
+                  <option value="menengah" {{ old('kemahiran_level', $article->kemahiran_level) === 'menengah' ? 'selected' : '' }}>🌿 Menengah</option>
+                  <option value="mahir"    {{ old('kemahiran_level', $article->kemahiran_level) === 'mahir'    ? 'selected' : '' }}>🌳 Mahir</option>
                 </select>
               </div>
             </div>
@@ -143,16 +144,24 @@
           </div>
           <div class="p-6">
             {{-- Hidden textarea untuk menyimpan konten HTML ke server --}}
-            <textarea name="content" id="content-bahasa-input" style="display:none;">{{ old('content') }}</textarea>
+            <textarea name="content" id="content-bahasa-input" style="display:none;">{{ old('content', $article->grammar_explanation) }}</textarea>
             {{-- Quill Editor Container --}}
             <div id="quill-editor-bahasa"></div>
           </div>
         </div>{{-- END Section B --}}
 
         {{-- ===== SECTION C: Tabel Kosakata / Karakter ===== --}}
+        @php
+          $vocabData = old('vocabulary_list') ?? ($article->vocabulary_list ? collect($article->vocabulary_list)->map(fn($v) => [
+            'kanji' => $v['kata'] ?? '',
+            'furigana' => $v['romaji'] ?? '',
+            'meaning' => $v['arti'] ?? '',
+            'example' => $v['contoh'] ?? ''
+          ])->toArray() : [['kanji' => '', 'furigana' => '', 'meaning' => '', 'example' => '']]);
+        @endphp
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
           x-data="{
-            rows: [{ kanji: '', furigana: '', meaning: '', example: '' }],
+            rows: {{ json_encode(array_values($vocabData)) }},
             addRow() {
               this.rows.push({ kanji: '', furigana: '', meaning: '', example: '' });
             },
@@ -254,6 +263,35 @@
             <p class="text-xs text-gray-500 mt-1">Upload gambar, video, audio, atau embed YouTube.</p>
           </div>
           <div class="p-6">
+
+            {{-- Existing media info --}}
+            @if($article->audio_file || $article->youtube_url || ($article->additional_images && count($article->additional_images) > 0))
+            <div class="mb-5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4">
+              <p class="text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">📂 Media saat ini:</p>
+              <div class="space-y-1.5">
+                @if($article->audio_file)
+                  <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                    <span>🎧</span>
+                    <span>Audio: {{ basename($article->audio_file) }}</span>
+                  </p>
+                @endif
+                @if($article->youtube_url)
+                  <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                    <span>▶️</span>
+                    <span>YouTube: {{ $article->youtube_url }}</span>
+                  </p>
+                @endif
+                @if($article->additional_images && count($article->additional_images) > 0)
+                  <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                    <span>🖼️</span>
+                    <span>{{ count($article->additional_images) }} gambar tersimpan</span>
+                  </p>
+                @endif
+              </div>
+              <p class="text-[10px] text-gray-400 mt-2">Upload file baru untuk mengganti media yang sudah ada.</p>
+            </div>
+            @endif
+
             <div class="flex gap-2 mb-5 flex-wrap">
               <button type="button" @click="mediaType = 'audio'"
                 :class="mediaType === 'audio' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
@@ -274,12 +312,12 @@
               <label
                 class="media-drop-zone flex items-center justify-center w-full h-36 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors"
                 :class="audioFile ? 'has-file' : ''"
-                for="audio-upload-bahasa">
-                <input type="file" id="audio-upload-bahasa" name="media_audio" accept="audio/mpeg,audio/wav,audio/ogg"
+                for="audio-upload-bahasa-edit">
+                <input type="file" id="audio-upload-bahasa-edit" name="media_audio" accept="audio/mpeg,audio/wav,audio/ogg"
                   class="sr-only" @change="handleAudioChange($event)">
                 <div class="text-center" x-show="!audioFile">
                   <span class="text-3xl mb-2 block">🎧</span>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload audio — <span class="text-brand-500 font-medium">klik untuk pilih</span></p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload audio baru — <span class="text-brand-500 font-medium">klik untuk pilih</span></p>
                   <p class="text-[10px] text-gray-400 mt-1">MP3 / WAV — Maks 20MB</p>
                 </div>
                 <div x-show="audioFile" class="flex items-center gap-3 px-4">
@@ -289,7 +327,7 @@
                   <div class="text-left min-w-0">
                     <p class="text-sm font-medium text-gray-800 dark:text-white/90 truncate" x-text="audioFile?.name"></p>
                     <p class="text-xs text-gray-500" x-text="formatBytes(audioFile?.size || 0)"></p>
-                    <button type="button" @click.prevent="audioFile = null; document.getElementById('audio-upload-bahasa').value = ''"
+                    <button type="button" @click.prevent="audioFile = null; document.getElementById('audio-upload-bahasa-edit').value = ''"
                       class="text-xs text-red-500 hover:text-red-600 mt-1">Hapus</button>
                   </div>
                 </div>
@@ -297,27 +335,39 @@
               <div class="mt-3">
                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Label Audio</label>
                 <input type="text" name="audio_label" placeholder="Misal: Percakapan di Restoran"
-                  value="{{ old('audio_label') }}"
+                  value="{{ old('audio_label', $article->audio_label) }}"
                   class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
               </div>
             </div>
 
             {{-- Image --}}
             <div x-show="mediaType === 'image'" x-transition>
+              @if($article->additional_images && count($article->additional_images) > 0)
+              <div class="mb-3">
+                <p class="text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Gambar tersimpan:</p>
+                <div class="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                  @foreach($article->additional_images as $imgPath)
+                    <div class="aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                      <img src="{{ asset('storage/' . $imgPath) }}" class="w-full h-full object-cover" alt="Gambar artikel">
+                    </div>
+                  @endforeach
+                </div>
+              </div>
+              @endif
               <label
                 class="media-drop-zone flex flex-col items-center justify-center w-full min-h-[140px] rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors"
                 :class="imageFiles.length > 0 ? 'has-file' : ''"
                 @dragover.prevent="$el.classList.add('drag-over')"
                 @dragleave.prevent="$el.classList.remove('drag-over')"
                 @drop.prevent="$el.classList.remove('drag-over'); handleImageDrop($event)"
-                for="image-upload-bahasa">
-                <input type="file" id="image-upload-bahasa" name="media_images[]" multiple accept="image/*"
+                for="image-upload-bahasa-edit">
+                <input type="file" id="image-upload-bahasa-edit" name="media_images[]" multiple accept="image/*"
                   class="sr-only" @change="handleImageDrop($event)">
                 <div class="text-center py-4" x-show="imageFiles.length === 0">
                   <svg class="mx-auto w-10 h-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M18 13.5V6.75A2.25 2.25 0 0015.75 4.5h-13.5A2.25 2.25 0 000 6.75v10.5A2.25 2.25 0 002.25 19.5h15" />
                   </svg>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Drag & drop gambar atau <span class="text-brand-500 font-medium">klik untuk upload</span></p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Tambah gambar baru — <span class="text-brand-500 font-medium">klik untuk upload</span></p>
                   <p class="text-[10px] text-gray-400 mt-1">JPG, PNG, WebP — Maks 5MB per file</p>
                 </div>
                 <div x-show="imageFiles.length > 0" class="w-full p-3">
@@ -329,11 +379,11 @@
                           class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none">✕</button>
                       </div>
                     </template>
-                    <label for="image-upload-bahasa" class="aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center cursor-pointer hover:border-brand-400 transition-colors" x-show="imageFiles.length < 5">
+                    <label for="image-upload-bahasa-edit" class="aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center cursor-pointer hover:border-brand-400 transition-colors" x-show="imageFiles.length < 5">
                       <span class="text-2xl text-gray-400">+</span>
                     </label>
                   </div>
-                  <p class="text-[10px] text-gray-400 text-center" x-text="imageFiles.length + ' gambar dipilih'"></p>
+                  <p class="text-[10px] text-gray-400 text-center" x-text="imageFiles.length + ' gambar baru dipilih'"></p>
                 </div>
               </label>
             </div>
@@ -343,12 +393,12 @@
               <label
                 class="media-drop-zone flex items-center justify-center w-full h-36 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors"
                 :class="videoFile ? 'has-file' : ''"
-                for="video-upload-bahasa">
-                <input type="file" id="video-upload-bahasa" name="media_video" accept="video/mp4,video/webm"
+                for="video-upload-bahasa-edit">
+                <input type="file" id="video-upload-bahasa-edit" name="media_video" accept="video/mp4,video/webm"
                   class="sr-only" @change="handleVideoChange($event)">
                 <div class="text-center" x-show="!videoFile">
                   <span class="text-3xl mb-2 block">🎬</span>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload video — <span class="text-brand-500 font-medium">klik untuk pilih</span></p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload video baru — <span class="text-brand-500 font-medium">klik untuk pilih</span></p>
                   <p class="text-[10px] text-gray-400 mt-1">MP4 / WebM — Maks 50MB</p>
                 </div>
                 <div x-show="videoFile" class="flex items-center gap-3 px-4">
@@ -358,7 +408,7 @@
                   <div class="text-left min-w-0">
                     <p class="text-sm font-medium text-gray-800 dark:text-white/90 truncate" x-text="videoFile?.name"></p>
                     <p class="text-xs text-gray-500" x-text="formatBytes(videoFile?.size || 0)"></p>
-                    <button type="button" @click.prevent="videoFile = null; document.getElementById('video-upload-bahasa').value = ''"
+                    <button type="button" @click.prevent="videoFile = null; document.getElementById('video-upload-bahasa-edit').value = ''"
                       class="text-xs text-red-500 hover:text-red-600 mt-1">Hapus</button>
                   </div>
                 </div>
@@ -373,7 +423,7 @@
                   <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                 </span>
                 <input type="url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=..."
-                  value="{{ old('youtube_url') }}"
+                  value="{{ old('youtube_url', $article->youtube_url) }}"
                   class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
               </div>
               <p class="text-xs text-gray-400 mt-1.5">Video akan ditanamkan (embed) di halaman artikel.</p>
@@ -382,9 +432,16 @@
         </div>{{-- END Section D --}}
 
         {{-- ===== SECTION E: Kuis Review Interaktif ===== --}}
+        @php
+          $quizData = old('quiz_questions') ?? ($article->quiz_questions ? collect($article->quiz_questions)->map(fn($q) => [
+            'question' => $q['question'] ?? '',
+            'options' => $q['options'] ?? ['', '', '', ''],
+            'correctAnswer' => $q['answer'] ?? 0
+          ])->toArray() : [['question' => '', 'options' => ['', '', '', ''], 'correctAnswer' => 0]]);
+        @endphp
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
           x-data="{
-            quizzes: [{ question: '', options: ['', '', '', ''], correctAnswer: 0 }],
+            quizzes: {{ json_encode(array_values($quizData)) }},
             addQuiz() {
               this.quizzes.push({
                 question: '',
@@ -494,16 +551,21 @@
               <span class="text-xs text-gray-500">→ Klik "Publish"</span>
             </div>
           </div>
+          <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+            <p class="text-xs text-gray-500">Status saat ini:
+              <span class="font-semibold {{ $article->status === 'published' ? 'text-green-500' : 'text-yellow-500' }}">{{ ucfirst($article->status) }}</span>
+            </p>
+          </div>
         </div>
 
         {{-- Thumbnail --}}
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5"
-          x-data="{ thumbPreview: null }">
+          x-data="{ thumbPreview: {{ $article->cover_image ? '\'' . asset('storage/' . $article->cover_image) . '\'' : 'null' }} }">
           <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Thumbnail / Cover</label>
-          <label for="cover-image-bahasa"
+          <label for="cover-image-bahasa-edit"
             class="relative flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 cursor-pointer hover:border-brand-400 transition-colors overflow-hidden"
             :class="thumbPreview ? 'h-44' : 'h-32'">
-            <input type="file" id="cover-image-bahasa" name="cover_image" accept="image/*" class="sr-only"
+            <input type="file" id="cover-image-bahasa-edit" name="cover_image" accept="image/*" class="sr-only"
               @change="const f=$event.target.files[0]; if(f){const r=new FileReader();r.onload=e=>thumbPreview=e.target.result;r.readAsDataURL(f)}">
             <img x-show="thumbPreview" :src="thumbPreview" class="absolute inset-0 w-full h-full object-cover rounded-xl">
             <div class="relative z-10 text-center py-4" x-show="!thumbPreview">
@@ -513,7 +575,7 @@
               <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Drag & drop atau <span class="text-brand-500">klik</span></p>
             </div>
             <button x-show="thumbPreview" type="button"
-              @click.prevent="thumbPreview = null; document.getElementById('cover-image-bahasa').value = ''"
+              @click.prevent="thumbPreview = null; document.getElementById('cover-image-bahasa-edit').value = ''"
               class="absolute top-2 right-2 z-20 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs leading-none">✕</button>
           </label>
           <p class="text-[10px] text-gray-400 mt-1">JPG, PNG, WebP — Maks 2MB</p>
@@ -523,14 +585,14 @@
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
           <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Ringkasan Pendek</label>
           <textarea name="excerpt" rows="3" placeholder="Penjelasan singkat 1-2 kalimat..."
-            class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">{{ old('excerpt') }}</textarea>
+            class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">{{ old('excerpt', $article->excerpt) }}</textarea>
         </div>
 
         {{-- Estimasi Waktu --}}
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
           <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estimasi Waktu Baca</label>
           <input type="text" name="read_time" placeholder="5 menit"
-            value="{{ old('read_time') }}"
+            value="{{ old('read_time', $article->read_time) }}"
             class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
         </div>
 
@@ -573,7 +635,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     const quill = new Quill('#quill-editor-bahasa', {
       theme: 'snow',
-      placeholder: 'Tulis penjelasan materi di sini...\n\nContoh:\n## Kata Tunjuk (Demonstrative)\nDalam bahasa Jepang, ada tiga kata tunjuk: これ (kore) — ini, それ (sore) — itu, あれ (are) — itu (jauh)',
+      placeholder: 'Tulis penjelasan materi di sini...',
       modules: {
         toolbar: [
           [{ 'header': [1, 2, 3, false] }],
@@ -591,15 +653,16 @@
     });
 
     // Sync Quill content ke hidden textarea saat submit
-    const form = document.getElementById('bahasa-form');
+    const form = document.getElementById('bahasa-edit-form');
     form.addEventListener('submit', function() {
       document.getElementById('content-bahasa-input').value = quill.root.innerHTML;
     });
 
-    // Populate dari old() jika ada validasi error
-    @if(old('content'))
-      quill.root.innerHTML = {!! json_encode(old('content')) !!};
-    @endif
+    // Populate konten yang sudah ada
+    const existingContent = {!! json_encode(old('content', $article->grammar_explanation ?? '')) !!};
+    if (existingContent) {
+      quill.root.innerHTML = existingContent;
+    }
   });
 </script>
 @endpush

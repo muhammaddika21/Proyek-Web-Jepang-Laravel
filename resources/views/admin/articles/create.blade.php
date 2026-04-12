@@ -57,14 +57,15 @@
     <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
       <a href="/admin/articles" class="hover:text-brand-500">Kelola Artikel</a>
       <span>›</span>
-      <span class="text-gray-800 dark:text-white/90 font-medium">Buat Artikel Umum</span>
+      <span class="text-gray-800 dark:text-white/90 font-medium">{{ isset($article) ? 'Edit Artikel' : 'Buat Artikel Umum' }}</span>
     </div>
-    <h2 class="text-xl font-bold text-gray-800 dark:text-white/90 sm:text-2xl">🏯 Buat Artikel Umum</h2>
+    <h2 class="text-xl font-bold text-gray-800 dark:text-white/90 sm:text-2xl">🏯 {{ isset($article) ? 'Edit Artikel: ' . $article->title : 'Buat Artikel Umum' }}</h2>
     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Untuk konten Budaya, Event, atau Pengetahuan Umum tentang Jepang.</p>
   </div>
 
-  <form action="{{ route('admin.articles.store') }}" method="POST" enctype="multipart/form-data" id="article-form">
+  <form action="{{ isset($article) ? route('admin.articles.update', $article) : route('admin.articles.store') }}" method="POST" enctype="multipart/form-data" id="article-form">
     @csrf
+    @if(isset($article)) @method('PUT') @endif
     <input type="hidden" name="type" value="umum">
 
     <div class="grid grid-cols-1 xl:grid-cols-10 gap-6">
@@ -75,9 +76,9 @@
         {{-- Section: Info Dasar --}}
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
           x-data="{
-            title: '',
-            slug: '',
-            autoSlug: true,
+            title: '{{ old('title', isset($article) ? $article->title : '') }}',
+            slug: '{{ old('slug', isset($article) ? $article->slug : '') }}',
+            autoSlug: {{ isset($article) ? 'false' : 'true' }},
             generateSlug(text) {
               return text.toLowerCase()
                 .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
@@ -120,7 +121,7 @@
           </div>
           <div class="p-6">
             {{-- Hidden textarea untuk menyimpan konten HTML ke server --}}
-            <textarea name="content" id="content-input" style="display:none;"></textarea>
+            <textarea name="content" id="content-input" style="display:none;">{{ old('content', isset($article) ? $article->content : '') }}</textarea>
             {{-- Quill Editor Container --}}
             <div id="quill-editor-umum" class="rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700"></div>
           </div>
@@ -305,19 +306,29 @@
       {{-- =================== KOLOM KANAN (30%) =================== --}}
       <div class="xl:col-span-3 space-y-6">
 
-        {{-- Status --}}
+        {{-- Status Info --}}
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
           <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">Status Publikasi</label>
-          <div class="space-y-2">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="status" value="published" checked class="text-brand-500 focus:ring-brand-500">
-              <span class="text-sm text-gray-800 dark:text-white/90">Published</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="status" value="draft" class="text-brand-500 focus:ring-brand-500">
-              <span class="text-sm text-gray-800 dark:text-white/90">Draft</span>
-            </label>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Status ditentukan berdasarkan tombol yang Anda klik di bawah:
+          </p>
+          <div class="mt-3 space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-yellow-50 text-yellow-600 dark:bg-yellow-500/15 dark:text-yellow-400">Draft</span>
+              <span class="text-xs text-gray-500">→ Klik "Simpan Draft"</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400">Published</span>
+              <span class="text-xs text-gray-500">→ Klik "Publish"</span>
+            </div>
           </div>
+          @if(isset($article))
+          <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+            <p class="text-xs text-gray-500">Status saat ini:
+              <span class="font-semibold {{ $article->status === 'published' ? 'text-green-500' : 'text-yellow-500' }}">{{ ucfirst($article->status) }}</span>
+            </p>
+          </div>
+          @endif
         </div>
 
         {{-- Kategori --}}
@@ -327,7 +338,7 @@
             class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">
             <option value="">Pilih Kategori...</option>
             @foreach($categories as $cat)
-              <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+              <option value="{{ $cat->id }}" {{ old('category_id', isset($article) ? $article->category_id : '') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
             @endforeach
           </select>
         </div>
@@ -368,7 +379,7 @@
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
           <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Ringkasan Pendek</label>
           <textarea name="excerpt" rows="3" placeholder="Tulis deskripsi singkat untuk SEO..."
-            class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden"></textarea>
+            class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">{{ old('excerpt', isset($article) ? $article->excerpt : '') }}</textarea>
         </div>
 
         {{-- Buttons --}}
@@ -424,8 +435,8 @@
     });
 
     // Populate dari old() jika ada validasi error
-    @if(old('content'))
-      quill.root.innerHTML = {!! json_encode(old('content')) !!};
+    @if(old('content') || (isset($article) && $article->content))
+      quill.root.innerHTML = {!! json_encode(old('content', isset($article) ? $article->content : '')) !!};
     @endif
   });
 </script>

@@ -11,19 +11,16 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             // Kategori Bahasa Jepang
-            ['name' => 'Writing (Hiragana/Katakana)', 'slug' => 'writing',      'type' => 'bahasa'],
-            ['name' => 'Kanji',                        'slug' => 'kanji',        'type' => 'bahasa'],
-            ['name' => 'Grammar',                      'slug' => 'grammar',      'type' => 'bahasa'],
-            ['name' => 'Vocabulary',                   'slug' => 'vocabulary',   'type' => 'bahasa'],
-            ['name' => 'Conversation',                 'slug' => 'conversation', 'type' => 'bahasa'],
-            ['name' => 'Reading Comprehension',        'slug' => 'reading',      'type' => 'bahasa'],
+            ['name' => 'Complete Guide',  'slug' => 'complete-guide', 'type' => 'bahasa'],
+            ['name' => 'Kanji',           'slug' => 'kanji',          'type' => 'bahasa'],
+            ['name' => 'Kotoba',          'slug' => 'kotoba',         'type' => 'bahasa'],
+            ['name' => 'Bunpou',          'slug' => 'bunpou',         'type' => 'bahasa'],
+            ['name' => 'Kaiwa',           'slug' => 'kaiwa',          'type' => 'bahasa'],
 
             // Kategori Umum
-            ['name' => 'Budaya',            'slug' => 'budaya',       'type' => 'umum'],
-            ['name' => 'Event',             'slug' => 'event',        'type' => 'umum'],
-            ['name' => 'Kuliner',           'slug' => 'kuliner',      'type' => 'umum'],
-            ['name' => 'Kesenian',          'slug' => 'kesenian',     'type' => 'umum'],
-            ['name' => 'Pengetahuan Umum',  'slug' => 'pengetahuan',  'type' => 'umum'],
+            ['name' => 'Budaya',   'slug' => 'budaya',  'type' => 'umum'],
+            ['name' => 'Event',    'slug' => 'event',   'type' => 'umum'],
+            ['name' => 'Kuliner',  'slug' => 'kuliner', 'type' => 'umum'],
         ];
 
         foreach ($categories as $cat) {

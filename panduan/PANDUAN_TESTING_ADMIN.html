@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Verifikasi Manual NihonLearn Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .checkbox-custom { width: 1.25rem; height: 1.25rem; cursor: pointer; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        
+        <div class="border-b border-gray-200 pb-6 mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">📋 Panduan Verifikasi Manual NihonLearn</h1>
+            <p class="text-gray-500">Gunakan daftar ini untuk meninjau dan memastikan semua perubahan terbaru pada Dashboard Admin berjalan dengan baik.</p>
+        </div>
+
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-r-lg">
+            <h3 class="text-yellow-800 font-bold mb-1">⚠️ Langkah Wajib Sebelum Testing</h3>
+            <p class="text-sm text-yellow-700 mb-2">Buka Command Prompt (CMD), arahkan ke folder project Anda, dan jalankan 2 perintah ini:</p>
+            <code class="block bg-yellow-100 text-yellow-800 p-2 rounded text-sm font-mono font-bold">php artisan migrate</code>
+            <code class="block bg-yellow-100 text-yellow-800 p-2 mt-2 rounded text-sm font-mono font-bold">php artisan storage:link</code>
+            <p class="text-xs text-yellow-600 mt-2">*Juga pastikan <code class="font-mono bg-yellow-200 px-1 rounded">php artisan serve</code> dan <code class="font-mono bg-yellow-200 px-1 rounded">npm run dev</code> sedang menyala.</p>
+        </div>
+
+        <!-- Tes 1 -->
+        <div class="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="flex items-center gap-3 border-b border-gray-200 pb-3 mb-4">
+                <input type="checkbox" class="checkbox-custom text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <h2 class="text-xl font-bold text-gray-800">Tes 1: Edit Artikel yang Sudah Ada</h2>
+            </div>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700 ml-2">
+                <li>Buka halaman <strong>Kelola Artikel</strong> di browser.</li>
+                <li>Klik tombol <strong>✏️ (Edit)</strong> pada salah satu artikel yang sudah ada (misal judul "ddd").</li>
+                <li class="font-semibold text-blue-700 mt-2">Pengecekan:</li>
+                <ul class="list-disc list-inside ml-6 space-y-1 text-sm text-gray-600">
+                    <li>Judul halaman di pojok kiri atas berubah menjadi "Edit Artikel" / "Edit: ddd".</li>
+                    <li>Kolom Judul otomatis terisi teks "ddd".</li>
+                    <li>Jika sebelumnya artikel sudah punya kosakata/kuis, tabel tersebut harus sudah terisi data lama.</li>
+                </ul>
+                <li class="mt-2">Ubah judul menjadi "ddd diupdate" lalu klik tombol <strong>Simpan Draft</strong> di bawah.</li>
+                <li class="font-semibold text-blue-700 mt-2">Pengecekan:</li>
+                <ul class="list-disc list-inside ml-6 space-y-1 text-sm text-gray-600">
+                    <li>Setelah kembali ke tabel, judul artikel berubah menjadi "ddd diupdate" (artikel ter-update, bukan membuat artikel baru).</li>
+                </ul>
+            </ol>
+        </div>
+
+        <!-- Tes 2 -->
+        <div class="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="flex items-center gap-3 border-b border-gray-200 pb-3 mb-4">
+                <input type="checkbox" class="checkbox-custom text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <h2 class="text-xl font-bold text-gray-800">Tes 2: Fitur Sorting (Urutkan)</h2>
+            </div>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700 ml-2">
+                <li>Di halaman <strong>Kelola Artikel</strong>, perhatikan dropdown filter di sebelah kanan form pencarian.</li>
+                <li>Ubah filter paling kanan menjadi <strong>↑ Terlama</strong>.</li>
+                <li class="font-semibold text-blue-700 mt-2">Pengecekan:</li>
+                <ul class="list-disc list-inside ml-6 space-y-1 text-sm text-gray-600">
+                    <li>Artikel dengan tanggal paling kuno harus berada di baris paling atas.</li>
+                </ul>
+                <li class="mt-2">Ubah kembali filter tersebut menjadi <strong>↓ Terbaru</strong>.</li>
+                <li class="font-semibold text-blue-700 mt-2">Pengecekan:</li>
+                <ul class="list-disc list-inside ml-6 space-y-1 text-sm text-gray-600">
+                    <li>Artikel yang baru saja diedit ("ddd diupdate") harus berada di bagian atas.</li>
+                </ul>
+            </ol>
+        </div>
+
+        <!-- Tes 3 -->
+        <div class="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="flex items-center gap-3 border-b border-gray-200 pb-3 mb-4">
+                <input type="checkbox" class="checkbox-custom text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <h2 class="text-xl font-bold text-gray-800">Tes 3: Buat Artikel Baru & Upload Media</h2>
+            </div>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700 ml-2">
+                <li>Klik tombol biru <strong>+ Buat Artikel Baru</strong> lalu pilih <strong>Artikel Bahasa</strong>.</li>
+                <li>Isi Judul, pilih Kategori Bahasa, dan pilih <strong>Level Kemahiran</strong> (Pemula/Menengah/Mahir).</li>
+                <li>Scroll ke kotak <strong>📎 Media Tambahan</strong>:</li>
+                <ul class="list-disc list-inside ml-6 space-y-1 text-sm text-gray-600 mb-2">
+                    <li>Pilih tab <strong>🎵 Audio</strong> lalu upload sebuah file lagu/audio berformat <strong>MP3/WAV</strong>.</li>
+                    <li>Pilih tab <strong>🖼️ Gambar</strong> lalu upload <strong>2 atau 3 gambar</strong> bebas.</li>
+                    <li>Pilih tab <strong>▶️ YouTube</strong> lalu tempelkan link YouTube (misal: <code class="bg-gray-200 px-1 rounded">https://www.youtube.com/watch?v=dQw4w9WgXcQ</code>).</li>
+                </ul>
+                <li>(Opsional) Isi 1 baris Kosakata dan 1 soal Kuis.</li>
+                <li>Klik tombol hijau <strong>Publish</strong>.</li>
+                <li class="font-semibold text-blue-700 mt-2">Pengecekan:</li>
+                <ul class="list-disc list-inside ml-6 space-y-1 text-sm text-gray-600">
+                    <li>Anda berhasil diarahkan kembali ke tabel dengan pesan sukses hijau di atas tabel.</li>
+                </ul>
+            </ol>
+        </div>
+
+        <!-- Tes 4 -->
+        <div class="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="flex items-center gap-3 border-b border-gray-200 pb-3 mb-4">
+                <input type="checkbox" class="checkbox-custom text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <h2 class="text-xl font-bold text-gray-800">Tes 4: Tampilan Preview dengan Media</h2>
+            </div>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700 ml-2">
+                <li>Di tabel, cari artikel bahasa baru yang Anda buat pada Tes 3.</li>
+                <li>Klik tombol <strong>👁️ (Preview/Logo Mata)</strong>.</li>
+                <li class="font-semibold text-blue-700 mt-2">Pengecekan Bagian Konten Kiri:</li>
+                <ul class="list-disc list-inside ml-6 space-y-1 text-sm text-gray-600">
+                    <li>Terdapat bagian baru bernama <strong>📎 Media Tambahan</strong>.</li>
+                    <li><strong>Galeri Foto:</strong> Gambar yang Anda upload muncul dalam bentuk grid. Arahkan mouse ke gambar, nama file aslinya akan muncul.</li>
+                    <li><strong>Audio:</strong> Muncul pemutar lagu (player) yang bisa ditekan tombol play (▶).</li>
+                    <li><strong>YouTube:</strong> Muncul bingkai video YouTube yang bisa diputar langsung.</li>
+                </ul>
+                <li class="font-semibold text-blue-700 mt-2">Pengecekan Bagian Sidebar Kanan:</li>
+                <ul class="list-disc list-inside ml-6 space-y-1 text-sm text-gray-600">
+                    <li>Ada kotak bernama <strong>Checklist Media</strong>.</li>
+                    <li>Ceklis warna warni (✓) menyala untuk foto tambahan, audio, dan youtube yang diupload.</li>
+                    <li>Nama file asli tercantum di bawah judul checklist tersebut.</li>
+                </ul>
+            </ol>
+        </div>
+
+        <!-- Tes 5 -->
+        <div class="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="flex items-center gap-3 border-b border-gray-200 pb-3 mb-4">
+                <input type="checkbox" class="checkbox-custom text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <h2 class="text-xl font-bold text-gray-800">Tes 5: Pewarnaan Kuis (Hijau)</h2>
+            </div>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700 ml-2">
+                <li>Masih di halaman Preview yang sama dengan Tes 4, scroll ke bawah hingga menemukan bagian <strong>🧠 Kuis Review</strong>.</li>
+                <li class="font-semibold text-blue-700 mt-2">Pengecekan:</li>
+                <ul class="list-disc list-inside ml-6 space-y-1 text-sm text-gray-600">
+                    <li>Satu jawaban (yang merupakan kunci jawaban) harus tampil menonjol:
+                        <br>- Memiliki warna kotak dengan hijau terang.
+                        <br>- Teks huruf (A/B/C/D) berada dalam bundaran hijau tua.
+                        <br>- Teks isinya dicetak tebal (bold).
+                        <br>- Terdapat ikon centang (✓) di pojok kanannya.
+                    </li>
+                    <li>Sisa tiga pilihan jawaban lainnya tetap berwarna abu-abu polos.</li>
+                </ul>
+            </ol>
+        </div>
+
+        <div class="mt-12 text-center text-sm text-gray-400">
+            Dibuat secara otomatis untuk proyek NihonLearn Laravel. Buka file ini di Chrome, Microsoft Edge, atau Firefox.
+        </div>
+
+    </div>
+
+    <script>
+        // Fitur simple agar checkbox dicoret jika diceklis
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const header = this.nextElementSibling;
+                if(this.checked) {
+                    header.classList.add('line-through', 'text-gray-400');
+                    header.classList.remove('text-gray-800');
+                } else {
+                    header.classList.remove('line-through', 'text-gray-400');
+                    header.classList.add('text-gray-800');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

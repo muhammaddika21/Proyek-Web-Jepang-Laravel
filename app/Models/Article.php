@@ -13,15 +13,17 @@ class Article extends Model
     protected $fillable = [
         'user_id', 'category_id', 'title', 'slug', 'type', 'excerpt',
         'content', 'cover_image', 'cover_image_caption',
-        'japanese_title', 'romaji_title', 'jlpt_level',
+        'additional_images', 'audio_file', 'audio_label', 'youtube_url',
+        'japanese_title', 'romaji_title', 'kemahiran_level',
         'grammar_explanation', 'vocabulary_list', 'quiz_questions',
         'status', 'read_time', 'view_count', 'published_at',
     ];
 
     protected $casts = [
-        'vocabulary_list' => 'array',
-        'quiz_questions'  => 'array',
-        'published_at'    => 'datetime',
+        'vocabulary_list'    => 'array',
+        'quiz_questions'     => 'array',
+        'additional_images'  => 'array',
+        'published_at'       => 'datetime',
     ];
 
     protected static function booted(): void

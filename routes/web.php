@@ -54,6 +54,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::post('/articles', [App\Http\Controllers\Admin\ArticleController::class, 'store'])
         ->name('articles.store');
 
+    Route::get('/articles/{article}', [App\Http\Controllers\Admin\ArticleController::class, 'show'])
+        ->name('articles.show');
+
     Route::get('/articles/{article}/edit', [App\Http\Controllers\Admin\ArticleController::class, 'edit'])
         ->name('articles.edit');
 

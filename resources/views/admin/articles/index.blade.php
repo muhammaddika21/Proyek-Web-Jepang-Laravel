@@ -56,7 +56,7 @@
   </div>
 
   {{-- Statistik --}}
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+  <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
     <div class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-4">
       <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Total Artikel</p>
       <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{ $stats['total'] }}</p>
@@ -69,8 +69,12 @@
       <p class="text-xs text-yellow-600 dark:text-yellow-400 font-medium">Draft</p>
       <p class="text-2xl font-bold text-yellow-700 dark:text-yellow-400 mt-1">{{ $stats['draft'] }}</p>
     </div>
+    <div class="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/10 p-4">
+      <p class="text-xs text-amber-600 dark:text-amber-400 font-medium">🏯 Artikel Umum</p>
+      <p class="text-2xl font-bold text-amber-700 dark:text-amber-400 mt-1">{{ $stats['umum'] }}</p>
+    </div>
     <div class="rounded-xl border border-blue-200 bg-blue-50 dark:border-blue-500/20 dark:bg-blue-500/10 p-4">
-      <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">Artikel Bahasa</p>
+      <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">🎌 Artikel Bahasa</p>
       <p class="text-2xl font-bold text-blue-700 dark:text-blue-400 mt-1">{{ $stats['bahasa'] }}</p>
     </div>
   </div>
@@ -181,10 +185,16 @@
               </span>
             </td>
             <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
-              {{ $article->created_at->format('d M Y') }}
+              <p class="text-sm">{{ $article->updated_at->format('d M Y') }}</p>
+              <p class="text-[10px] text-gray-400">{{ $article->updated_at->format('H:i') }}</p>
             </td>
             <td class="px-6 py-4 text-right whitespace-nowrap">
               <div class="flex items-center justify-end gap-2">
+                {{-- Preview --}}
+                <a href="{{ route('admin.articles.show', $article) }}"
+                  class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-blue-500/20 dark:hover:text-blue-400 transition-colors" title="Preview">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                </a>
                 {{-- Edit --}}
                 <a href="{{ route('admin.articles.edit', $article) }}"
                   class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-brand-500/20 dark:hover:text-brand-400 transition-colors" title="Edit">
