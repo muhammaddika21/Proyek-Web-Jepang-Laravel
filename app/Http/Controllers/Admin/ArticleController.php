@@ -41,22 +41,22 @@ class ArticleController extends Controller
 
         // Sorting berdasarkan updated_at (agar artikel yang baru diedit muncul di atas)
         $sort = $request->get('sort', 'newest');
-        match($sort) {
+        match ($sort) {
             'oldest' => $query->orderBy('updated_at', 'asc'),
-            'views'  => $query->orderByDesc('view_count'),
-            default  => $query->orderBy('updated_at', 'desc'),
+            'views' => $query->orderByDesc('view_count'),
+            default => $query->orderBy('updated_at', 'desc'),
         };
 
-        $articles   = $query->paginate(10)->withQueryString();
+        $articles = $query->paginate(10)->withQueryString();
         $categories = Category::all();
 
         // Statistik untuk header dashboard
         $stats = [
-            'total'     => Article::count(),
+            'total' => Article::count(),
             'published' => Article::where('status', 'published')->count(),
-            'draft'     => Article::where('status', 'draft')->count(),
-            'umum'      => Article::where('type', 'umum')->count(),
-            'bahasa'    => Article::where('type', 'bahasa')->count(),
+            'draft' => Article::where('status', 'draft')->count(),
+            'umum' => Article::where('type', 'umum')->count(),
+            'bahasa' => Article::where('type', 'bahasa')->count(),
         ];
 
         return view('admin.articles.index', compact('articles', 'categories', 'stats'));
@@ -68,7 +68,14 @@ class ArticleController extends Controller
     public function create()
     {
         $categories = Category::where('type', 'umum')->get();
-        return view('admin.articles.create', compact('categories'));
+
+        // Parent categories with children for dependent dropdown
+        $parentCategories = Category::where('type', 'umum')
+            ->whereNull('parent_id')
+            ->with('children')
+            ->get();
+
+        return view('admin.articles.create', compact('categories', 'parentCategories'));
     }
 
     // =============================================
@@ -94,10 +101,10 @@ class ArticleController extends Controller
 
         // Validasi dasar
         $rules = [
-            'title'       => 'required|string|max:255',
-            'slug'        => 'nullable|string|max:255|unique:articles,slug',
+            'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:articles,slug',
             'category_id' => 'nullable|exists:categories,id',
-            'excerpt'     => 'nullable|string|max:500',
+            'excerpt' => 'nullable|string|max:500',
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
 
@@ -149,26 +156,26 @@ class ArticleController extends Controller
 
         // Buat artikel
         $article = Article::create([
-            'user_id'              => Auth::id(),
-            'category_id'         => $request->category_id,
-            'title'               => $request->title,
-            'slug'                => $slug,
-            'type'                => $type,
-            'excerpt'             => $request->excerpt,
-            'content'             => $content,
-            'cover_image'         => $coverPath,
+            'user_id' => Auth::id(),
+            'category_id' => $request->category_id,
+            'title' => $request->title,
+            'slug' => $slug,
+            'type' => $type,
+            'excerpt' => $request->excerpt,
+            'content' => $content,
+            'cover_image' => $coverPath,
             'cover_image_caption' => $request->cover_image_caption,
-            'additional_images'   => !empty($additionalImages) ? $additionalImages : null,
-            'audio_file'          => $audioPath,
-            'audio_label'         => $request->audio_label,
-            'japanese_title'      => $request->japanese_title,
-            'romaji_title'        => $request->romaji_title,
-            'kemahiran_level'     => $request->kemahiran_level,
+            'additional_images' => !empty($additionalImages) ? $additionalImages : null,
+            'audio_file' => $audioPath,
+            'audio_label' => $request->audio_label,
+            'japanese_title' => $request->japanese_title,
+            'romaji_title' => $request->romaji_title,
+            'kemahiran_level' => $request->kemahiran_level,
             'grammar_explanation' => $grammarExplanation,
-            'vocabulary_list'     => $this->parseVocabList($request->vocabulary_list),
-            'quiz_questions'      => $this->parseQuiz($request->quiz_questions),
-            'status'              => $status,
-            'read_time'           => $request->read_time,
+            'vocabulary_list' => $this->parseVocabList($request->vocabulary_list),
+            'quiz_questions' => $this->parseQuiz($request->quiz_questions),
+            'status' => $status,
+            'read_time' => $request->read_time,
         ]);
 
         $label = $type === 'bahasa' ? 'Artikel Bahasa' : 'Artikel Umum';
@@ -185,7 +192,17 @@ class ArticleController extends Controller
     {
         $categories = Category::where('type', $article->type)->get();
         $view = $article->type === 'bahasa' ? 'admin.articles.edit-bahasa' : 'admin.articles.create';
-        return view($view, compact('article', 'categories'));
+
+        // For umum articles, pass parentCategories with children for dependent dropdown
+        $parentCategories = collect();
+        if ($article->type === 'umum') {
+            $parentCategories = Category::where('type', 'umum')
+                ->whereNull('parent_id')
+                ->with('children')
+                ->get();
+        }
+
+        return view($view, compact('article', 'categories', 'parentCategories'));
     }
 
     // =============================================
@@ -197,13 +214,13 @@ class ArticleController extends Controller
         $status = $request->input('action') === 'draft' ? 'draft' : 'published';
 
         $rules = [
-            'title'       => 'required|string|max:255',
-            'slug'        => 'nullable|string|max:255|unique:articles,slug,' . $article->id,
+            'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:articles,slug,' . $article->id,
             'category_id' => 'nullable|exists:categories,id',
-            'excerpt'     => 'nullable|string|max:500',
+            'excerpt' => 'nullable|string|max:500',
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'additional_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'audio_file'  => 'nullable|mimes:mp3,wav,ogg,m4a|max:20480',
+            'audio_file' => 'nullable|mimes:mp3,wav,ogg,m4a|max:20480',
         ];
 
         if ($article->type === 'bahasa') {
@@ -253,25 +270,25 @@ class ArticleController extends Controller
         }
 
         $article->update([
-            'category_id'         => $request->category_id,
-            'title'               => $request->title,
-            'slug'                => $slug,
-            'excerpt'             => $request->excerpt,
-            'content'             => $content,
-            'cover_image'         => $coverPath,
+            'category_id' => $request->category_id,
+            'title' => $request->title,
+            'slug' => $slug,
+            'excerpt' => $request->excerpt,
+            'content' => $content,
+            'cover_image' => $coverPath,
             'cover_image_caption' => $request->cover_image_caption,
-            'additional_images'   => !empty($additionalImages) ? $additionalImages : null,
-            'audio_file'          => $audioPath,
-            'audio_label'         => $request->audio_label,
-            'youtube_url'         => $request->youtube_url,
-            'japanese_title'      => $request->japanese_title,
-            'romaji_title'        => $request->romaji_title,
-            'kemahiran_level'     => $request->kemahiran_level,
+            'additional_images' => !empty($additionalImages) ? $additionalImages : null,
+            'audio_file' => $audioPath,
+            'audio_label' => $request->audio_label,
+            'youtube_url' => $request->youtube_url,
+            'japanese_title' => $request->japanese_title,
+            'romaji_title' => $request->romaji_title,
+            'kemahiran_level' => $request->kemahiran_level,
             'grammar_explanation' => $grammarExplanation,
-            'vocabulary_list'     => $this->parseVocabList($request->vocabulary_list),
-            'quiz_questions'      => $this->parseQuiz($request->quiz_questions),
-            'status'              => $status,
-            'read_time'           => $request->read_time,
+            'vocabulary_list' => $this->parseVocabList($request->vocabulary_list),
+            'quiz_questions' => $this->parseQuiz($request->quiz_questions),
+            'status' => $status,
+            'read_time' => $request->read_time,
         ]);
 
         $statusLabel = $status === 'draft' ? '(Draft)' : '(Published)';
@@ -328,7 +345,7 @@ class ArticleController extends Controller
     private function makeUniqueSlug(string $slug, ?int $exceptId = null): string
     {
         $original = $slug;
-        $counter  = 1;
+        $counter = 1;
 
         while (
             Article::where('slug', $slug)
@@ -344,18 +361,52 @@ class ArticleController extends Controller
 
     // =============================================
     // Helper: Parse vocabulary list dari form
+    // Supports two formats:
+    //   1. Grouped (new): [ { title, rows: [{kata,romaji,arti,contoh}] }, ... ]
+    //   2. Flat   (old):  [ {kata, romaji, arti, contoh}, ... ]
     // =============================================
     private function parseVocabList($raw): ?array
     {
-        if (empty($raw) || !is_array($raw)) return null;
+        if (empty($raw) || !is_array($raw))
+            return null;
 
+        // Detect grouped format: first item has 'rows' key
+        $firstItem = reset($raw);
+        $isGrouped = is_array($firstItem) && array_key_exists('rows', $firstItem);
+
+        if ($isGrouped) {
+            // --- GROUPED FORMAT (from create-bahasa / edit-bahasa) ---
+            $tables = [];
+            foreach ($raw as $tableData) {
+                $rows = [];
+                foreach ($tableData['rows'] ?? [] as $row) {
+                    if (empty($row['kata']) && empty($row['arti'])) continue;
+                    $rows[] = [
+                        'kata'   => $row['kata']   ?? '',
+                        'romaji' => $row['romaji']  ?? '',
+                        'arti'   => $row['arti']    ?? '',
+                        'contoh' => $row['contoh']  ?? '',
+                    ];
+                }
+                if (!empty($rows)) {
+                    $tables[] = [
+                        'title' => $tableData['title'] ?? '',
+                        'rows'  => $rows,
+                    ];
+                }
+            }
+            return !empty($tables) ? $tables : null;
+        }
+
+        // --- FLAT FORMAT (legacy) ---
         $result = array_filter(array_map(function ($item) {
-            if (empty($item['kata']) && empty($item['arti'])) return null;
+            if (empty($item['kata']) && empty($item['arti']))
+                return null;
             return [
-                'kata'    => $item['kata']    ?? '',
-                'romaji'  => $item['romaji']  ?? '',
-                'arti'    => $item['arti']    ?? '',
-                'contoh'  => $item['contoh']  ?? '',
+                'kata'   => $item['kata']   ?? '',
+                'romaji' => $item['romaji']  ?? '',
+                'arti'   => $item['arti']    ?? '',
+                'contoh' => $item['contoh']  ?? '',
             ];
         }, $raw));
 
@@ -367,16 +418,18 @@ class ArticleController extends Controller
     // =============================================
     private function parseQuiz($raw): ?array
     {
-        if (empty($raw) || !is_array($raw)) return null;
+        if (empty($raw) || !is_array($raw))
+            return null;
 
         $result = array_filter(array_map(function ($item) {
-            if (empty($item['question'])) return null;
+            if (empty($item['question']))
+                return null;
             // Filter out empty options
             $options = array_values(array_filter($item['options'] ?? [], fn($o) => trim($o) !== ''));
             return [
-                'question' => $item['question']        ?? '',
-                'options'  => $options,
-                'answer'   => (int)($item['answer']     ?? 0),
+                'question' => $item['question'] ?? '',
+                'options' => $options,
+                'answer' => (int) ($item['answer'] ?? 0),
             ];
         }, $raw));
 
@@ -391,7 +444,8 @@ class ArticleController extends Controller
     // =============================================
     private function stripBase64Images(?string $content): ?string
     {
-        if (empty($content)) return $content;
+        if (empty($content))
+            return $content;
 
         // Ganti <img src="data:image/...;base64,..."> dengan peringatan
         return preg_replace(

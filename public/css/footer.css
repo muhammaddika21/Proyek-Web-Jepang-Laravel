@@ -1,11 +1,11 @@
 /* =======================================================
-   FOOTER STYLES — Copy dari original style.css
-   Background: gradient hijau post-migration
+   FOOTER STYLES — Blended with sakura color palette
+   Colors: #448646, #80b68b, #296751, #f8f7ef, #d6975e, #404235
 ======================================================= */
 
 /* Container Utama Footer */
 .main-footer {
-    background: linear-gradient(to bottom, #296751, #1a4035);
+    background: linear-gradient(165deg, #74a880 0%, #589165 50%, #467a52 100%);
     color: #f8f7ef;
     padding-top: 3rem;
     position: relative;
@@ -55,12 +55,14 @@
     margin: 0;
     font-size: 1.2rem;
     font-weight: 700;
+    color: #f8f7ef;
 }
 
 .footer-text-wrapper p {
     margin: 0;
     font-size: 0.9rem;
-    opacity: 0.8;
+    opacity: 0.85;
+    color: #f8f7ef;
 }
 
 /* Kolom Tengah: Social Media */
@@ -68,6 +70,7 @@
     text-align: center;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
     gap: 0.8rem;
 }
@@ -83,6 +86,7 @@
     display: flex;
     gap: 1rem;
     justify-content: center;
+    align-items: center;
 }
 
 /* Sembunyikan label di desktop */
@@ -99,10 +103,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    line-height: 1;
     color: white;
     text-decoration: none;
-    transition: 0.28s ease;
+    transition: all 0.28s ease;
+}
+
+.social-btn i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: inherit;
 }
 
 /* Hover — Original Effect */
@@ -180,18 +193,27 @@
         align-items: center;
     }
 
-    /* Social Buttons → CAPSULES */
+    /* Social Buttons → CAPSULES — centered icon+text */
     .social-btn {
         width: 220px;
         height: 50px;
         border-radius: 50px;
         display: flex;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
-        padding-left: 20px;
-        gap: 15px;
+        gap: 12px;
         background: rgba(255, 255, 255, 0.25);
         border: 1px solid rgba(255, 255, 255, 0.2);
+        font-size: 1.2rem;
+        /* Pastikan tidak ada transform scale yang menyebabkan jitter layout */
+        box-sizing: border-box;
+    }
+
+    .social-btn i {
+        font-size: 1.2rem;
+        width: auto;
+        height: auto;
+        flex-shrink: 0;
     }
 
     /* Munculkan label */
@@ -200,22 +222,23 @@
         font-size: 1rem;
         font-weight: 600;
         color: white;
+        min-width: 70px;
+        text-align: center;
     }
 
-    /* Mobile hover */
+    /* Mobile hover — NO width change to prevent jitter */
     .social-btn:hover,
     .social-btn:active {
-        background: white;
-        transform: translateY(-2px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        width: 230px;
+        background: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        /* width tetap sama, tidak berubah */
     }
 
     .social-btn:hover .social-label,
     .social-btn:active .social-label,
     .social-btn:hover i,
     .social-btn:active i {
-        color: #8fd6b0 !important;
+        color: white !important;
         transition: color 0.2s ease;
     }
 }

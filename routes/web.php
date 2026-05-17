@@ -3,29 +3,20 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BahasaController;
+use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\BudayaController;
 use App\Http\Controllers\AuthController;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-
-// ===== DEBUG/DEV BYPASS (Hapus rute ini jika sudah selesai) =====
-Route::get('/bypass', function () {
-    $user = User::first(); 
-    if ($user) {
-        Auth::login($user);
-        return redirect()->route('admin.dashboard');
-    }
-    return "User tidak ditemukan di database. Pastikan database sudah terisi!";
-});
 
 // ===== PUBLIC ROUTES =====
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/bahasa', [BahasaController::class, 'index'])->name('bahasa.index');
+Route::get('/bahasa/{slug}', [BahasaController::class, 'show'])->name('bahasa.show');
 
-// Future routes (to be implemented):
-// Route::get('/bahasa/{slug}', [BahasaController::class, 'show'])->name('bahasa.show');
-// Route::get('/budaya', [BudayaController::class, 'index'])->name('budaya.index');
-// Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
-// Route::get('/profil', [ProfilController::class, 'index'])->name('profil.index');
+Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
+Route::get('/kegiatan/{slug}', [KegiatanController::class, 'show'])->name('kegiatan.show');
+
+Route::get('/budaya', [BudayaController::class, 'index'])->name('budaya.index');
+Route::get('/budaya/{slug}', [BudayaController::class, 'show'])->name('budaya.show');
 
 // ===== AUTH ROUTES (Admin Login) =====
 Route::middleware('guest')->group(function () {
@@ -68,4 +59,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     Route::patch('/articles/{article}/toggle-status', [App\Http\Controllers\Admin\ArticleController::class, 'toggleStatus'])
         ->name('articles.toggleStatus');
+
+    Route::delete('/articles/{article}/media', [App\Http\Controllers\Admin\ArticleController::class, 'deleteMedia'])
+        ->name('articles.deleteMedia');
 });

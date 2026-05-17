@@ -30,7 +30,7 @@
         x-transition:leave="transition ease-in duration-75"
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95"
-        class="absolute right-0 mt-2 w-64 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900 z-50 overflow-hidden"
+        class="absolute right-0 mt-2 w-64 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-[#24463a] dark:bg-[#1a2e24] z-50 overflow-hidden"
         style="display:none;">
         <div class="p-3">
           <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">Pilih Tipe Artikel</p>
@@ -57,7 +57,7 @@
 
   {{-- Statistik --}}
   <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
-    <div class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-4">
+    <div class="rounded-xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-4">
       <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Total Artikel</p>
       <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">{{ $stats['total'] }}</p>
     </div>
@@ -81,7 +81,7 @@
 
   {{-- Filter & Search (sebagai form GET) --}}
   <form method="GET" action="{{ route('admin.articles.index') }}"
-    class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] mb-6">
+    class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] mb-6">
     <div class="p-4 flex flex-wrap items-center gap-3">
       {{-- Search --}}
       <div class="flex items-center gap-2 flex-1 min-w-[200px]">
@@ -95,7 +95,7 @@
 
       {{-- Filter Tipe --}}
       <select name="type" onchange="this.form.submit()"
-        class="text-xs rounded-lg border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 px-3 py-2">
+        class="text-xs rounded-lg border-gray-200 dark:border-[#24463a] dark:bg-[#1a2e24] dark:text-gray-300 px-3 py-2">
         <option value="all" {{ request('type','all') === 'all' ? 'selected' : '' }}>Semua Tipe</option>
         <option value="bahasa" {{ request('type') === 'bahasa' ? 'selected' : '' }}>🎌 Bahasa</option>
         <option value="umum"   {{ request('type') === 'umum'   ? 'selected' : '' }}>🏯 Umum</option>
@@ -103,7 +103,7 @@
 
       {{-- Filter Kategori --}}
       <select name="category" onchange="this.form.submit()"
-        class="text-xs rounded-lg border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 px-3 py-2">
+        class="text-xs rounded-lg border-gray-200 dark:border-[#24463a] dark:bg-[#1a2e24] dark:text-gray-300 px-3 py-2">
         <option value="all">Semua Kategori</option>
         <optgroup label="📘 Bahasa Jepang">
           @foreach($categories->where('type', 'bahasa') as $cat)
@@ -119,7 +119,7 @@
 
       {{-- Filter Status --}}
       <select name="status" onchange="this.form.submit()"
-        class="text-xs rounded-lg border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 px-3 py-2">
+        class="text-xs rounded-lg border-gray-200 dark:border-[#24463a] dark:bg-[#1a2e24] dark:text-gray-300 px-3 py-2">
         <option value="all"       {{ request('status','all') === 'all' ? 'selected' : '' }}>Semua Status</option>
         <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>✅ Published</option>
         <option value="draft"     {{ request('status') === 'draft'     ? 'selected' : '' }}>📝 Draft</option>
@@ -127,7 +127,7 @@
 
       {{-- Sorting --}}
       <select name="sort" onchange="this.form.submit()"
-        class="text-xs rounded-lg border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 px-3 py-2">
+        class="text-xs rounded-lg border-gray-200 dark:border-[#24463a] dark:bg-[#1a2e24] dark:text-gray-300 px-3 py-2">
         <option value="newest" {{ request('sort','newest') === 'newest' ? 'selected' : '' }}>↓ Terbaru</option>
         <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>↑ Terlama</option>
         <option value="views"  {{ request('sort') === 'views'  ? 'selected' : '' }}>🔥 Paling Banyak Dilihat</option>
@@ -146,11 +146,11 @@
   </form>
 
   {{-- Table --}}
-  <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+  <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]">
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left">
         <thead>
-          <tr class="border-b border-gray-100 dark:border-gray-800">
+          <tr class="border-b border-gray-100 dark:border-[#24463a]">
             <th class="px-6 py-4 font-medium text-gray-500 dark:text-gray-400">Judul</th>
             <th class="px-6 py-4 font-medium text-gray-500 dark:text-gray-400">Tipe</th>
             <th class="px-6 py-4 font-medium text-gray-500 dark:text-gray-400">Kategori</th>
@@ -192,19 +192,19 @@
               <div class="flex items-center justify-end gap-2">
                 {{-- Preview --}}
                 <a href="{{ route('admin.articles.show', $article) }}"
-                  class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-blue-500/20 dark:hover:text-blue-400 transition-colors" title="Preview">
+                  class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:bg-[#24463a] dark:text-gray-400 dark:hover:bg-blue-500/20 dark:hover:text-blue-400 transition-colors" title="Preview">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                 </a>
                 {{-- Edit --}}
                 <a href="{{ route('admin.articles.edit', $article) }}"
-                  class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-brand-500/20 dark:hover:text-brand-400 transition-colors" title="Edit">
+                  class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 hover:bg-brand-50 hover:text-brand-600 dark:bg-[#24463a] dark:text-gray-400 dark:hover:bg-brand-500/20 dark:hover:text-brand-400 transition-colors" title="Edit">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </a>
                 {{-- Toggle Status --}}
                 <form method="POST" action="{{ route('admin.articles.toggleStatus', $article) }}">
                   @csrf @method('PATCH')
                   <button type="submit" title="{{ $article->status === 'published' ? 'Jadikan Draft' : 'Publish' }}"
-                    class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 hover:bg-green-50 hover:text-green-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-green-500/20 dark:hover:text-green-400 transition-colors">
+                    class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 hover:bg-green-50 hover:text-green-600 dark:bg-[#24463a] dark:text-gray-400 dark:hover:bg-green-500/20 dark:hover:text-green-400 transition-colors">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       @if($article->status === 'published')
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -219,7 +219,7 @@
                   onsubmit="return confirm('Yakin hapus artikel ini?')">
                   @csrf @method('DELETE')
                   <button type="submit" title="Hapus"
-                    class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 hover:bg-red-50 hover:text-red-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-red-500/20 dark:hover:text-red-400 transition-colors">
+                    class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 hover:bg-red-50 hover:text-red-600 dark:bg-[#24463a] dark:text-gray-400 dark:hover:bg-red-500/20 dark:hover:text-red-400 transition-colors">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                   </button>
                 </form>
@@ -244,7 +244,7 @@
 
     {{-- Pagination --}}
     @if($articles->hasPages())
-    <div class="border-t border-gray-100 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+    <div class="border-t border-gray-100 dark:border-[#24463a] px-6 py-4 flex items-center justify-between">
       <p class="text-xs text-gray-500">
         Menampilkan {{ $articles->firstItem() }}-{{ $articles->lastItem() }} dari {{ $articles->total() }} artikel
       </p>

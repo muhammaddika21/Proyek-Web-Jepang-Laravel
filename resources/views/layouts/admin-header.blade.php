@@ -1,5 +1,5 @@
 <header
-    class="sticky top-0 flex w-full bg-white border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 xl:border-b"
+    class="sticky top-0 flex w-full bg-white border-gray-200 z-99999 dark:border-[#24463a] dark:bg-[#1a2e24] xl:border-b"
     x-data="{
         isApplicationMenuOpen: false,
         toggleApplicationMenu() {
@@ -49,9 +49,9 @@
             </button>
 
             <!-- Logo (mobile only) -->
-            <a href="/" class="xl:hidden">
-                <img class="dark:hidden" src="/images/logo/logo.svg" alt="Logo" />
-                <img class="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" />
+            <a href="/" class="xl:hidden flex items-center gap-2">
+                <img src="/images/Logo ukm nihon fix.png" alt="NihonLearn" class="w-8 h-8 rounded-lg object-contain" />
+                <span class="font-bold text-gray-800 dark:text-white">NihonLearn</span>
             </a>
 
             <!-- Application Menu Toggle (mobile only) -->

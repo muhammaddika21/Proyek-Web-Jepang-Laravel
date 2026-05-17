@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NihonLearn - Scholarly Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Inter:wght@100..900&amp;family=Noto+Sans+JP:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface-container": "#e7eefe",
+                        "on-secondary-container": "#731a04",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#b1f0ce",
+                        "on-surface": "#151c27",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#8e0051",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#dce2f3",
+                        "secondary-container": "#ff8162",
+                        "on-tertiary-container": "#ffccdc",
+                        "surface": "#f9f9ff",
+                        "inverse-surface": "#2a313d",
+                        "inverse-primary": "#95d4b3",
+                        "on-primary-fixed-variant": "#0e5138",
+                        "tertiary-container": "#b4196a",
+                        "surface-container-high": "#e2e8f8",
+                        "background": "#F5F0E8", // Overriding for brand feel
+                        "tertiary-fixed": "#ffd9e4",
+                        "tertiary-fixed-dim": "#ffb0cc",
+                        "secondary-fixed-dim": "#ffb4a2",
+                        "on-secondary-fixed-variant": "#83260e",
+                        "primary": "#0f5238",
+                        "on-tertiary-fixed-variant": "#8d0050",
+                        "surface-container-low": "#f0f3ff",
+                        "primary-fixed-dim": "#95d4b3",
+                        "on-surface-variant": "#404943",
+                        "on-primary-container": "#a8e7c5",
+                        "primary-container": "#2d6a4f",
+                        "surface-tint": "#2c694e",
+                        "outline": "#707973",
+                        "surface-variant": "#dce2f3",
+                        "surface-bright": "#f9f9ff",
+                        "on-background": "#151c27",
+                        "secondary-fixed": "#ffdad2",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#3c0700",
+                        "on-primary-fixed": "#002114",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#bfc9c1",
+                        "secondary": "#a33d23",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d3daea",
+                        "on-tertiary-fixed": "#3e0020"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": [
+                            "Newsreader", "serif"
+                        ],
+                        "body": [
+                            "Inter", "sans-serif"
+                        ],
+                        "label": [
+                            "Inter", "sans-serif"
+                        ],
+                        "jp": [
+                            "Noto Sans JP", "sans-serif"
+                        ]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #F5F0E8; } /* Explicit brand background */
+        .glass-panel {
+            background: rgba(249, 249, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface antialiased selection:bg-primary-container selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="glass-panel w-full px-8 py-4 flex justify-between items-center max-w-screen-2xl mx-auto sticky top-0 z-50">
+<div class="flex items-center gap-6">
+<h1 class="text-2xl font-headline italic font-bold text-primary tracking-tight">NihonLearn</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-primary font-medium hover:bg-surface-container-high px-4 py-2 rounded-lg transition-all">Mahir</button>
+<button class="text-surface-variant font-medium hover:bg-surface-container-high px-4 py-2 rounded-lg transition-all">Menengah</button>
+<button class="text-primary hover:bg-surface-container-high p-2 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<main class="max-w-screen-2xl mx-auto px-4 md:px-8 pb-24">
+<!-- Hero Section -->
+<section class="relative w-full h-[614px] min-h-[500px] mb-12 rounded-xl overflow-hidden flex items-end p-12 bg-surface-container-low" data-alt="dramatic sunset sky over kyoto mountains with soft pastel orange and purple clouds, serene atmospheric lighting" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC1rp1X9l89ZPdoMs5SPcYnehj_iZdlpXJA1hEpF3eiRJqVAuwHDsKHNxC3Lmhx4zLHO-dTEvaa_9tT9GIiOL4QrBeckXi-TH1nOCPYK4cN8Hm_m7Qaf7UCanPDzn5lWVxGiEoWxkLhy3AQ7-yc9kjvQ8R0-_pQos9TYjv-3iD21W2RMJ1bQr_oHtOTNTOsKzwlve4XauZENIpNqgyFl2P8QtkKbb719EjjUwv-jm_YyYIcluaGzbssEyhCx1g04zYgvKLUbPcloO8'); background-size: cover; background-position: center;">
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-on-surface/20 to-transparent"></div>
+<div class="relative z-10 max-w-3xl">
+<span class="font-jp text-on-primary/80 text-xl tracking-widest mb-4 block">学びの道</span>
+<h2 class="font-headline text-5xl md:text-7xl font-bold text-on-primary tracking-tight leading-tight mb-6">
+                    Menyelami Keindahan<br/>Bahasa Jepang
+                </h2>
+<p class="font-body text-lg text-on-primary/90 max-w-xl font-light">
+                    Kurasi artikel dan materi belajar yang mendalam, dirancang untuk membimbing Anda dari dasar hingga kefasihan.
+                </p>
+</div>
+</section>
+<!-- Filter/Nav Bar -->
+<div class="sticky top-[72px] z-40 bg-[#F5F0E8]/90 backdrop-blur-md py-4 mb-16 border-b border-outline-variant/15 flex flex-col md:flex-row justify-between items-center gap-6">
+<!-- Left: Search -->
+<div class="relative w-full md:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-transparent border-0 border-b-2 border-outline-variant focus:border-primary focus:ring-0 pl-10 py-2 font-body text-sm text-on-surface placeholder:text-outline transition-colors" placeholder="Cari materi..." type="text"/>
+</div>
+<!-- Center: Categories -->
+<nav class="flex overflow-x-auto w-full md:w-auto gap-8 hide-scrollbar pb-2 md:pb-0">
+<a class="font-headline font-bold text-primary border-b-2 border-primary pb-1 whitespace-nowrap" href="#">Tata Bahasa</a>
+<a class="font-headline font-medium text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap" href="#">Kanji</a>
+<a class="font-headline font-medium text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap" href="#">Kosakata</a>
+<a class="font-headline font-medium text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap" href="#">Menulis</a>
+<a class="font-headline font-medium text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap" href="#">Budaya &amp; Konteks</a>
+<a class="font-headline font-medium text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap" href="#">JLPT</a>
+</nav>
+<!-- Right: Levels -->
+<div class="flex gap-4">
+<button class="text-sm font-label text-on-surface-variant hover:text-primary">Pemula</button>
+<button class="text-sm font-label text-on-surface-variant hover:text-primary">Menengah</button>
+<button class="text-sm font-label text-on-surface-variant hover:text-primary">Mahir</button>
+</div>
+</div>
+<!-- Main Content: Artikel Terbaru -->
+<section>
+<h3 class="font-headline text-3xl font-bold text-primary mb-12 tracking-tight">Artikel Terbaru</h3>
+<!-- Category Group: Tata Bahasa -->
+<div class="mb-20">
+<div class="flex items-end justify-between mb-8 border-b border-outline-variant/15 pb-4">
+<h4 class="font-headline text-2xl text-on-surface italic">Tata Bahasa</h4>
+<a class="text-sm font-label text-primary underline underline-offset-4 decoration-outline-variant/50 hover:decoration-primary transition-colors" href="#">Lihat Semua</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Article Card 1 -->
+<article class="group cursor-pointer">
+<div class="relative w-full aspect-[4/3] bg-surface-container-low rounded-xl overflow-hidden mb-6">
+<img class="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="close up of traditional japanese calligraphy brush and ink stone on textured paper with dramatic soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATcwf5SYG6xQ5jcjcdXG8Q95DRNZOMsgWGdk5C52WZ0JDH-GhmTe2QOlUl0W7L43LAhoohVUKuBQFm1TMarZf_KXc-Y-Dk39S_qTZdzcQF7sfL92ptHTjaqSdkVBvXU4e_Z6mj7-AiArQ7rmsU2WK8SkYJytVQfqJcKQ-I3OPfUw7KOXldWdZT9qa7Ktibty8_1963gX3xndQD3l4f-x6Horwu5uwN-RcyI0CQKWe9QyH_aTpfzralZzaxi_FDkqr9yYIkhAgETC4"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Tata Bahasa</span>
+<span class="bg-primary-fixed text-on-primary-fixed-variant text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Pemula</span>
+</div>
+</div>
+<h5 class="font-headline text-xl font-bold text-on-surface leading-tight mb-3 group-hover:text-primary transition-colors">Memahami Partikel 'Wa' (は) dan 'Ga' (が) dalam Konteks Sehari-hari</h5>
+<p class="font-body text-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                            Meskipun sering dianggap sama, penggunaan 'wa' dan 'ga' memiliki nuansa yang sangat berbeda dalam kalimat bahasa Jepang. Mari kita bedah perbedaannya.
+                        </p>
+<div class="flex items-center text-xs text-outline font-label uppercase tracking-widest">
+<span>Oleh Sensei Aki</span>
+<span class="mx-2">•</span>
+<span>5 Min Baca</span>
+</div>
+</article>
+<!-- Article Card 2 -->
+<article class="group cursor-pointer">
+<div class="relative w-full aspect-[4/3] bg-surface-container-low rounded-xl overflow-hidden mb-6 flex items-center justify-center overflow-hidden">
+<!-- Asymmetric Kanji Background Card Pattern -->
+<span class="absolute -right-8 -bottom-12 font-jp text-[12rem] text-primary/5 leading-none select-none">条件</span>
+<img class="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="minimalist architectural interior of modern japanese tea house with warm wood tones and soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcIxqsm5kQOwnNed_pvwDccbYMrTOtjA0oInVL0gTHQRLqK7TWoGH9FH5sJDnUhVhogMFOevOCGG9ujRA54l02zzO1vxaQxSeClax_u58W50Agg_SYrGTlSB1WstYnl47apTKuQl53nyjcoHM2IE9ZOAZqJWQ-GK74eIWFnvFD2x9mC9QNfTBtHubG-Xb6X-1M1tLqtrAfrpY0yVikPh7wxNCYRJrfFTc6gTZscu7RFVow-PrQNW_bFXYLx6jpksZkQ4oYKTQBSvA"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Tata Bahasa</span>
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Menengah</span>
+</div>
+</div>
+<h5 class="font-headline text-xl font-bold text-on-surface leading-tight mb-3 group-hover:text-primary transition-colors">Bentuk Pengandaian: 'Tara' (たら), 'Ba' (ば), 'To' (と), dan 'Nara' (なら)</h5>
+<p class="font-body text-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                            Bahasa Jepang memiliki empat cara utama untuk menyatakan kalimat kondisional. Pelajari kapan harus menggunakan masing-masing bentuk ini agar terdengar natural.
+                        </p>
+<div class="flex items-center text-xs text-outline font-label uppercase tracking-widest">
+<span>Oleh Sensei Ken</span>
+<span class="mx-2">•</span>
+<span>8 Min Baca</span>
+</div>
+</article>
+</div>
+</div>
+<!-- Category Group: Kanji -->
+<div class="mb-20">
+<div class="flex items-end justify-between mb-8 border-b border-outline-variant/15 pb-4">
+<h4 class="font-headline text-2xl text-on-surface italic">Kanji</h4>
+<a class="text-sm font-label text-primary underline underline-offset-4 decoration-outline-variant/50 hover:decoration-primary transition-colors" href="#">Lihat Semua</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Article Card 3 -->
+<article class="group cursor-pointer">
+<div class="relative w-full aspect-[4/3] bg-surface-container-low rounded-xl overflow-hidden mb-6 flex items-center justify-center">
+<span class="absolute -left-4 -top-8 font-jp text-[12rem] text-primary/10 leading-none select-none">自然</span>
+<div class="absolute top-4 left-4 flex gap-2 z-10">
+<span class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Kanji</span>
+<span class="bg-primary-fixed text-on-primary-fixed-variant text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Pemula</span>
+</div>
+</div>
+<h5 class="font-headline text-xl font-bold text-on-surface leading-tight mb-3 group-hover:text-primary transition-colors">Radikal Kanji: Kunci Mengingat Ratusan Karakter</h5>
+<p class="font-body text-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                            Jangan menghafal kanji sebagai gambar acak. Pelajari komponen dasarnya (radikal) untuk membangun struktur ingatan yang kuat.
+                        </p>
+<div class="flex items-center text-xs text-outline font-label uppercase tracking-widest">
+<span>Oleh Kurator</span>
+<span class="mx-2">•</span>
+<span>6 Min Baca</span>
+</div>
+</article>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-20 bg-surface-container-low py-12 px-8 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto border-t-0">
+<div class="font-headline text-lg text-on-surface mb-6 md:mb-0">
+            © 2024 NihonLearn. A Curated Scholarly Publication.
+        </div>
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="font-body text-xs uppercase tracking-widest text-outline hover:text-on-surface transition-colors" href="#">Privacy Policy</a>
+<a class="font-body text-xs uppercase tracking-widest text-outline hover:text-on-surface transition-colors" href="#">Terms of Service</a>
+<a class="font-body text-xs uppercase tracking-widest text-outline hover:text-on-surface transition-colors" href="#">Curator Guidelines</a>
+<a class="font-body text-xs uppercase tracking-widest text-outline hover:text-on-surface transition-colors" href="#">Contact</a>
+</nav>
+</footer>
+</body></html>

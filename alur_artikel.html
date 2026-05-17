@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alur Sistem Artikel - Nihon Learn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+    <div class="max-w-5xl mx-auto py-10 px-6">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-extrabold text-indigo-700">Alur Sistem Artikel: Nihon Learn</h1>
+            <p class="text-lg text-gray-600 mt-2">Dokumentasi lengkap aliran data artikel dari Backend (Admin) ke Client Side (User)</p>
+        </header>
+
+        <!-- Arsitektur Flow -->
+        <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">1. Diagram Alur Keseluruhan</h2>
+            <div class="mermaid flex justify-center">
+                flowchart TD
+                    subgraph Backend [Admin Panel / Backend]
+                        A[Admin Form (Create/Edit)] -->|Submit Data & Media| B(ArticleController)
+                        B -->|Validasi & Upload| C{Database: articles table}
+                        B -->|Simpan File| D[(Storage/Public)]
+                    end
+                    
+                    subgraph Client [Client Side / User View]
+                        C -->|Query Published Articles| E(BahasaController / HomeController)
+                        E -->|Data Artikel| F[Blade Views]
+                        D -->|Load Image/Audio| F
+                        F -->|Render HTML| G((Browser User))
+                    end
+            </div>
+            <p class="text-sm text-gray-500 mt-4 text-center">Diagram di atas menunjukkan bagaimana data bergerak dari input admin hingga ditampilkan ke user.</p>
+        </section>
+
+        <!-- Struktur Database -->
+        <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">2. Struktur Data (Database)</h2>
+            <p class="mb-4">Artikel disimpan dalam tabel <code>articles</code> dengan field utama sebagai berikut:</p>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left border-collapse border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border border-gray-200 px-4 py-2">Kategori</th>
+                            <th class="border border-gray-200 px-4 py-2">Kolom</th>
+                            <th class="border border-gray-200 px-4 py-2">Deskripsi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border border-gray-200 px-4 py-2 font-medium" rowspan="3">Metadata</td>
+                            <td class="border border-gray-200 px-4 py-2"><code>title</code>, <code>slug</code></td>
+                            <td class="border border-gray-200 px-4 py-2">Judul artikel dan URL ramah SEO.</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 px-4 py-2"><code>type</code></td>
+                            <td class="border border-gray-200 px-4 py-2">Jenis artikel: <b>umum</b> atau <b>bahasa</b>.</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 px-4 py-2"><code>status</code></td>
+                            <td class="border border-gray-200 px-4 py-2"><b>draft</b> (belum terbit) atau <b>published</b> (bisa dilihat user).</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="border border-gray-200 px-4 py-2 font-medium" rowspan="2">Konten Inti</td>
+                            <td class="border border-gray-200 px-4 py-2"><code>content</code> / <code>grammar_explanation</code></td>
+                            <td class="border border-gray-200 px-4 py-2">Isi artikel dari Quill Editor (HTML string).</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="border border-gray-200 px-4 py-2"><code>vocabulary_list</code>, <code>quiz_questions</code></td>
+                            <td class="border border-gray-200 px-4 py-2">Disimpan dalam format <b>JSON (Array)</b>.</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 px-4 py-2 font-medium" rowspan="2">Media</td>
+                            <td class="border border-gray-200 px-4 py-2"><code>cover_image</code>, <code>additional_images</code></td>
+                            <td class="border border-gray-200 px-4 py-2">Path gambar yang disimpan di folder storage public.</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 px-4 py-2"><code>audio_file</code>, <code>youtube_url</code></td>
+                            <td class="border border-gray-200 px-4 py-2">File audio pelafalan dan link video referensi.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Alur Backend -->
+        <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">3. Alur Backend (Admin Side)</h2>
+            <div class="space-y-6">
+                <div class="flex">
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">1</div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">Input Form Artikel</h3>
+                        <p class="text-gray-600 mt-1">Admin mengisi form (Umum/Bahasa). Data seperti teks diproses oleh Quill Editor. Kosakata dan Kuis dimasukkan via form dinamis berbasis JavaScript. File media (cover, audio, gambar tambahan) dipilih dari perangkat.</p>
+                    </div>
+                </div>
+                <div class="flex">
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">2</div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">Proses Controller (<code>ArticleController@store/update</code>)</h3>
+                        <ul class="list-disc list-inside text-gray-600 mt-2 space-y-1">
+                            <li>Memvalidasi input agar sesuai kriteria.</li>
+                            <li>Meng-upload file media ke <code>storage/app/public/articles/...</code> dan mengambil string path-nya.</li>
+                            <li>Mendeteksi jika artikel adalah "Bahasa", konten dipindah ke kolom <code>grammar_explanation</code>.</li>
+                            <li>Memparsing array input form ke bentuk JSON untuk <code>vocabulary_list</code> dan <code>quiz_questions</code>.</li>
+                            <li>Menyimpan record ke database.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alur Client Side -->
+        <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">4. Alur Client Side (User View)</h2>
+            <div class="space-y-6">
+                <div class="flex">
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">1</div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">Controller Mengambil Data</h3>
+                        <p class="text-gray-600 mt-1">Saat user membuka halaman belajar (misal via <code>BahasaController@show</code>), sistem mencari artikel berdasarkan <code>slug</code> yang berstatus <code>published</code>.</p>
+                    </div>
+                </div>
+                <div class="flex">
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">2</div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">Rendering dengan Shortcode (Blade)</h3>
+                        <p class="text-gray-600 mt-1">Pada tampilan (View), sistem membaca isi konten utama artikel. Karena sebelumnya Anda mengimplementasikan shortcode, tag seperti <code>[vocab1]</code> atau <code>[gambar1]</code> diganti menjadi komponen HTML interaktif. Ini menggabungkan data text dengan data JSON (seperti <code>vocabulary_list</code>) dan relasi media Storage menjadi satu halaman utuh.</p>
+                    </div>
+                </div>
+                <div class="flex">
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">3</div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">Interaksi User</h3>
+                        <p class="text-gray-600 mt-1">User dapat membaca konten, mendengarkan audio melalui web player, melihat gambar referensi, dan mengerjalan latihan dari data kuis yang dirender menggunakan JavaScript/Alpine di frontend.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="text-center mt-8">
+            <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors duration-200">
+                Simpan sebagai PDF (Print)
+            </button>
+        </div>
+
+        <footer class="text-center text-gray-500 text-sm mt-12 border-t pt-6">
+            Dibuat secara otomatis untuk proyek Nihon Learn.
+        </footer>
+    </div>
+</body>
+</html>

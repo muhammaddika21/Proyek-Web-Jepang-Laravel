@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Artikel - NihonLearn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Inter:wght@300..700&amp;family=Noto+Sans+JP:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "inverse-on-surface": "#ebf1ff",
+                            "on-surface": "#151c27",
+                            "surface-dim": "#d3daea",
+                            "on-primary-fixed-variant": "#0e5138",
+                            "on-error-container": "#93000a",
+                            "surface-tint": "#2c694e",
+                            "surface": "#f9f9ff",
+                            "surface-container": "#e7eefe",
+                            "on-primary-container": "#a8e7c5",
+                            "on-error": "#ffffff",
+                            "on-tertiary-container": "#ffccdc",
+                            "secondary-fixed-dim": "#ffb4a2",
+                            "primary": "#0f5238",
+                            "primary-fixed": "#b1f0ce",
+                            "tertiary-container": "#b4196a",
+                            "primary-container": "#2d6a4f",
+                            "on-secondary-container": "#731a04",
+                            "on-tertiary-fixed": "#3e0020",
+                            "secondary-container": "#ff8162",
+                            "surface-container-high": "#e2e8f8",
+                            "surface-container-low": "#f0f3ff",
+                            "inverse-surface": "#2a313d",
+                            "surface-variant": "#dce2f3",
+                            "error-container": "#ffdad6",
+                            "on-secondary-fixed": "#3c0700",
+                            "on-background": "#151c27",
+                            "inverse-primary": "#95d4b3",
+                            "outline-variant": "#bfc9c1",
+                            "surface-container-highest": "#dce2f3",
+                            "surface-bright": "#f9f9ff",
+                            "on-primary": "#ffffff",
+                            "surface-container-lowest": "#ffffff",
+                            "on-tertiary-fixed-variant": "#8d0050",
+                            "tertiary-fixed": "#ffd9e4",
+                            "on-secondary": "#ffffff",
+                            "tertiary": "#8e0051",
+                            "error": "#ba1a1a",
+                            "on-tertiary": "#ffffff",
+                            "on-primary-fixed": "#002114",
+                            "outline": "#707973",
+                            "primary-fixed-dim": "#95d4b3",
+                            "secondary-fixed": "#ffdad2",
+                            "secondary": "#a33d23",
+                            "background": "#f9f9ff",
+                            "on-surface-variant": "#404943",
+                            "on-secondary-fixed-variant": "#83260e",
+                            "tertiary-fixed-dim": "#ffb0cc"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.125rem",
+                            "lg": "0.25rem",
+                            "xl": "0.5rem",
+                            "full": "0.75rem"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                            "headline": [
+                                    "Newsreader", "serif"
+                            ],
+                            "body": [
+                                    "Inter", "sans-serif"
+                            ],
+                            "label": [
+                                    "Inter", "sans-serif"
+                            ],
+                            "jp": [
+                                    "Noto Sans JP", "sans-serif"
+                            ]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.surface'); color: theme('colors.on-surface'); font-family: theme('fontFamily.body'); }
+        h1, h2, h3, h4, h5, h6 { font-family: theme('fontFamily.headline'); letter-spacing: -0.02em; }
+        .jp-text { font-family: theme('fontFamily.jp'); font-size: 110%; }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: theme('colors.surface-container-low'); }
+        ::-webkit-scrollbar-thumb { background: theme('colors.outline-variant'); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: theme('colors.outline'); }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-[#F5F0E8]/70 dark:bg-slate-900/70 backdrop-blur-xl sticky top-0 w-full z-50 shadow-sm shadow-[#151c27]/5">
+<div class="flex justify-between items-center w-full px-8 py-5 max-w-screen-2xl mx-auto bg-slate-100/50 dark:bg-slate-800/50">
+<!-- Brand -->
+<a class="text-2xl font-bold font-newsreader text-[#0F5238] dark:text-[#52B788] font-headline tracking-tight italic" href="#">
+                NihonLearn
+            </a>
+<!-- Nav Links (Desktop) -->
+<div class="hidden md:flex space-x-8 items-center">
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#2D6A4F] dark:hover:text-[#52B788] transition-all duration-300 font-body" href="#">Beranda</a>
+<a class="text-[#0F5238] dark:text-[#52B788] border-b-2 border-[#2D6A4F] pb-1 font-bold hover:text-[#2D6A4F] dark:hover:text-[#52B788] transition-all duration-300 font-body" href="#">Tata Bahasa</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#2D6A4F] dark:hover:text-[#52B788] transition-all duration-300 font-body" href="#">Kanji</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#2D6A4F] dark:hover:text-[#52B788] transition-all duration-300 font-body" href="#">Kosakata</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#2D6A4F] dark:hover:text-[#52B788] transition-all duration-300 font-body" href="#">Menulis</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#2D6A4F] dark:hover:text-[#52B788] transition-all duration-300 font-body" href="#">JLPT</a>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center space-x-4 text-[#2D6A4F] dark:text-[#40916C]">
+<button class="hover:text-[#2D6A4F] dark:hover:text-[#52B788] transition-all duration-300 active:scale-95 transform duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="h-1 bg-surface-container-low w-full">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container w-1/3 rounded-r-full"></div>
+</div>
+</nav>
+<!-- Sub-hero Header -->
+<header class="relative w-full h-[320px] bg-surface-container-low overflow-hidden flex items-end pb-12 px-8 md:px-16">
+<!-- Background Blur -->
+<div class="absolute inset-0 z-0">
+<img alt="Japanese temple garden in autumn with vibrant red maple leaves and soft mist in the background, serene and scholarly atmosphere" class="w-full h-full object-cover opacity-40 blur-sm scale-105" data-alt="Japanese temple garden in autumn with vibrant red maple leaves and soft mist in the background, serene and scholarly atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAO4MXaLFGBme1jnowWfDPeJr9trEFl4j4fll-oWmB0uws1SlRYwHIwEeE2MUxK2mw1rT1ocNHOffEPITUIsLeHNFoetmiuNpTHywkl8CtP6yyUDWwOkoWecDIIgAVrxAAsgMc8xueG_griPDlldRkCp1SgOtdLRvnSLkmwjU0WVPj2iGTXIxWRa_vEizNW6WFG9-wZuCOAk9wUdbWpnGDY83qtx_B4ghEgFu0cdvz_wixm_tzzJ19Skg7izD_BFIqM9ePnCcn97ho"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-screen-xl mx-auto w-full flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-xs font-semibold font-label tracking-wide uppercase">Beginner</span>
+<span class="px-3 py-1 rounded-full bg-surface-container-highest text-on-surface text-xs font-medium font-label tracking-wide">Particles</span>
+</div>
+<h1 class="text-4xl md:text-5xl lg:text-6xl text-on-surface font-headline leading-tight max-w-3xl">
+                Understanding the 'Wa' (は) and 'Ga' (が) Particles
+            </h1>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow w-full max-w-screen-xl mx-auto px-6 md:px-12 py-16 flex flex-col lg:flex-row gap-16">
+<!-- Left Column: Article Content -->
+<article class="w-full lg:w-[70%] space-y-12">
+<!-- Introduction -->
+<section class="prose prose-lg prose-slate max-w-none text-on-surface-variant font-body leading-relaxed">
+<p class="text-xl leading-relaxed">
+                    The distinction between the topic marker <strong>は (wa)</strong> and the subject marker <strong>が (ga)</strong> is one of the most fundamental, yet challenging, concepts for beginners in Japanese. While they often seem interchangeable, their nuances dramatically alter the focus of a sentence.
+                </p>
+</section>
+<!-- Character Cards -->
+<section class="space-y-6">
+<h2 class="text-3xl text-on-surface font-headline pb-2 border-b-2 border-surface-container-high inline-block">The Protagonists</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+<!-- Card 1 -->
+<div class="relative bg-surface-container-lowest p-8 rounded-xl overflow-hidden group">
+<div class="absolute -right-4 -bottom-8 text-9xl text-surface-container-low jp-text select-none group-hover:scale-105 transition-transform duration-500">は</div>
+<div class="relative z-10 flex flex-col gap-2">
+<span class="text-sm font-label text-on-surface-variant uppercase tracking-wider">Topic Marker</span>
+<div class="flex items-baseline gap-4">
+<span class="text-5xl text-primary font-bold jp-text">は</span>
+<span class="text-xl text-on-surface font-headline italic">wa</span>
+</div>
+<p class="text-sm text-on-surface mt-4 font-body">Marks the topic of the sentence. Often translated as "As for...". It highlights what comes <em>after</em> it.</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="relative bg-surface-container-lowest p-8 rounded-xl overflow-hidden group">
+<div class="absolute -right-4 -bottom-8 text-9xl text-surface-container-low jp-text select-none group-hover:scale-105 transition-transform duration-500">が</div>
+<div class="relative z-10 flex flex-col gap-2">
+<span class="text-sm font-label text-on-surface-variant uppercase tracking-wider">Subject Marker</span>
+<div class="flex items-baseline gap-4">
+<span class="text-5xl text-secondary font-bold jp-text">が</span>
+<span class="text-xl text-on-surface font-headline italic">ga</span>
+</div>
+<p class="text-sm text-on-surface mt-4 font-body">Marks the grammatical subject. It emphasizes what comes <em>before</em> it, often introducing new information.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Examples with Audio -->
+<section class="space-y-8">
+<h2 class="text-3xl text-on-surface font-headline">Practical Usage</h2>
+<div class="bg-surface-container-low p-6 rounded-xl flex items-start gap-4 hover:bg-surface-container-high transition-colors">
+<button class="mt-1 flex-shrink-0 w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<div>
+<div class="text-xl text-on-surface jp-text mb-2">私<span class="text-primary font-bold">は</span>学生です。</div>
+<div class="text-sm text-on-surface-variant font-label mb-1">Watashi wa gakusei desu.</div>
+<div class="text-base text-on-surface font-body italic">"As for me, I am a student." (Focus is on being a student)</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex items-start gap-4 hover:bg-surface-container-high transition-colors">
+<button class="mt-1 flex-shrink-0 w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<div>
+<div class="text-xl text-on-surface jp-text mb-2">私<span class="text-secondary font-bold">が</span>学生です。</div>
+<div class="text-sm text-on-surface-variant font-label mb-1">Watashi ga gakusei desu.</div>
+<div class="text-base text-on-surface font-body italic">"I am the one who is a student." (Focus is on 'I', answering "Who is the student?")</div>
+</div>
+</div>
+</section>
+<!-- Key Takeaways -->
+<section class="bg-primary-fixed/30 border border-primary-fixed-dim/50 rounded-2xl p-8 relative overflow-hidden">
+<div class="absolute -top-6 -right-6 text-9xl text-primary-fixed-dim/20">
+<span class="material-symbols-outlined" style="font-size: 1em; font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<h3 class="text-xl font-headline text-on-primary-fixed-variant mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">push_pin</span>
+                    Key Takeaways
+                </h3>
+<ul class="space-y-4 text-on-surface font-body">
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-primary text-sm mt-1">check_circle</span>
+<span>Use <strong>は</strong> when the topic is already known or established in the conversation.</span>
+</li>
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-primary text-sm mt-1">check_circle</span>
+<span>Use <strong>が</strong> to introduce new information or emphasize the subject performing the action.</span>
+</li>
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-primary text-sm mt-1">check_circle</span>
+<span>Question words (who, what, which) always take <strong>が</strong>, never <strong>は</strong>.</span>
+</li>
+</ul>
+</section>
+<!-- Interactive Quiz -->
+<section class="bg-surface-container-highest rounded-2xl p-8 shadow-sm shadow-[#151c27]/5">
+<div class="flex justify-between items-center mb-6 border-b border-outline-variant/30 pb-4">
+<h3 class="text-2xl font-headline text-on-surface">Knowledge Check</h3>
+<span class="px-3 py-1 bg-surface-container-lowest text-primary font-label text-sm rounded-full shadow-sm">Score: 0/1</span>
+</div>
+<div class="space-y-6">
+<p class="text-lg text-on-surface font-body">Which particle correctly fills the blank to answer the question: "Who ate the cake?"</p>
+<div class="text-xl text-center p-4 bg-surface-container-lowest rounded-lg border border-outline-variant/30 jp-text">
+                        だれ ___ ケーキを食べましたか。
+                    </div>
+<div class="grid grid-cols-2 gap-4 mt-6">
+<button class="py-4 px-6 rounded-xl border border-outline-variant/30 bg-surface-container-lowest hover:bg-primary-container hover:text-on-primary hover:border-primary-container transition-all text-lg font-headline jp-text group">
+                            は (wa)
+                        </button>
+<button class="py-4 px-6 rounded-xl border-2 border-primary-container bg-primary-container text-on-primary transition-all text-lg font-headline jp-text relative overflow-hidden">
+                            が (ga)
+                            <span class="absolute inset-0 bg-white/20 animate-pulse"></span>
+</button>
+</div>
+<!-- Feedback -->
+<div class="mt-6 p-4 bg-primary-fixed/50 rounded-lg flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-container mt-0.5">check_circle</span>
+<p class="text-on-surface font-body text-sm">Correct! Because "who" (だれ) is a question word asking for new information, it must be marked with が.</p>
+</div>
+</div>
+</section>
+</article>
+<!-- Right Column: Sidebar -->
+<aside class="hidden lg:block w-[30%]">
+<div class="sticky top-32 space-y-8">
+<!-- Table of Contents -->
+<div class="bg-surface-container-low rounded-xl p-6">
+<h4 class="text-sm font-label text-on-surface-variant uppercase tracking-widest mb-4">In this Lesson</h4>
+<nav class="space-y-3 font-body text-sm">
+<a class="block text-primary font-medium border-l-2 border-primary pl-3" href="#">Introduction</a>
+<a class="block text-on-surface-variant hover:text-primary transition-colors border-l-2 border-transparent pl-3" href="#">The Protagonists</a>
+<a class="block text-on-surface-variant hover:text-primary transition-colors border-l-2 border-transparent pl-3" href="#">Practical Usage</a>
+<a class="block text-on-surface-variant hover:text-primary transition-colors border-l-2 border-transparent pl-3" href="#">Key Takeaways</a>
+<a class="block text-on-surface-variant hover:text-primary transition-colors border-l-2 border-transparent pl-3" href="#">Knowledge Check</a>
+</nav>
+</div>
+<!-- Related Resource -->
+<div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/15 hover:shadow-[0_10px_30px_-10px_rgba(21,28,39,0.08)] transition-shadow">
+<h4 class="text-sm font-label text-on-surface-variant uppercase tracking-widest mb-4">Recommended Next</h4>
+<a class="group block" href="#">
+<div class="aspect-video bg-surface-container-high rounded-lg overflow-hidden mb-3">
+<img alt="Minimalist arrangement of Japanese calligraphy brushes and ink stone on a wooden desk with soft natural light" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Minimalist arrangement of Japanese calligraphy brushes and ink stone on a wooden desk with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0rPKXcThdBvMNn9OWp6E8hmKMzEWNN8SUy93yBow0m81hVO94DtFkmP2W9iPd1ZqszScjq52d5kOXhq80Ysh81KRznXbWuNyNaQDfmWYZEVeAu1drYt412939i10wy_zexJK_NNgI67Zpu6YHVD1ozCFD2A6gSiELuJ9zEBIFJ1i80LCd1rbqrBoUBW_cEzOy8j_FFI2-vFsSjYY4mOfaGhflkrakm9ImkRxd1UCou5PBDGTJY_Ys0Dm-F_4IrLlrCdIX7Uxc8dk"/>
+</div>
+<h5 class="text-base font-headline text-on-surface group-hover:text-primary transition-colors">The Object Particle: を (wo)</h5>
+<p class="text-xs text-on-surface-variant mt-1 font-body">Mastering direct objects in sentences.</p>
+</a>
+</div>
+</div>
+</aside>
+</main>
+<!-- Footer Area (Related & Nav) -->
+<div class="w-full bg-surface-container-low pt-16 pb-8 border-t border-outline-variant/15">
+<div class="max-w-screen-xl mx-auto px-6 md:px-12">
+<!-- Article Navigation -->
+<div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-16">
+<a class="w-full md:w-[45%] flex items-center gap-4 p-4 rounded-xl hover:bg-surface-container-lowest transition-colors group" href="#">
+<div class="w-16 h-16 rounded-lg bg-surface-container-high overflow-hidden shrink-0">
+<img alt="Tokyo street scene at dawn with soft muted colors and a solitary figure walking, calm atmosphere" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="Tokyo street scene at dawn with soft muted colors and a solitary figure walking, calm atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBftvb-mxcI05xF8xJ-8oWMmEWWfJ4TyNFgpoboo00ksYc6FiisMO7RwcXk9h-WkTyBIRpaw7JLcWQLIbdO6WdHVl2yW644vqRBPi4oIAQMzCuDumP2YMKDN0XVrLkKp2B9jk8tKsyzr0Y5XRHsDvxSnUO-ygu2MbbbvUmaQeGC2zt2bLqnnXHp7yPGaYdxOt7ug2KRbIEggkWkWXH1yTM0FoeWPq44oMUJ8b-SHiWWKevsyMxnTpoMswa9g58-V7AFRk2ixK1Eicw"/>
+</div>
+<div>
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-wider mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">arrow_back</span> Previous
+                        </span>
+<h4 class="text-base font-headline text-on-surface group-hover:text-primary">Basic Sentence Structure</h4>
+</div>
+</a>
+<a class="w-full md:w-[45%] flex items-center justify-end gap-4 p-4 rounded-xl hover:bg-surface-container-lowest transition-colors group text-right" href="#">
+<div>
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-wider mb-1 flex items-center justify-end gap-1">
+                            Next <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</span>
+<h4 class="text-base font-headline text-on-surface group-hover:text-primary">Directional Particles: に and へ</h4>
+</div>
+<div class="w-16 h-16 rounded-lg bg-surface-container-high overflow-hidden shrink-0">
+<img alt="Close up of a traditional Japanese directional signpost made of weathered wood in a forest setting" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="Close up of a traditional Japanese directional signpost made of weathered wood in a forest setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_K3Ctg_5GctRm8PwtJqj3mw66WKxayiMNvbxZ9xfrRSoYOzFDWg2qXtdhvENrjjiXgQ-lXG-5AP_NtBY_fgYXtYEgXZrWfY4rgd9ViV96dn6dwYy7-SFPBURSM2f54_H2PLWzfTHK2weiMd3nRdqRQuVp7sHwYe6ry0BWCH1PI0620ytx-lP7k1EsetUEPeJduQKk3ebqBVubzbbAWEc_DdiOS92jkPtAqDBWarlsGTv6453GjyBBJi4TcRAhqxEIK0wwvohcE_4"/>
+</div>
+</a>
+</div>
+</div>
+</div>
+<!-- Shared Footer -->
+<footer class="bg-[#F5F0E8] dark:bg-slate-950 w-full py-12 border-t border-slate-200/15 dark:border-slate-800/15 flat no-shadows mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 max-w-screen-2xl mx-auto">
+<!-- Brand & Copyright -->
+<div class="flex flex-col items-center md:items-start mb-6 md:mb-0">
+<span class="text-xl font-newsreader italic text-[#0F5238] dark:text-[#52B788] mb-2 font-headline">NihonLearn</span>
+<p class="text-sm font-newsreader text-[#2D6A4F] dark:text-[#40916C] font-body">© 2024 NihonLearn. Platform Pembelajaran Bahasa Jepang.</p>
+</div>
+<!-- Links -->
+<div class="flex space-x-6 text-sm font-newsreader">
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#0F5238] dark:hover:text-[#74C69D] underline underline-offset-4 font-body" href="#">Kategori</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#0F5238] dark:hover:text-[#74C69D] underline underline-offset-4 font-body" href="#">Budaya</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#0F5238] dark:hover:text-[#74C69D] underline underline-offset-4 font-body" href="#">Privasi</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#0F5238] dark:hover:text-[#74C69D] underline underline-offset-4 font-body" href="#">Kontak</a>
+</div>
+</div>
+</footer>
+</body></html>

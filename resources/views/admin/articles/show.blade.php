@@ -32,7 +32,7 @@
         {{ ucfirst($article->status) }}
       </span>
       <a href="{{ route('admin.articles.edit', $article) }}"
-        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:hover:bg-white/5 transition-colors">
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-[#24463a] dark:bg-[#1a2e24] dark:text-white/90 dark:hover:bg-white/5 transition-colors">
         ✏️ Edit Artikel
       </a>
     </div>
@@ -45,12 +45,12 @@
 
       {{-- Cover Image --}}
       @if($article->cover_image)
-        <div class="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div class="overflow-hidden rounded-2xl border border-gray-200 dark:border-[#24463a] shadow-sm">
           <img src="{{ asset('storage/' . $article->cover_image) }}"
             alt="Cover {{ $article->title }}"
             class="w-full h-auto object-cover max-h-[420px]">
           @if($article->cover_image_caption)
-            <div class="px-6 py-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40">
+            <div class="px-6 py-3 border-t border-gray-100 dark:border-[#24463a] bg-gray-50 dark:bg-[#1a2e24]/40">
               <p class="text-xs italic text-gray-500 dark:text-gray-400 text-center">{{ $article->cover_image_caption }}</p>
             </div>
           @endif
@@ -58,7 +58,7 @@
       @endif
 
       {{-- Article Header & Content --}}
-      <div class="rounded-2xl border border-gray-200 bg-white px-8 py-8 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="rounded-2xl border border-gray-200 bg-white px-8 py-8 dark:border-[#24463a] dark:bg-[#1a2e24]">
         <div class="flex items-center gap-2 mb-4 flex-wrap">
           <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold {{ $article->type_badge }}">
             {{ $article->type === 'bahasa' ? '🎌 Bahasa' : '🏯 Umum' }}
@@ -107,15 +107,15 @@
 
       {{-- Kosakata Table --}}
       @if($article->type === 'bahasa' && $article->vocabulary_list && count($article->vocabulary_list) > 0)
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
-          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800 bg-blue-50/30 dark:bg-transparent">
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] overflow-hidden">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-[#24463a] bg-blue-50/30 dark:bg-transparent">
             <h3 class="text-base font-bold text-gray-800 dark:text-white/90">📖 Daftar Kosakata</h3>
             <p class="text-xs text-gray-500 mt-1">{{ count($article->vocabulary_list) }} entri kosakata</p>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
-                <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.02]">
+                <tr class="border-b border-gray-100 dark:border-[#24463a] bg-gray-50 dark:bg-white/[0.02]">
                   <th class="px-6 py-3 text-left font-semibold text-gray-500 dark:text-gray-400">Kanji / Kata</th>
                   <th class="px-6 py-3 text-left font-semibold text-gray-500 dark:text-gray-400">Romaji</th>
                   <th class="px-6 py-3 text-left font-semibold text-gray-500 dark:text-gray-400">Arti</th>
@@ -146,8 +146,8 @@
       {{-- Posisi: setelah Kosakata, sebelum Kuis --}}
       {{-- ============================================= --}}
       @if(($article->additional_images && count($article->additional_images) > 0) || $article->audio_file || $article->youtube_url)
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
-          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800 bg-indigo-50/30 dark:bg-transparent">
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] overflow-hidden">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-[#24463a] bg-indigo-50/30 dark:bg-transparent">
             <h3 class="text-base font-bold text-gray-800 dark:text-white/90">📎 Media Tambahan</h3>
             <p class="text-xs text-gray-500 mt-1">Semua media yang telah ditambahkan ke artikel ini.</p>
           </div>
@@ -165,7 +165,7 @@
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   @foreach($article->additional_images as $index => $imgPath)
-                    <div class="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 aspect-[4/3] cursor-pointer"
+                    <div class="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-[#24463a] aspect-[4/3] cursor-pointer"
                       x-data="{ showFull: false }">
                       {{-- Thumbnail --}}
                       <img src="{{ asset('storage/' . $imgPath) }}"
@@ -190,7 +190,7 @@
                             <p class="text-sm text-white/80 font-mono">{{ basename($imgPath) }}</p>
                           </div>
                           <button @click="showFull = false"
-                            class="absolute -top-3 -right-3 w-9 h-9 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-lg leading-none">
+                            class="absolute -top-3 -right-3 w-9 h-9 bg-white dark:bg-[#24463a] text-gray-800 dark:text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-lg leading-none">
                             ✕
                           </button>
                         </div>
@@ -247,7 +247,7 @@
                   </div>
                 </div>
                 @if($ytId)
-                  <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 aspect-video">
+                  <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-[#24463a] aspect-video">
                     <iframe src="https://www.youtube.com/embed/{{ $ytId }}"
                       class="w-full h-full"
                       frameborder="0"
@@ -269,8 +269,8 @@
 
       {{-- Kuis Review --}}
       @if($article->type === 'bahasa' && $article->quiz_questions && count($article->quiz_questions) > 0)
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
-          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800 bg-emerald-50/30 dark:bg-transparent">
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] overflow-hidden">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-[#24463a] bg-emerald-50/30 dark:bg-transparent">
             <h3 class="text-base font-bold text-gray-800 dark:text-white/90">🧠 Kuis Review</h3>
             <p class="text-xs text-gray-500 mt-1">
               {{ count($article->quiz_questions) }} soal — <span class="text-emerald-600 dark:text-emerald-400 font-semibold">kunci jawaban berwarna hijau</span>
@@ -278,7 +278,7 @@
           </div>
           <div class="p-6 space-y-6">
             @foreach($article->quiz_questions as $index => $quiz)
-              <div class="p-5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-white/[0.02]">
+              <div class="p-5 rounded-xl border border-gray-100 dark:border-[#24463a] bg-gray-50/30 dark:bg-white/[0.02]">
                 <p class="font-bold text-gray-800 dark:text-white mb-4 text-base">
                   Soal #{{ $index + 1 }}: {{ $quiz['question'] }}
                 </p>
@@ -288,7 +288,7 @@
                     <div class="flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors
                       {{ $isCorrect
                         ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 dark:border-emerald-500/40'
-                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-white/[0.02]' }}">
+                        : 'border-gray-200 dark:border-[#24463a] bg-white dark:bg-white/[0.02]' }}">
                       <span class="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold
                         {{ $isCorrect
                           ? 'bg-emerald-500 text-white'
@@ -322,7 +322,7 @@
     <div class="xl:col-span-4 space-y-6">
 
       {{-- Meta Info Card --}}
-      <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-[#24463a] dark:bg-[#1a2e24]">
         <h4 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Informasi Artikel</h4>
         <div class="space-y-3">
           <div class="flex items-start justify-between gap-3 text-sm">
@@ -343,14 +343,14 @@
               <span class="font-medium text-gray-800 dark:text-white text-right">{{ $article->published_at->format('d M Y, H:i') }}</span>
             </div>
           @endif
-          <hr class="my-2 dark:border-gray-800">
+          <hr class="my-2 dark:border-[#24463a]">
           <div class="text-sm">
             <p class="text-gray-500 mb-1.5">Slug:</p>
-            <code class="block w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs text-brand-500 break-all">{{ $article->slug }}</code>
+            <code class="block w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#1a2e24] border border-gray-200 dark:border-[#24463a] text-xs text-brand-500 break-all">{{ $article->slug }}</code>
           </div>
           <div class="text-sm">
             <p class="text-gray-500 mb-1.5">URL Publik kelak:</p>
-            <code class="block w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs text-gray-500 break-all">
+            <code class="block w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#1a2e24] border border-gray-200 dark:border-[#24463a] text-xs text-gray-500 break-all">
               /{{ $article->type === 'bahasa' ? 'bahasa' : 'artikel' }}/{{ $article->slug }}
             </code>
           </div>
@@ -358,14 +358,14 @@
       </div>
 
       {{-- Media Checklist Card --}}
-      <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-[#24463a] dark:bg-[#1a2e24]">
         <h4 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Checklist Media</h4>
         <div class="space-y-4">
 
           {{-- Cover Image --}}
           <div>
             <div class="flex items-center gap-3 text-sm">
-              <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->cover_image ? 'bg-green-100 dark:bg-green-500/20 text-green-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">🖼️</span>
+              <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->cover_image ? 'bg-green-100 dark:bg-green-500/20 text-green-600' : 'bg-gray-100 dark:bg-[#24463a] text-gray-400' }}">🖼️</span>
               <div class="flex-1 min-w-0">
                 <p class="{{ $article->cover_image ? 'text-gray-800 dark:text-white' : 'text-gray-400' }}">Cover Image</p>
                 @if($article->cover_image)
@@ -381,7 +381,7 @@
             {{-- Cover Image Thumbnail --}}
             @if($article->cover_image)
               <div class="mt-2 ml-11">
-                <div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 w-full h-24">
+                <div class="rounded-lg overflow-hidden border border-gray-200 dark:border-[#24463a] w-full h-24">
                   <img src="{{ asset('storage/' . $article->cover_image) }}"
                     alt="Cover thumbnail"
                     class="w-full h-full object-cover">
@@ -393,7 +393,7 @@
           {{-- Additional Images --}}
           <div>
             <div class="flex items-center gap-3 text-sm">
-              <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->additional_images && count($article->additional_images) > 0 ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">🗂️</span>
+              <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->additional_images && count($article->additional_images) > 0 ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600' : 'bg-gray-100 dark:bg-[#24463a] text-gray-400' }}">🗂️</span>
               <div class="flex-1 min-w-0">
                 <p class="{{ $article->additional_images && count($article->additional_images) > 0 ? 'text-gray-800 dark:text-white' : 'text-gray-400' }}">Foto Tambahan</p>
               </div>
@@ -407,7 +407,7 @@
             @if($article->additional_images && count($article->additional_images) > 0)
               <div class="mt-2 ml-11 grid grid-cols-3 gap-1.5">
                 @foreach($article->additional_images as $idx => $imgPath)
-                  <div class="rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 aspect-square cursor-pointer group"
+                  <div class="rounded-md overflow-hidden border border-gray-200 dark:border-[#24463a] aspect-square cursor-pointer group"
                     x-data="{ showModal: false }">
                     <img src="{{ asset('storage/' . $imgPath) }}"
                       alt="Foto {{ $idx + 1 }}"
@@ -426,7 +426,7 @@
                           <p class="text-sm text-white/80 font-mono">{{ basename($imgPath) }}</p>
                         </div>
                         <button @click="showModal = false"
-                          class="absolute -top-3 -right-3 w-9 h-9 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-lg leading-none">
+                          class="absolute -top-3 -right-3 w-9 h-9 bg-white dark:bg-[#24463a] text-gray-800 dark:text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-lg leading-none">
                           ✕
                         </button>
                       </div>
@@ -440,7 +440,7 @@
           {{-- Audio --}}
           <div>
             <div class="flex items-center gap-3 text-sm">
-              <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->audio_file ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">🎵</span>
+              <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->audio_file ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600' : 'bg-gray-100 dark:bg-[#24463a] text-gray-400' }}">🎵</span>
               <div class="flex-1 min-w-0">
                 <p class="{{ $article->audio_file ? 'text-gray-800 dark:text-white' : 'text-gray-400' }}">
                   {{ $article->audio_label ?: 'Audio' }}
@@ -472,7 +472,7 @@
           {{-- YouTube --}}
           <div>
             <div class="flex items-center gap-3 text-sm">
-              <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->youtube_url ? 'bg-red-100 dark:bg-red-500/20 text-red-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">▶️</span>
+              <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->youtube_url ? 'bg-red-100 dark:bg-red-500/20 text-red-600' : 'bg-gray-100 dark:bg-[#24463a] text-gray-400' }}">▶️</span>
               <div class="flex-1 min-w-0">
                 <p class="{{ $article->youtube_url ? 'text-gray-800 dark:text-white' : 'text-gray-400' }}">YouTube</p>
                 @if($article->youtube_url)
@@ -493,7 +493,7 @@
               @endphp
               @if($ytThumbId)
                 <div class="mt-2 ml-11">
-                  <a href="{{ $article->youtube_url }}" target="_blank" class="block relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-video group">
+                  <a href="{{ $article->youtube_url }}" target="_blank" class="block relative rounded-lg overflow-hidden border border-gray-200 dark:border-[#24463a] aspect-video group">
                     <img src="https://img.youtube.com/vi/{{ $ytThumbId }}/mqdefault.jpg"
                       alt="YouTube thumbnail"
                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
@@ -513,7 +513,7 @@
       </div>
 
       {{-- Quick Actions Card --}}
-      <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-[#24463a] dark:bg-[#1a2e24]">
         <h4 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Aksi Cepat</h4>
         <div class="space-y-3">
           <form method="POST" action="{{ route('admin.articles.toggleStatus', $article) }}">
@@ -530,7 +530,7 @@
             ✏️ Edit Artikel
           </a>
           <a href="{{ route('admin.articles.index') }}"
-            class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors">
+            class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-[#24463a] dark:text-gray-300 dark:hover:bg-gray-700 transition-colors">
             ← Kembali ke Daftar
           </a>
         </div>

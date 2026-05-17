@@ -7,7 +7,7 @@
 @endphp
 
 <aside id="sidebar"
-    class="fixed flex flex-col mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-99999 border-r border-gray-200"
+    class="fixed flex flex-col mt-0 top-0 px-5 left-0 bg-white dark:bg-[#1a2e24] dark:border-[#24463a] text-gray-900 h-screen transition-all duration-300 ease-in-out z-99999 border-r border-gray-200"
     x-data="{
         openSubmenus: {},
         init() {
@@ -62,15 +62,21 @@
         :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ?
         'xl:justify-center' :
         'justify-start'">
-        <a href="/">
-            <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="dark:hidden" src="/images/logo/logo.svg" alt="Logo" width="150" height="40" />
-            <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" width="150"
-                height="40" />
-            <img x-show="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen"
-                src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
-
+        <a href="/" class="flex items-center gap-3">
+            {{-- Expanded: Full logo --}}
+            <template x-if="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen">
+                <div class="flex items-center gap-3">
+                    <img src="/images/Logo ukm nihon fix.png" alt="NihonLearn Logo" class="w-10 h-10 rounded-xl object-contain" />
+                    <div>
+                        <h1 class="font-bold text-lg leading-none text-gray-800 dark:text-white">NihonLearn</h1>
+                        <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Admin Panel</span>
+                    </div>
+                </div>
+            </template>
+            {{-- Collapsed: Icon only --}}
+            <template x-if="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen">
+                <img src="/images/Logo ukm nihon fix.png" alt="NihonLearn" class="w-10 h-10 rounded-xl object-contain" />
+            </template>
         </a>
     </div>
 

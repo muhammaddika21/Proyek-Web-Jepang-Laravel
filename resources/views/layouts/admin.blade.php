@@ -36,10 +36,10 @@
                     const body = document.body;
                     if (this.theme === 'dark') {
                         html.classList.add('dark');
-                        body.classList.add('dark', 'bg-gray-900');
+                        body.classList.add('dark', 'bg-[#112117]');
                     } else {
                         html.classList.remove('dark');
-                        body.classList.remove('dark', 'bg-gray-900');
+                        body.classList.remove('dark', 'bg-[#112117]');
                     }
                 }
             });

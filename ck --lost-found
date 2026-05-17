@@ -1,0 +1,31 @@
+ alur_artikel.html                                  | 167 [32m++++[m
+ app/Http/Controllers/BudayaController.php          |  74 [32m++[m
+ app/Http/Controllers/KegiatanController.php        |  73 [32m++[m
+ ...26_04_24_001000_add_parent_id_to_categories.php |  27 [32m+[m
+ gambar_subhero_bahasa.jpg                          | Bin [31m0[m -> [32m3213988[m bytes
+ gambars_subhero_budaya.jpg                         | Bin [31m0[m -> [32m16261762[m bytes
+ nihon-learn-testing-guide.html                     | 878 [32m+++++++++++++++++++++[m
+ panduan/halaman_artikel/DESIGN.md                  |  82 [32m++[m
+ panduan/halaman_artikel/code.html                  | 338 [32m++++++++[m
+ panduan/halaman_artikel/screen.png                 | Bin [31m0[m -> [32m347551[m bytes
+ panduan/navigasi_artikel_utama/DESIGN.md           |  82 [32m++[m
+ panduan/navigasi_artikel_utama/code.html           | 244 [32m++++++[m
+ panduan/navigasi_artikel_utama/screen.png          | Bin [31m0[m -> [32m552185[m bytes
+ ...orial_learning_portal_halaman_utama_artikel.zip | Bin [31m0[m -> [32m554397[m bytes
+ public/css/footer.css                              |  55 [32m+[m[31m-[m
+ public/images/gambar_subhero_bahasa.jpg            | Bin [31m0[m -> [32m3213988[m bytes
+ public/images/gambars_subhero_budaya.jpg           | Bin [31m0[m -> [32m16261762[m bytes
+ .../views/admin/articles/create-bahasa.blade.php   | 257 [32m++++[m[31m--[m
+ resources/views/admin/articles/create.blade.php    | 377 [32m+++++++[m[31m--[m
+ .../views/admin/articles/edit-bahasa.blade.php     | 380 [32m++++++[m[31m---[m
+ resources/views/components/navbar.blade.php        | 156 [32m++[m[31m--[m
+ resources/views/layouts/app.blade.php              | 105 [32m++[m[31m-[m
+ resources/views/pages/bahasa/index.blade.php       | 675 [32m+++++++++++++[m[31m---[m
+ resources/views/pages/bahasa/show.blade.php        | 688 [32m++++++++++++++++[m
+ resources/views/pages/budaya/index.blade.php       | 223 [32m++++++[m
+ resources/views/pages/budaya/show.blade.php        | 473 [32m+++++++++++[m
+ resources/views/pages/home.blade.php               | 262 [32m++++[m[31m--[m
+ resources/views/pages/kegiatan/index.blade.php     | 214 [32m+++++[m
+ resources/views/pages/kegiatan/show.blade.php      | 483 [32m++++++++++++[m
+ task_pengecekan.md                                 | 105 [32m+++[m
+ 30 files changed, 5855 insertions(+), 563 deletions(-)
