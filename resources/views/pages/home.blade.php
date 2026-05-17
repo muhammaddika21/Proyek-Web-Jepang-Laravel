@@ -16,8 +16,6 @@
         <div class="absolute inset-0 bg-gradient-to-b from-white/70 via-white/50 to-white/80"></div>
     </div>
 
-    <div class="absolute top-10 left-10 text-8xl opacity-5 font-bold z-[1]" style="font-family: 'Noto Sans JP', sans-serif;">日</div>
-    <div class="absolute bottom-10 right-10 text-9xl opacity-5 font-bold z-[1]" style="font-family: 'Noto Sans JP', sans-serif;">本</div>
 
     <div class="text-center px-4 relative z-10 max-w-3xl mx-auto">
         <p class="text-[#2D6A4F] text-lg md:text-xl mb-3 font-medium" style="font-family: 'Noto Sans JP', sans-serif;">
@@ -48,8 +46,12 @@
 
         <div class="carousel-container">
             <div class="carousel-wrapper" id="carouselWrapper"></div>
-            <button class="carousel-nav prev" id="prevBtn" aria-label="Previous slide">‹</button>
-            <button class="carousel-nav next" id="nextBtn" aria-label="Next slide">›</button>
+            <button class="carousel-nav prev" id="prevBtn" aria-label="Previous slide">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button class="carousel-nav next" id="nextBtn" aria-label="Next slide">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
         </div>
         <div class="carousel-dots" id="carouselDots"></div>
     </div>

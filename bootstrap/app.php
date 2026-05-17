@@ -14,5 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectUsersTo('/admin/dashboard');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('admin/*')) {
+                return response()->view('admin.errors.404', [], 404);
+            }
+        });
     })->create();

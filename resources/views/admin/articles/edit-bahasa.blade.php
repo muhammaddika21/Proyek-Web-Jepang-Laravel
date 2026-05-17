@@ -75,7 +75,7 @@
       <div class="xl:col-span-7 space-y-6">
 
         {{-- ===== SECTION A: Info Dasar ===== --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]"
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]"
           x-data="{
             title: '{{ old('title', addslashes($article->title)) }}',
             slug: '{{ old('slug', $article->slug) }}',
@@ -137,7 +137,7 @@
         </div>{{-- END Section A --}}
 
         {{-- ===== SECTION B: Konten Pembelajaran (Quill.js) ===== --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]">
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]">
           <div class="px-6 py-5 border-b border-gray-200 dark:border-[#24463a]">
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📖 Konten Pembelajaran</h3>
             <p class="text-xs text-gray-500 mt-1">Tulis penjelasan materi, grammar, contoh kalimat. Mendukung furigana dan karakter Jepang.</p>
@@ -183,7 +183,7 @@
               $vocabTables = [['title' => '', 'rows' => [['kanji' => '', 'furigana' => '', 'meaning' => '', 'example' => '']]]];
           }
         @endphp
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]"
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]"
           x-data="{
             tables: {{ json_encode(array_values($vocabTables)) }},
             addRow(tableIndex) {
@@ -276,7 +276,7 @@
         </div>{{-- END Section C --}}
 
         {{-- ===== SECTION D: Media (Audio, Gambar, Video, YouTube) ===== --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]"
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]"
           x-data="{
             mediaType: 'audio',
             audioFile: null,
@@ -543,7 +543,7 @@
             'correctAnswer' => $q['answer'] ?? 0
           ])->toArray() : [['question' => '', 'options' => ['', '', '', ''], 'correctAnswer' => 0]]);
         @endphp
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]"
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]"
           x-data="{
             quizzes: {{ json_encode(array_values($quizData)) }},
             addQuiz() {
@@ -640,7 +640,7 @@
       <div class="xl:col-span-3 space-y-6">
 
         {{-- Status Info --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5">
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24] p-5">
           <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">Status Publikasi</label>
           <p class="text-xs text-gray-500 dark:text-gray-400">
             Status ditentukan berdasarkan tombol yang Anda klik di bawah:
@@ -663,7 +663,7 @@
         </div>
 
         {{-- Thumbnail --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5"
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24] p-5"
           x-data="{ thumbPreview: {{ $article->cover_image ? '\'' . asset('storage/' . $article->cover_image) . '\'' : 'null' }} }">
           <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Thumbnail / Cover</label>
           <label for="cover-image-bahasa-edit"
@@ -686,14 +686,14 @@
         </div>
 
         {{-- Excerpt --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5">
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24] p-5">
           <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Ringkasan Pendek</label>
           <textarea name="excerpt" rows="3" placeholder="Penjelasan singkat 1-2 kalimat..."
             class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-[#24463a] dark:bg-[#1a2e24] dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">{{ old('excerpt', $article->excerpt) }}</textarea>
         </div>
 
         {{-- Estimasi Waktu --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5">
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24] p-5">
           <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estimasi Waktu Baca</label>
           <input type="text" name="read_time" placeholder="5 menit"
             value="{{ old('read_time', $article->read_time) }}"

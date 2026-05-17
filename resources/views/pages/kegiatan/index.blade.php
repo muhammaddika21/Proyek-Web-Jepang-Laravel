@@ -78,14 +78,13 @@
 
 {{-- Hero --}}
 <section class="relative w-full min-h-[420px] md:min-h-[500px] overflow-hidden flex items-end p-8 md:p-12"
-    style="background: linear-gradient(to bottom, rgba(21,28,39,0.15), rgba(21,28,39,0.7)), url('{{ asset('images/hero-bahasa.jpg') }}') center/cover no-repeat; background-color: #d6975e;">
-    <div class="absolute inset-0 bg-gradient-to-t from-[#151c27]/80 via-[#151c27]/20 to-transparent"></div>
+    style="background: linear-gradient(to top, rgba(214,151,94,1) 0%, rgba(214,151,94,0.65) 50%, rgba(214,151,94,0.25) 100%), url('{{ asset('images/comifuroEvent.jpg') }}') top/cover no-repeat; background-color: #d6975e;">
     <div class="relative z-10 max-w-4xl">
-        <span class="text-white/80 text-xl tracking-widest mb-4 block" style="font-family: 'Noto Sans JP';">活動の記録</span>
-        <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-tight mb-6" style="font-family: 'Zen Kurenaido', serif;">
+        <span class="text-[#f8f7ef]/90 text-xl tracking-widest mb-4 block font-semibold" style="font-family: 'Noto Sans JP';">活動の記録</span>
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-[#f8f7ef] tracking-tight leading-tight mb-6 text-shadow-lg" style="font-family: 'Zen Kurenaido', serif;">
             Kegiatan &<br>Event UKM
         </h1>
-        <p class="text-lg text-white/90 max-w-xl font-light" style="font-family: 'Noto Sans JP';">
+        <p class="text-lg text-[#f8f7ef]/90 max-w-xl font-light" style="font-family: 'Noto Sans JP';">
             Ikuti perkembangan kegiatan, workshop, dan event seru dari UKM Nihon STIS.
         </p>
     </div>

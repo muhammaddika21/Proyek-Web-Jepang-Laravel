@@ -36,10 +36,12 @@
                     const body = document.body;
                     if (this.theme === 'dark') {
                         html.classList.add('dark');
+                        body.classList.remove('bg-[#f8f7ef]');
                         body.classList.add('dark', 'bg-[#112117]');
                     } else {
                         html.classList.remove('dark');
                         body.classList.remove('dark', 'bg-[#112117]');
+                        body.classList.add('bg-[#f8f7ef]');
                     }
                 }
             });
@@ -81,6 +83,7 @@
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
+                document.body.classList.add('bg-[#f8f7ef]');
             }
         })();
     </script>
@@ -89,6 +92,7 @@
 
 <body
     x-data="{ 'loaded': true}"
+    class="bg-[#f8f7ef]"
     x-init="$store.sidebar.isExpanded = window.innerWidth >= 1280;
     const checkMobile = () => {
         if (window.innerWidth < 1280) {

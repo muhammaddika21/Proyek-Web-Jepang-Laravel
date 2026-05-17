@@ -146,7 +146,7 @@
   </form>
 
   {{-- Table --}}
-  <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]">
+  <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]">
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left">
         <thead>

@@ -23,10 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
         { 
             label: '', 
             image: '/images/Gathering.png' 
-        },
-        { 
-            label: '', 
-            image: '/images/6.png' 
         }
     ];
    

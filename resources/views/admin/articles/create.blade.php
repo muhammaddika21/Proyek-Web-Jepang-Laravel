@@ -109,7 +109,7 @@
       <div class="xl:col-span-7 space-y-6">
 
         {{-- Section: Info Dasar --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]"
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]"
           x-data="{
             title: '{{ old('title', isset($article) ? $article->title : '') }}',
             slug: '{{ old('slug', isset($article) ? $article->slug : '') }}',
@@ -149,7 +149,7 @@
         </div>
 
         {{-- Section: Rich Text Editor (Quill.js) --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]">
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]">
           <div class="px-6 py-5 border-b border-gray-200 dark:border-[#24463a]">
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📝 Konten Artikel</h3>
             <p class="text-xs text-gray-500 mt-1">Tulis isi artikel dengan editor rich text. Mendukung format, link, gambar, dan list.</p>
@@ -163,7 +163,7 @@
         </div>
 
         {{-- Section: Media Upload --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]"
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]"
           x-data="{
             mediaType: 'image',
             imageFiles: [],
@@ -419,7 +419,7 @@
       <div class="xl:col-span-3 space-y-6">
 
         {{-- Status Info --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5">
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24] p-5">
           <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">Status Publikasi</label>
           <p class="text-xs text-gray-500 dark:text-gray-400">
             Status ditentukan berdasarkan tombol yang Anda klik di bawah:
@@ -444,7 +444,7 @@
         </div>
 
         {{-- Kategori Bertingkat --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5"
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24] p-5"
           x-data="{
             parentId: '{{ old('parent_category', isset($article) && $article->category && $article->category->parent_id ? $article->category->parent_id : '') }}',
             categoryId: '{{ old('category_id', isset($article) ? $article->category_id : '') }}',
@@ -481,7 +481,7 @@
         </div>
 
         {{-- Thumbnail --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5"
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24] p-5"
           x-data="{ thumbPreview: null }"
           @drop.prevent="
             const f = $event.dataTransfer.files[0];
@@ -513,7 +513,7 @@
         </div>
 
         {{-- Excerpt --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5">
+        <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24] p-5">
           <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Ringkasan Pendek</label>
           <textarea name="excerpt" rows="3" placeholder="Tulis deskripsi singkat untuk SEO..."
             class="shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:border-[#24463a] dark:bg-[#1a2e24] dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden">{{ old('excerpt', isset($article) ? $article->excerpt : '') }}</textarea>

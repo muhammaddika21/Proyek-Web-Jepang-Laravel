@@ -20,7 +20,7 @@
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-6 mb-6">
 
     {{-- Card 1: Total Artikel --}}
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-[#24463a] dark:bg-[#1a2e24] md:p-6">
+    <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] p-5 dark:border-[#24463a] dark:bg-[#1a2e24] md:p-6 shadow-sm">
       <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-green-100 dark:bg-green-500/20">
         <svg class="text-green-600 dark:text-green-400" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -35,7 +35,7 @@
     </div>
 
     {{-- Card 2: Published --}}
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-[#24463a] dark:bg-[#1a2e24] md:p-6">
+    <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] p-5 dark:border-[#24463a] dark:bg-[#1a2e24] md:p-6 shadow-sm">
       <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-500/20">
         <svg class="text-emerald-600 dark:text-emerald-400" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -51,7 +51,7 @@
     </div>
 
     {{-- Card 3: Draft --}}
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-[#24463a] dark:bg-[#1a2e24] md:p-6">
+    <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] p-5 dark:border-[#24463a] dark:bg-[#1a2e24] md:p-6 shadow-sm">
       <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-yellow-100 dark:bg-yellow-500/20">
         <svg class="text-yellow-600 dark:text-yellow-400" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -69,7 +69,7 @@
     </div>
 
     {{-- Card 4: Breakdown Tipe --}}
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-[#24463a] dark:bg-[#1a2e24] md:p-6">
+    <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] p-5 dark:border-[#24463a] dark:bg-[#1a2e24] md:p-6 shadow-sm">
       <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-500/20">
         <svg class="text-blue-600 dark:text-blue-400" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
@@ -95,11 +95,11 @@
   <div class="grid grid-cols-12 gap-4 md:gap-6 mb-6">
 
     {{-- Artikel Terbaru --}}
-    <div class="col-span-12 xl:col-span-7">
-      <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]">
+    <div class="col-span-12 xl:col-span-6">
+      <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] dark:border-[#24463a] dark:bg-[#1a2e24] shadow-sm">
         <div class="px-5 py-4 border-b border-gray-200 dark:border-[#24463a] sm:px-6 sm:py-5 flex items-center justify-between">
           <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-            📝 Artikel Terbaru
+            📝 Artikel Terbaru <span class="text-xs font-normal text-gray-400 ml-1">(5 terbaru)</span>
           </h3>
           <a href="{{ route('admin.articles.index') }}"
             class="text-xs font-semibold text-emerald-500 hover:text-emerald-600 transition-colors">
@@ -152,11 +152,11 @@
     </div>
 
     {{-- Artikel Populer --}}
-    <div class="col-span-12 xl:col-span-5">
-      <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24]">
+    <div class="col-span-12 xl:col-span-6">
+      <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] dark:border-[#24463a] dark:bg-[#1a2e24] shadow-sm">
         <div class="px-5 py-4 border-b border-gray-200 dark:border-[#24463a] sm:px-6 sm:py-5">
           <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-            🔥 Artikel Populer
+            🔥 Artikel Populer <span class="text-xs font-normal text-gray-400 ml-1">(5 teratas)</span>
           </h3>
         </div>
         <div class="p-5 sm:p-6">
@@ -196,56 +196,25 @@
   {{-- ============================================ --}}
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6">
     <a href="{{ route('admin.articles.create') }}"
-      class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-lg transition-all group">
+      class="rounded-2xl border border-stone-200 bg-[#fdfcf7] dark:border-[#24463a] dark:bg-[#1a2e24] p-5 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-lg transition-all group shadow-sm">
       <span class="text-2xl mb-3 block">🏯</span>
       <h4 class="text-sm font-bold text-gray-800 dark:text-white/90 group-hover:text-emerald-500 transition-colors">Buat Artikel Umum</h4>
       <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Budaya, Event, Pengetahuan</p>
     </a>
     <a href="{{ route('admin.articles.createBahasa') }}"
-      class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg transition-all group">
+      class="rounded-2xl border border-stone-200 bg-[#fdfcf7] dark:border-[#24463a] dark:bg-[#1a2e24] p-5 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg transition-all group shadow-sm">
       <span class="text-2xl mb-3 block">🎌</span>
       <h4 class="text-sm font-bold text-gray-800 dark:text-white/90 group-hover:text-blue-500 transition-colors">Buat Artikel Bahasa</h4>
       <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Pembelajaran Jepang (Quill Editor)</p>
     </a>
     <a href="{{ route('admin.articles.index') }}"
-      class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] p-5 hover:border-amber-300 dark:hover:border-amber-700 hover:shadow-lg transition-all group">
+      class="rounded-2xl border border-stone-200 bg-[#fdfcf7] dark:border-[#24463a] dark:bg-[#1a2e24] p-5 hover:border-amber-300 dark:hover:border-amber-700 hover:shadow-lg transition-all group shadow-sm">
       <span class="text-2xl mb-3 block">📋</span>
       <h4 class="text-sm font-bold text-gray-800 dark:text-white/90 group-hover:text-amber-500 transition-colors">Kelola Artikel</h4>
       <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Edit, hapus, ubah status</p>
     </a>
   </div>
 
-  {{-- ============================================ --}}
-  {{-- SECTION 5: COLOR PALETTE --}}
-  {{-- ============================================ --}}
-  <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] mb-6">
-    <div class="px-5 py-4 border-b border-gray-200 dark:border-[#24463a] sm:px-6 sm:py-5">
-      <h3 class="text-base font-medium text-gray-800 dark:text-white/90">🎨 Color Palette UKM NihonLearn</h3>
-      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Panduan warna resmi proyek.</p>
-    </div>
-    <div class="p-5 sm:p-6">
-      <div class="flex flex-wrap gap-4">
-        @php
-          $colors = [
-            ['name' => 'Hijau Tua',  'hex' => '#448646'],
-            ['name' => 'Hijau Soft', 'hex' => '#80b68b'],
-            ['name' => 'Forest',     'hex' => '#296751'],
-            ['name' => 'Cream',      'hex' => '#f8f7ef'],
-            ['name' => 'Gold',       'hex' => '#d6975e'],
-            ['name' => 'Olive',      'hex' => '#404235'],
-          ];
-        @endphp
-        @foreach($colors as $c)
-          <div class="w-28 rounded-xl overflow-hidden shadow-sm border border-gray-200 dark:border-[#24463a]">
-            <div class="h-16" style="background-color: {{ $c['hex'] }};"></div>
-            <div class="p-2 text-center bg-white dark:bg-[#24463a]">
-              <p class="text-xs font-bold text-gray-800 dark:text-white/90">{{ $c['name'] }}</p>
-              <p class="text-[10px] text-gray-500 dark:text-gray-400">{{ $c['hex'] }}</p>
-            </div>
-          </div>
-        @endforeach
-      </div>
-    </div>
-  </div>
+
 
 @endsection

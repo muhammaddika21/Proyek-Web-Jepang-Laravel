@@ -92,6 +92,20 @@
     @media (max-width: 1023px) {
         .article-sidebar-col { width: 100%; }
     }
+    @media (max-width: 768px) {
+        .vocab-table th, .vocab-table td { padding: 10px 8px; }
+        .vocab-table td { font-size: 0.85rem; }
+        .vocab-table td.jp-col { font-size: 1rem; line-height: 1.3; }
+        .vocab-table td.romaji-col { font-size: 0.8rem; }
+        .vocab-table td.contoh-col { font-size: 0.8rem; line-height: 1.4; }
+        .vocab-table th { font-size: 0.65rem; }
+        
+        /* Adjust column widths for mobile */
+        .vocab-table th:nth-child(1) { width: 22% !important; } /* Kanji/Kata */
+        .vocab-table th:nth-child(2) { width: 23% !important; } /* Romaji */
+        .vocab-table th:nth-child(3) { width: 25% !important; } /* Arti */
+        .vocab-table th:nth-child(4) { width: 30% !important; } /* Contoh */
+    }
 
     /* Quiz warning shake */
     .quiz-warning { animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both; }
