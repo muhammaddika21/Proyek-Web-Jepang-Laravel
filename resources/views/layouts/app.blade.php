@@ -114,6 +114,7 @@
     <!-- Preserved CSS from original -->
     <link rel="stylesheet" href="{{ asset('css/sakura.css') }}">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/animations.css') }}">
     @stack('styles')
 
     <!-- Vite (Tailwind + Alpine) -->
@@ -131,6 +132,8 @@
 
     <!-- Preserved JS from original -->
     <script src="{{ asset('js/sakura.js') }}"></script>
+    <!-- Global Animation System -->
+    <script src="{{ asset('js/animations.js') }}" defer></script>
     @stack('scripts')
 
 </body>

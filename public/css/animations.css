@@ -1,0 +1,443 @@
+/* ============================================================
+   NIHONGO BU STIS — Global Animation System
+   Progressive Enhancement, 60fps, Japanese-inspired "Ma" feel
+   ============================================================ */
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Timing tokens ─────────────────────────────────────────── */
+:root {
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:    cubic-bezier(0.0, 0.0, 0.2, 1);
+  --dur-fast:   200ms;
+  --dur-normal: 400ms;
+  --dur-slow:   600ms;
+  --dur-enter:  800ms;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   1. KEYFRAMES
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes navbarEnter {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeSlideRight {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+
+@keyframes filterBarEnter {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; }
+}
+
+@keyframes floatSakura {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  33%      { transform: translateY(-8px) rotate(1deg); }
+  66%      { transform: translateY(-4px) rotate(-1deg); }
+}
+
+@keyframes petalFall {
+  0%   { transform: translateY(-20px) rotate(0deg) translateX(0); opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(100vh) rotate(720deg) translateX(60px); opacity: 0; }
+}
+
+@keyframes notePulse {
+  0%   { box-shadow: 0 0 0 0   rgba(231, 111, 81, 0.4); }
+  70%  { box-shadow: 0 0 0 8px rgba(231, 111, 81, 0);   }
+  100% { box-shadow: 0 0 0 0   rgba(231, 111, 81, 0);   }
+}
+
+@keyframes checkmark {
+  0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
+  60%  { transform: scale(1.2) rotate(0deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   2. NAVBAR
+   ══════════════════════════════════════════════════════════════ */
+
+#mainHeader {
+  animation: navbarEnter var(--dur-slow) var(--ease-out) forwards;
+}
+
+/* Nav link underline from centre */
+.nav-link-anim {
+  position: relative;
+}
+.nav-link-anim::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #2D6A4F;
+  transform: translateX(-50%);
+  transition: width var(--dur-normal) var(--ease-smooth);
+}
+.nav-link-anim:hover::after,
+.nav-link-anim.active::after {
+  width: 80%;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3. SCROLL REVEAL — Intersection Observer driven
+   ══════════════════════════════════════════════════════════════ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity  var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger for grid children */
+.reveal-stagger > *:nth-child(1) { transition-delay:   0ms; }
+.reveal-stagger > *:nth-child(2) { transition-delay: 100ms; }
+.reveal-stagger > *:nth-child(3) { transition-delay: 200ms; }
+.reveal-stagger > *:nth-child(4) { transition-delay: 300ms; }
+.reveal-stagger > *:nth-child(5) { transition-delay: 400ms; }
+.reveal-stagger > *:nth-child(6) { transition-delay: 500ms; }
+
+/* ══════════════════════════════════════════════════════════════
+   4. HERO — staggered entry per page
+   ══════════════════════════════════════════════════════════════ */
+
+/* Landing hero */
+.hero-badge    { animation: fadeSlideUp var(--dur-enter) var(--ease-out) 200ms both; }
+.hero-title    { animation: fadeSlideUp var(--dur-enter) var(--ease-out) 400ms both; }
+.hero-subtitle { animation: fadeSlideUp var(--dur-enter) var(--ease-out) 600ms both; }
+.hero-cta      { animation: fadeSlideUp var(--dur-enter) var(--ease-out) 800ms both; }
+
+/* Bahasa / Kegiatan / Budaya hero — slide from left */
+.hero-label-slide { animation: fadeSlideRight var(--dur-slow)  var(--ease-out) 100ms both; }
+.hero-title-slide { animation: fadeSlideRight var(--dur-enter) var(--ease-out) 300ms both; }
+.hero-sub-slide   { animation: fadeSlideRight var(--dur-enter) var(--ease-out) 500ms both; }
+
+/* Filter bar */
+.filter-bar-anim  { animation: filterBarEnter var(--dur-slow) var(--ease-spring) 600ms both; }
+
+/* ══════════════════════════════════════════════════════════════
+   5. CARD INTERACTIONS
+   ══════════════════════════════════════════════════════════════ */
+/* Category cards */
+.category-card {
+  transition:
+    transform    var(--dur-normal) ease-out,
+    box-shadow   var(--dur-normal) ease-out,
+    border-color var(--dur-normal) ease-out;
+  will-change: transform;
+}
+.category-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 16px 40px rgba(45, 106, 79, 0.12) !important;
+}
+
+/* Article cards */
+.article-card-anim {
+  overflow: hidden;
+  transition:
+    transform  var(--dur-normal) var(--ease-spring),
+    box-shadow var(--dur-normal) var(--ease-smooth);
+}
+.article-card-anim:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.10);
+}
+.article-card-anim .thumbnail-zoom {
+  transition: transform 600ms var(--ease-smooth);
+}
+.article-card-anim:hover .thumbnail-zoom {
+  transform: scale(1.04);
+}
+
+/* Kegiatan card overlay */
+.kegiatan-card {
+  overflow: hidden;
+  position: relative;
+}
+.kegiatan-card .overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(45,106,79,0.9) 0%, transparent 100%);
+  padding: 1.5rem;
+  transform: translateY(100%);
+  transition: transform var(--dur-normal) var(--ease-smooth);
+}
+.kegiatan-card:hover .overlay    { transform: translateY(0); }
+.kegiatan-card .img-zoom {
+  transition: transform 600ms var(--ease-smooth);
+}
+.kegiatan-card:hover .img-zoom   { transform: scale(1.06); }
+
+/* ══════════════════════════════════════════════════════════════
+   6. FOOTER
+   ══════════════════════════════════════════════════════════════ */
+
+.footer-logo {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+}
+.footer-social {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity   var(--dur-slow) var(--ease-out) 200ms,
+    transform var(--dur-slow) var(--ease-out) 200ms;
+}
+.footer-sakura {
+  opacity: 0;
+  transform: translateX(20px) rotate(-5deg);
+  transition:
+    opacity   var(--dur-slow) var(--ease-out)    400ms,
+    transform var(--dur-slow) var(--ease-smooth) 400ms;
+}
+
+footer.is-visible .footer-logo,
+footer.is-visible .footer-social,
+footer.is-visible .footer-sakura {
+  opacity: 1;
+  transform: none;
+}
+
+.footer-sakura img {
+  animation: floatSakura 4s var(--ease-smooth) infinite;
+  animation-play-state: paused;
+}
+footer.is-visible .footer-sakura img {
+  animation-play-state: running;
+}
+
+/* Social icon bounce */
+.social-icon-anim {
+  transition: transform var(--dur-fast) var(--ease-spring);
+  display: inline-flex;
+}
+.social-icon-anim:hover {
+  transform: translateY(-4px) scale(1.1);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   7. ARTICLE PAGE
+   ══════════════════════════════════════════════════════════════ */
+
+/* Reading progress bar */
+#reading-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(to right, #2D6A4F, #52B788);
+  transform-origin: left;
+  transform: scaleX(0);
+  z-index: 9999;
+  pointer-events: none;
+  transition: transform 50ms linear;
+}
+
+/* TOC link highlight */
+.toc-link {
+  transition:
+    color        var(--dur-fast) var(--ease-smooth),
+    padding-left var(--dur-fast) var(--ease-smooth),
+    border-color var(--dur-fast) var(--ease-smooth);
+  border-left: 2px solid transparent;
+  padding-left: 0;
+}
+.toc-link.active {
+  color: #2D6A4F;
+  padding-left: 0.5rem;
+  border-left-color: #2D6A4F;
+}
+
+/* Note box pulse */
+.note-box.is-visible {
+  animation: notePulse 1s ease-out 300ms 1;
+}
+
+/* Copy button checkmark */
+.copy-btn.copied .icon-check {
+  animation: checkmark 400ms var(--ease-spring) forwards;
+}
+
+/* Section heading line grow */
+.section-line {
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #2D6A4F;
+  transition: width 800ms var(--ease-smooth) 200ms;
+}
+.section-heading.is-visible .section-line {
+  width: 48px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   8. SAKURA PETALS — persists on every hero (auto-injected by JS)
+   ══════════════════════════════════════════════════════════════ */
+
+.petal {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 80% 0 80% 0;
+  animation: petalFall var(--petal-dur, 9s) linear var(--petal-delay, 0s) infinite;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+/* Each petal gets slightly different size/colour for natural look */
+.petal:nth-child(1)  { width:7px; height:7px; background:rgba(255,182,193,0.45); left:10%; --petal-dur:9s;  --petal-delay:0s; }
+.petal:nth-child(2)  { width:6px; height:6px; background:rgba(255,200,210,0.35); left:25%; --petal-dur:11s; --petal-delay:2s; }
+.petal:nth-child(3)  { width:8px; height:8px; background:rgba(255,182,193,0.40); left:45%; --petal-dur:10s; --petal-delay:4s; }
+.petal:nth-child(4)  { width:5px; height:5px; background:rgba(255,215,220,0.30); left:65%; --petal-dur:12s; --petal-delay:1s; }
+.petal:nth-child(5)  { width:7px; height:7px; background:rgba(255,182,193,0.35); left:80%; --petal-dur:8s;  --petal-delay:3s; }
+.petal:nth-child(6)  { width:6px; height:6px; background:rgba(255,200,210,0.28); left:55%; --petal-dur:13s; --petal-delay:6s; }
+.petal:nth-child(7)  { width:5px; height:5px; background:rgba(255,182,193,0.32); left:35%; --petal-dur:10s; --petal-delay:7s; }
+.petal:nth-child(8)  { width:8px; height:8px; background:rgba(255,220,225,0.25); left:72%; --petal-dur:14s; --petal-delay:5s; }
+
+/* ══════════════════════════════════════════════════════════════
+   9. PAGE TRANSITION (View Transitions API)
+   ══════════════════════════════════════════════════════════════ */
+
+::view-transition-new(root) {
+  animation: pageEnter var(--dur-slow) var(--ease-out);
+}
+::view-transition-old(root) {
+  animation: fadeOut var(--dur-normal) var(--ease-out);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   10. ARTICLE CARD — Premium hover & reveal
+   ══════════════════════════════════════════════════════════════ */
+
+/* Stagger reveal for article grids */
+@keyframes cardReveal {
+  from { opacity:0; transform: translateY(28px) scale(0.97); }
+  to   { opacity:1; transform: translateY(0)    scale(1); }
+}
+
+.article-card {
+  animation: cardReveal 500ms var(--ease-spring) both;
+}
+/* Stagger delays — JS sets --card-i via style */
+.article-card { animation-delay: calc(var(--card-i, 0) * 70ms); }
+
+/* Enhanced card link effects */
+.article-card-link {
+  /* Shimmer overlay using pseudo-element */
+  position: relative;
+}
+.article-card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255,255,255,0.12) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  background-position: 200% 0;
+  transition: background-position 600ms var(--ease-smooth);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+}
+.article-card-link:hover::after {
+  background-position: -30% 0;
+}
+
+/* Shine border on hover */
+.article-card-link::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 18px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0) 60%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--dur-normal) var(--ease-smooth);
+  pointer-events: none;
+  z-index: 3;
+}
+.article-card-link:hover::before { opacity: 1; }
+
+/* Title underline on hover */
+.article-card-title {
+  position: relative;
+  display: inline;
+}
+.article-card-link:hover .article-card-title {
+  text-shadow: 0 0 16px rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.35);
+}
+
+/* ── Footer subtle entry animations ── */
+.footer-left {
+  opacity: 0;
+  transform: translateX(-16px);
+  transition: opacity 700ms var(--ease-out) 100ms,
+              transform 700ms var(--ease-out) 100ms;
+}
+.footer-center {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 700ms var(--ease-out) 250ms,
+              transform 700ms var(--ease-out) 250ms;
+}
+.footer-right {
+  opacity: 0;
+  transform: translateX(16px);
+  transition: opacity 700ms var(--ease-out) 400ms,
+              transform 700ms var(--ease-out) 400ms;
+}
+.footer-bottom-row {
+  opacity: 0;
+  transition: opacity 600ms var(--ease-out) 600ms;
+}
+footer.is-visible .footer-left,
+footer.is-visible .footer-center,
+footer.is-visible .footer-right { opacity: 1; transform: none; }
+footer.is-visible .footer-bottom-row { opacity: 1; }

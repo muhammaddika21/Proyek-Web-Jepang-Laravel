@@ -276,11 +276,11 @@
     style="background: linear-gradient(135deg, rgba(41,103,81,0.88), rgba(68,134,70,0.55)), url('{{ asset('images/gambar_subhero_bahasa.jpg') }}') center/cover no-repeat; background-color: #296751;">
     <div class="absolute inset-0 bg-gradient-to-t from-[#296751] via-[#296751]/30 to-transparent"></div>
     <div class="relative z-10 max-w-4xl">
-        <span class="text-[#f8f7ef]/80 text-xl tracking-widest mb-4 block" style="font-family: 'Noto Sans JP';">学びの道</span>
-        <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-tight mb-6" style="font-family: 'Zen Kurenaido', serif;">
+        <span class="text-[#f8f7ef]/80 text-xl tracking-widest mb-4 block hero-label-slide" style="font-family: 'Noto Sans JP';">学びの道</span>
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-tight mb-6 hero-title-slide" style="font-family: 'Zen Kurenaido', serif;">
             Menyelami Keindahan<br>Bahasa Jepang
         </h1>
-        <p class="text-lg text-white/90 max-w-xl font-light" style="font-family: 'Noto Sans JP';">
+        <p class="text-lg text-white/90 max-w-xl font-light hero-sub-slide" style="font-family: 'Noto Sans JP';">
             Kurasi artikel dan materi belajar yang mendalam, dirancang untuk membimbing Anda dari dasar hingga kefasihan.
         </p>
     </div>
@@ -288,7 +288,7 @@
 
 {{-- ===== STATIC Filter Bar ===== --}}
 <section class="py-8 md:py-10" style="background: #f8f7ef;">
-    <div class="filter-bar">
+    <div class="filter-bar filter-bar-anim">
         {{-- LEFT: Search (~28%) --}}
         <div class="filter-search">
             <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">

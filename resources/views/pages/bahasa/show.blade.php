@@ -130,6 +130,9 @@
 
 @section('content')
 
+{{-- Reading Progress Bar --}}
+<div id="reading-progress"></div>
+
 {{-- Sub-hero Header --}}
 <header class="relative w-full min-h-[280px] md:min-h-[320px] overflow-hidden flex items-end pb-10 px-6 md:px-16"
     style="background-color: #e7eefe;">
@@ -158,10 +161,10 @@
                 </span>
             @endif
         </div>
-        <h1 class="text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-tight max-w-3xl" style="font-family: 'Zen Kurenaido', serif;">
+        <h1 class="text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-tight max-w-3xl hero-title-slide" style="font-family: 'Zen Kurenaido', serif;">
             {{ $article->title }}
         </h1>
-        <div class="flex items-center gap-4 text-sm text-gray-500 mt-2 justify-center">
+        <div class="flex items-center gap-4 text-sm text-gray-500 mt-2 justify-center hero-sub-slide">
             @if($article->user)
                 <span>Oleh {{ $article->user->name ?? 'Admin' }}</span>
             @endif

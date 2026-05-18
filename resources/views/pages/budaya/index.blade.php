@@ -90,11 +90,11 @@
     style="background: linear-gradient(to top, rgba(64,66,53,0.95), rgba(64,66,53,0.4)), url('{{ asset('images/gambars_subhero_budaya.jpg') }}') center/cover no-repeat; background-color: #404235;">
     <div class="absolute inset-0 bg-gradient-to-t from-[#404235] via-[#404235]/60 to-transparent"></div>
     <div class="relative z-10 max-w-4xl">
-        <span class="text-[#d6975e] text-xl tracking-widest mb-4 block font-semibold" style="font-family: 'Noto Sans JP';">文化を知る</span>
-        <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-[#f8f7ef] tracking-tight leading-tight mb-6 text-shadow-lg" style="font-family: 'Zen Kurenaido', serif;">
+        <span class="text-[#d6975e] text-xl tracking-widest mb-4 block font-semibold hero-label-slide" style="font-family: 'Noto Sans JP';">文化を知る</span>
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-[#f8f7ef] tracking-tight leading-tight mb-6 text-shadow-lg hero-title-slide" style="font-family: 'Zen Kurenaido', serif;">
             Budaya &<br>Tradisi Jepang
         </h1>
-        <p class="text-lg text-[#f8f7ef]/90 max-w-xl font-light" style="font-family: 'Noto Sans JP';">
+        <p class="text-lg text-[#f8f7ef]/90 max-w-xl font-light hero-sub-slide" style="font-family: 'Noto Sans JP';">
             Menyelami kekayaan tradisi, festival, dan kuliner dari Negeri Sakura.
         </p>
     </div>
@@ -102,7 +102,7 @@
 
 {{-- Filter --}}
 <section class="py-8 md:py-10" style="background: #f8f7ef;">
-    <div class="filter-bar">
+    <div class="filter-bar filter-bar-anim">
         <div class="filter-search">
             <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
             <input type="text" id="articleSearch" class="search-input" placeholder="Cari budaya..." autocomplete="off">

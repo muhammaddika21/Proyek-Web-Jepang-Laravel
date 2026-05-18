@@ -11,25 +11,31 @@
 
 {{-- ======== HERO SECTION ======== --}}
 <section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
-    <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 z-0 hero-parallax-bg">
         <img src="{{ asset('images/hero_kereta.png') }}" alt="Hero kereta Jepang" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-gradient-to-b from-white/70 via-white/50 to-white/80"></div>
     </div>
+    <!-- Sakura petals -->
+    <span class="petal"></span>
+    <span class="petal"></span>
+    <span class="petal"></span>
+    <span class="petal"></span>
+    <span class="petal"></span>
 
 
     <div class="text-center px-4 relative z-10 max-w-3xl mx-auto">
-        <p class="text-[#2D6A4F] text-lg md:text-xl mb-3 font-medium" style="font-family: 'Noto Sans JP', sans-serif;">
+        <p class="text-[#2D6A4F] text-lg md:text-xl mb-3 font-medium hero-badge" style="font-family: 'Noto Sans JP', sans-serif;">
             日本語部へようこそ
         </p>
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#1A1A2E] leading-tight mb-6" style="font-family: 'Zen Kurenaido', serif;">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#1A1A2E] leading-tight mb-6 hero-title" style="font-family: 'Zen Kurenaido', serif;">
             Belajar Bahasa &<br>
             <span class="bg-gradient-to-r from-[#2D6A4F] to-[#E76F51] bg-clip-text text-transparent">Budaya Jepang</span>
         </h1>
-        <p class="text-gray-700 text-lg md:text-xl mb-10 max-w-xl mx-auto leading-relaxed" style="font-family: 'Noto Sans JP', sans-serif;">
+        <p class="text-gray-700 text-lg md:text-xl mb-10 max-w-xl mx-auto leading-relaxed hero-subtitle" style="font-family: 'Noto Sans JP', sans-serif;">
             Platform lengkap UKM untuk menguasai bahasa Jepang dari nol hingga mahir.
         </p>
         <a href="#belajar"
-           class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#2D6A4F] to-[#0F5238] text-white rounded-full text-lg font-semibold shadow-lg shadow-[#2D6A4F]/30 hover:shadow-xl hover:shadow-[#2D6A4F]/40 hover:-translate-y-1 transition-all duration-300">
+           class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#2D6A4F] to-[#0F5238] text-white rounded-full text-lg font-semibold shadow-lg shadow-[#2D6A4F]/30 hover:shadow-xl hover:shadow-[#2D6A4F]/40 hover:-translate-y-1 transition-all duration-300 hero-cta">
             Lihat Materi
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </a>
@@ -37,9 +43,9 @@
 </section>
 
 {{-- ======== GALLERY / CAROUSEL SECTION ======== --}}
-<section class="py-16 md:py-24 bg-white">
+<section class="py-16 md:py-24 bg-white reveal">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
+        <div class="text-center mb-12 section-heading">
             <p class="text-[#2D6A4F] text-sm font-semibold uppercase tracking-wider mb-2" style="font-family: 'Noto Sans JP';">活動記録</p>
             <h2 class="text-3xl md:text-4xl text-[#1A1A2E]" style="font-family: 'Sawarabi Mincho', serif;">Kegiatan Kami</h2>
         </div>
@@ -60,14 +66,14 @@
 {{-- ======== KEIKEN SURU KOTO ======== --}}
 <section id="belajar" class="py-16 md:py-24 bg-[#f8f7ef]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-14">
+        <div class="text-center mb-14 section-heading reveal">
             <p class="text-[#2D6A4F] text-sm font-semibold uppercase tracking-wider mb-2" style="font-family: 'Noto Sans JP';">経験すること</p>
             <h2 class="text-3xl md:text-4xl text-[#1A1A2E] mb-3" style="font-family: 'Sawarabi Mincho', serif;">Keiken Suru Koto</h2>
             <p class="text-gray-500 text-lg" style="font-family: 'Noto Sans JP';">Apa yang akan kalian alami?</p>
         </div>
 
         {{-- ===== BAHASA GROUP ===== --}}
-        <div class="mb-12">
+        <div class="mb-12 reveal">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-10 h-10 rounded-xl bg-[#2D6A4F]/10 flex items-center justify-center">
                     <span class="text-xl font-bold text-[#2D6A4F]" style="font-family: 'Noto Sans JP';">言</span>
@@ -80,10 +86,10 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 reveal-stagger">
 
                 {{-- Complete Guide --}}
-                <a href="{{ url('/bahasa?cat=complete-guide') }}" class="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#2D6A4F]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                <a href="{{ url('/bahasa?cat=complete-guide') }}" class="reveal group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#2D6A4F]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden category-card">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-[#2D6A4F]/5 rounded-full -translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#2D6A4F]/10 to-[#0F5238]/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
@@ -100,7 +106,7 @@
                 </a>
 
                 {{-- Kanji --}}
-                <a href="{{ url('/bahasa?cat=kanji') }}" class="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#C0392B]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                <a href="{{ url('/bahasa?cat=kanji') }}" class="reveal group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#C0392B]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden category-card">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-[#C0392B]/5 rounded-full -translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C0392B]/10 to-[#C0392B]/5 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
@@ -117,7 +123,7 @@
                 </a>
 
                 {{-- Kotoba --}}
-                <a href="{{ url('/bahasa?cat=kotoba') }}" class="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#B8860B]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                <a href="{{ url('/bahasa?cat=kotoba') }}" class="reveal group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#B8860B]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden category-card">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-[#B8860B]/5 rounded-full -translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#B8860B]/10 to-[#B8860B]/5 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
@@ -134,7 +140,7 @@
                 </a>
 
                 {{-- Bunpou --}}
-                <a href="{{ url('/bahasa?cat=bunpou') }}" class="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#4a7ec9]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                <a href="{{ url('/bahasa?cat=bunpou') }}" class="reveal group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#4a7ec9]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden category-card">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-[#4a7ec9]/5 rounded-full -translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#4a7ec9]/10 to-[#4a7ec9]/5 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
@@ -153,7 +159,7 @@
         </div>
 
         {{-- ===== BUDAYA & KEGIATAN GROUP ===== --}}
-        <div>
+        <div class="reveal">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-10 h-10 rounded-xl bg-[#E76F51]/10 flex items-center justify-center">
                     <span class="text-xl font-bold text-[#E76F51]" style="font-family: 'Noto Sans JP';">活</span>
@@ -166,10 +172,10 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 reveal-stagger">
 
                 {{-- 1. Kegiatan Terbaru --}}
-                <a href="{{ url('/kegiatan?cat=kegiatan-terbaru') }}" class="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#d6975e]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                <a href="{{ url('/kegiatan?cat=kegiatan-terbaru') }}" class="reveal group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#d6975e]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden category-card">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-[#d6975e]/5 rounded-full -translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#d6975e]/10 to-[#d6975e]/5 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
@@ -186,7 +192,7 @@
                 </a>
 
                 {{-- 2. Event --}}
-                <a href="{{ url('/kegiatan?cat=event') }}" class="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#7c5cbf]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                <a href="{{ url('/kegiatan?cat=event') }}" class="reveal group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#7c5cbf]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden category-card">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-[#7c5cbf]/5 rounded-full -translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7c5cbf]/10 to-[#7c5cbf]/5 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
@@ -203,7 +209,7 @@
                 </a>
 
                 {{-- 3. Budaya --}}
-                <a href="{{ url('/budaya') }}" class="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#E76F51]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                <a href="{{ url('/budaya') }}" class="reveal group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#E76F51]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden category-card">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-[#E76F51]/5 rounded-full -translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#E76F51]/10 to-[#E76F51]/5 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
@@ -220,7 +226,7 @@
                 </a>
 
                 {{-- 4. Pop Culture --}}
-                <a href="{{ url('/budaya?cat=pop-culture') }}" class="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#4a7ec9]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                <a href="{{ url('/budaya?cat=pop-culture') }}" class="reveal group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#4a7ec9]/30 transition-all duration-300 hover:-translate-y-2 overflow-hidden category-card">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-[#4a7ec9]/5 rounded-full -translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#4a7ec9]/10 to-[#4a7ec9]/5 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
