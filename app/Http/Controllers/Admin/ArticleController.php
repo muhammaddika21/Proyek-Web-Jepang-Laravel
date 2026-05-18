@@ -113,7 +113,8 @@ class ArticleController extends Controller
             $rules['kemahiran_level'] = 'nullable|in:pemula,menengah,mahir';
         }
         $rules['additional_images.*'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048';
-        $rules['audio_file'] = 'nullable|mimes:mp3,wav,ogg,m4a|max:20480';
+        $rules['audio_files.*']        = 'nullable|mimes:mp3,wav,ogg,m4a|max:20480';
+        $rules['video_files.*']        = 'nullable|mimes:mp4,webm|max:102400';
 
         $request->validate($rules);
 
@@ -136,7 +137,7 @@ class ArticleController extends Controller
         $content = $this->stripBase64Images($request->content);
         $grammarExplanation = null;
         if ($type === 'bahasa') {
-            $grammarExplanation = $content; // Quill content → grammar_explanation
+            $grammarExplanation = $content;
             $content = null;
         }
 
@@ -148,34 +149,78 @@ class ArticleController extends Controller
             }
         }
 
-        // Handle upload audio
+        // Handle multiple audio files
+        $audioFiles = [];
+        if ($request->hasFile('audio_files')) {
+            foreach ($request->file('audio_files') as $audio) {
+                $audioFiles[] = [
+                    'path'  => $audio->store('articles/audio', 'public'),
+                    'label' => '',
+                ];
+            }
+        }
+        // Legacy single audio_file (backward compat)
         $audioPath = null;
         if ($request->hasFile('audio_file')) {
             $audioPath = $request->file('audio_file')->store('articles/audio', 'public');
         }
 
+        // Handle multiple video files
+        $videoFiles = [];
+        if ($request->hasFile('video_files')) {
+            foreach ($request->file('video_files') as $video) {
+                $videoFiles[] = [
+                    'path'  => $video->store('articles/video', 'public'),
+                    'label' => '',
+                ];
+            }
+        }
+
+        // Handle multiple YouTube URLs
+        $youtubeUrls = array_values(array_filter(
+            (array)($request->input('youtube_urls', []))
+        ));
+        // Legacy single youtube_url (backward compat)
+        $youtubeUrl = $request->youtube_url;
+
+        // Merge audio labels
+        $audioLabels = (array)($request->input('audio_labels', []));
+        foreach ($audioFiles as $i => &$af) {
+            $af['label'] = $audioLabels[$i] ?? '';
+        }
+        unset($af);
+        $videoLabels = (array)($request->input('video_labels', []));
+        foreach ($videoFiles as $i => &$vf) {
+            $vf['label'] = $videoLabels[$i] ?? '';
+        }
+        unset($vf);
+
         // Buat artikel
         $article = Article::create([
-            'user_id' => Auth::id(),
-            'category_id' => $request->category_id,
-            'title' => $request->title,
-            'slug' => $slug,
-            'type' => $type,
-            'excerpt' => $request->excerpt,
-            'content' => $content,
-            'cover_image' => $coverPath,
+            'user_id'             => Auth::id(),
+            'category_id'         => $request->category_id,
+            'title'               => $request->title,
+            'slug'                => $slug,
+            'type'                => $type,
+            'excerpt'             => $request->excerpt,
+            'content'             => $content,
+            'cover_image'         => $coverPath,
             'cover_image_caption' => $request->cover_image_caption,
-            'additional_images' => !empty($additionalImages) ? $additionalImages : null,
-            'audio_file' => $audioPath,
-            'audio_label' => $request->audio_label,
-            'japanese_title' => $request->japanese_title,
-            'romaji_title' => $request->romaji_title,
-            'kemahiran_level' => $request->kemahiran_level,
+            'additional_images'   => !empty($additionalImages) ? $additionalImages : null,
+            'audio_file'          => $audioPath,
+            'audio_label'         => $request->audio_label,
+            'audio_files'         => !empty($audioFiles) ? $audioFiles : null,
+            'video_files'         => !empty($videoFiles) ? $videoFiles : null,
+            'youtube_url'         => $youtubeUrl,
+            'youtube_urls'        => !empty($youtubeUrls) ? $youtubeUrls : null,
+            'japanese_title'      => $request->japanese_title,
+            'romaji_title'        => $request->romaji_title,
+            'kemahiran_level'     => $request->kemahiran_level,
             'grammar_explanation' => $grammarExplanation,
-            'vocabulary_list' => $this->parseVocabList($request->vocabulary_list),
-            'quiz_questions' => $this->parseQuiz($request->quiz_questions),
-            'status' => $status,
-            'read_time' => $request->read_time,
+            'vocabulary_list'     => $this->parseVocabList($request->vocabulary_list),
+            'quiz_questions'      => $this->parseQuiz($request->quiz_questions),
+            'status'              => $status,
+            'read_time'           => $request->read_time,
         ]);
 
         $label = $type === 'bahasa' ? 'Artikel Bahasa' : 'Artikel Umum';
@@ -214,13 +259,15 @@ class ArticleController extends Controller
         $status = $request->input('action') === 'draft' ? 'draft' : 'published';
 
         $rules = [
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:articles,slug,' . $article->id,
-            'category_id' => 'nullable|exists:categories,id',
-            'excerpt' => 'nullable|string|max:500',
-            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'title'               => 'required|string|max:255',
+            'slug'                => 'nullable|string|max:255|unique:articles,slug,' . $article->id,
+            'category_id'         => 'nullable|exists:categories,id',
+            'excerpt'             => 'nullable|string|max:500',
+            'cover_image'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'additional_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'audio_file' => 'nullable|mimes:mp3,wav,ogg,m4a|max:20480',
+            'audio_file'          => 'nullable|mimes:mp3,wav,ogg,m4a|max:20480',
+            'audio_files.*'       => 'nullable|mimes:mp3,wav,ogg,m4a|max:51200',
+            'video_files.*'       => 'nullable|mimes:mp4,webm,mov,avi|max:204800',
         ];
 
         if ($article->type === 'bahasa') {
@@ -247,7 +294,7 @@ class ArticleController extends Controller
             }
         }
 
-        // Handle audio file
+        // Handle legacy single audio
         $audioPath = $article->audio_file;
         if ($request->hasFile('audio_file')) {
             if ($article->audio_file) {
@@ -255,6 +302,45 @@ class ArticleController extends Controller
             }
             $audioPath = $request->file('audio_file')->store('articles/audio', 'public');
         }
+
+        // Handle multiple audio files (append new ones)
+        $audioFiles = $article->audio_files ?? [];
+        if ($request->hasFile('audio_files')) {
+            $audioLabels = (array)($request->input('audio_labels', []));
+            foreach ($request->file('audio_files') as $i => $audio) {
+                $audioFiles[] = [
+                    'path'  => $audio->store('articles/audio', 'public'),
+                    'label' => $audioLabels[$i] ?? '',
+                ];
+            }
+        }
+        // Update labels of existing audio_files
+        $existingAudioLabels = (array)($request->input('existing_audio_labels', []));
+        foreach ($existingAudioLabels as $i => $lbl) {
+            if (isset($audioFiles[$i])) $audioFiles[$i]['label'] = $lbl;
+        }
+
+        // Handle multiple video files (append new ones)
+        $videoFiles = $article->video_files ?? [];
+        if ($request->hasFile('video_files')) {
+            $videoLabels = (array)($request->input('video_labels', []));
+            foreach ($request->file('video_files') as $i => $video) {
+                $videoFiles[] = [
+                    'path'  => $video->store('articles/video', 'public'),
+                    'label' => $videoLabels[$i] ?? '',
+                ];
+            }
+        }
+        $existingVideoLabels = (array)($request->input('existing_video_labels', []));
+        foreach ($existingVideoLabels as $i => $lbl) {
+            if (isset($videoFiles[$i])) $videoFiles[$i]['label'] = $lbl;
+        }
+
+        // Handle multiple YouTube URLs
+        $youtubeUrls = array_values(array_filter(
+            (array)($request->input('youtube_urls', []))
+        ));
+        $youtubeUrl = $request->youtube_url;
 
         $slug = $request->filled('slug')
             ? Str::slug($request->slug)
@@ -270,25 +356,28 @@ class ArticleController extends Controller
         }
 
         $article->update([
-            'category_id' => $request->category_id,
-            'title' => $request->title,
-            'slug' => $slug,
-            'excerpt' => $request->excerpt,
-            'content' => $content,
-            'cover_image' => $coverPath,
+            'category_id'         => $request->category_id,
+            'title'               => $request->title,
+            'slug'                => $slug,
+            'excerpt'             => $request->excerpt,
+            'content'             => $content,
+            'cover_image'         => $coverPath,
             'cover_image_caption' => $request->cover_image_caption,
-            'additional_images' => !empty($additionalImages) ? $additionalImages : null,
-            'audio_file' => $audioPath,
-            'audio_label' => $request->audio_label,
-            'youtube_url' => $request->youtube_url,
-            'japanese_title' => $request->japanese_title,
-            'romaji_title' => $request->romaji_title,
-            'kemahiran_level' => $request->kemahiran_level,
+            'additional_images'   => !empty($additionalImages) ? $additionalImages : null,
+            'audio_file'          => $audioPath,
+            'audio_label'         => $request->audio_label,
+            'audio_files'         => !empty($audioFiles) ? array_values($audioFiles) : null,
+            'video_files'         => !empty($videoFiles) ? array_values($videoFiles) : null,
+            'youtube_url'         => $youtubeUrl,
+            'youtube_urls'        => !empty($youtubeUrls) ? $youtubeUrls : null,
+            'japanese_title'      => $request->japanese_title,
+            'romaji_title'        => $request->romaji_title,
+            'kemahiran_level'     => $request->kemahiran_level,
             'grammar_explanation' => $grammarExplanation,
-            'vocabulary_list' => $this->parseVocabList($request->vocabulary_list),
-            'quiz_questions' => $this->parseQuiz($request->quiz_questions),
-            'status' => $status,
-            'read_time' => $request->read_time,
+            'vocabulary_list'     => $this->parseVocabList($request->vocabulary_list),
+            'quiz_questions'      => $this->parseQuiz($request->quiz_questions),
+            'status'              => $status,
+            'read_time'           => $request->read_time,
         ]);
 
         $statusLabel = $status === 'draft' ? '(Draft)' : '(Published)';
@@ -337,6 +426,72 @@ class ArticleController extends Controller
 
         $label = $article->status === 'published' ? 'dipublikasikan' : 'dikembalikan ke draft';
         return back()->with('success', "✅ Artikel berhasil {$label}.");
+    }
+
+    // =============================================
+    // DELETE MEDIA — Hapus gambar/audio dari artikel (AJAX)
+    // =============================================
+    public function deleteMedia(Request $request, Article $article)
+    {
+        $type  = $request->input('type');   // 'image'|'audio'|'audio_item'|'video_item'|'youtube_item'|'cover'
+        $index = $request->input('index');  // int
+
+        if ($type === 'image') {
+            $images = $article->additional_images ?? [];
+            if (!isset($images[$index])) {
+                return response()->json(['success' => false, 'message' => 'Gambar tidak ditemukan'], 404);
+            }
+            Storage::disk('public')->delete($images[$index]);
+            array_splice($images, $index, 1);
+            $article->update(['additional_images' => !empty($images) ? array_values($images) : null]);
+            return response()->json(['success' => true]);
+        }
+
+        if ($type === 'audio') {
+            if ($article->audio_file) Storage::disk('public')->delete($article->audio_file);
+            $article->update(['audio_file' => null, 'audio_label' => null]);
+            return response()->json(['success' => true]);
+        }
+
+        if ($type === 'audio_item') {
+            $files = $article->audio_files ?? [];
+            if (!isset($files[$index])) {
+                return response()->json(['success' => false, 'message' => 'Audio tidak ditemukan'], 404);
+            }
+            Storage::disk('public')->delete($files[$index]['path'] ?? '');
+            array_splice($files, $index, 1);
+            $article->update(['audio_files' => !empty($files) ? array_values($files) : null]);
+            return response()->json(['success' => true]);
+        }
+
+        if ($type === 'video_item') {
+            $files = $article->video_files ?? [];
+            if (!isset($files[$index])) {
+                return response()->json(['success' => false, 'message' => 'Video tidak ditemukan'], 404);
+            }
+            Storage::disk('public')->delete($files[$index]['path'] ?? '');
+            array_splice($files, $index, 1);
+            $article->update(['video_files' => !empty($files) ? array_values($files) : null]);
+            return response()->json(['success' => true]);
+        }
+
+        if ($type === 'youtube_item') {
+            $urls = $article->youtube_urls ?? [];
+            if (!isset($urls[$index])) {
+                return response()->json(['success' => false, 'message' => 'YouTube URL tidak ditemukan'], 404);
+            }
+            array_splice($urls, $index, 1);
+            $article->update(['youtube_urls' => !empty($urls) ? array_values($urls) : null]);
+            return response()->json(['success' => true]);
+        }
+
+        if ($type === 'cover') {
+            if ($article->cover_image) Storage::disk('public')->delete($article->cover_image);
+            $article->update(['cover_image' => null]);
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Tipe media tidak valid'], 422);
     }
 
     // =============================================

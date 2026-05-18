@@ -329,17 +329,51 @@
         {{-- ===== SECTION D: Media (Audio, Gambar, Video, YouTube) ===== --}}
         <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]" x-data="{
               mediaType: 'audio',
-              audioFile: null,
+              audioFiles: [],  audioInput: null,
               imageFiles: [],
-              videoFile: null,
+              videoFiles: [],  videoInput: null,
+              ytUrls: [''],
               formatBytes(bytes) {
                 if (bytes < 1024) return bytes + ' B';
-                if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-                return (bytes / 1048576).toFixed(1) + ' MB';
+                if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+                return (bytes/1048576).toFixed(1) + ' MB';
               },
-              handleAudioChange(e) {
-                const f = e.target.files[0];
-                if (f) this.audioFile = { name: f.name, size: f.size };
+              pickAudio() {
+                const inp = this.$refs.audioInput;
+                inp.click();
+              },
+              onAudioPick(e) {
+                const dt = new DataTransfer();
+                this.audioFiles.forEach(a => dt.items.add(a.file));
+                Array.from(e.target.files).forEach(f => {
+                  dt.items.add(f);
+                  this.audioFiles.push({ name: f.name, size: f.size, file: f, label: '' });
+                });
+                this.$refs.audioInput.files = dt.files;
+                e.target.value = '';
+              },
+              removeAudio(i) {
+                this.audioFiles.splice(i, 1);
+                const dt = new DataTransfer();
+                this.audioFiles.forEach(a => dt.items.add(a.file));
+                this.$refs.audioInput.files = dt.files;
+              },
+              pickVideo() { this.$refs.videoInput.click(); },
+              onVideoPick(e) {
+                const dt = new DataTransfer();
+                this.videoFiles.forEach(v => dt.items.add(v.file));
+                Array.from(e.target.files).forEach(f => {
+                  dt.items.add(f);
+                  this.videoFiles.push({ name: f.name, size: f.size, file: f, label: '' });
+                });
+                this.$refs.videoInput.files = dt.files;
+                e.target.value = '';
+              },
+              removeVideo(i) {
+                this.videoFiles.splice(i, 1);
+                const dt = new DataTransfer();
+                this.videoFiles.forEach(v => dt.items.add(v.file));
+                this.$refs.videoInput.files = dt.files;
               },
               handleImageDrop(e) {
                 const files = Array.from(e.dataTransfer?.files || e.target.files || []);
@@ -351,159 +385,181 @@
                   }
                 });
               },
-              handleVideoChange(e) {
-                const f = e.target.files[0];
-                if (f) this.videoFile = { name: f.name, size: f.size };
-              },
               removeImage(i) { this.imageFiles.splice(i, 1); }
             }">
+          {{-- Hidden real file inputs --}}
+          <input type="file" x-ref="audioInput" name="audio_files[]" multiple accept="audio/mpeg,audio/wav,audio/ogg" class="sr-only" @change="onAudioPick($event)">
+          <input type="file" x-ref="videoInput" name="video_files[]" multiple accept="video/mp4,video/webm" class="sr-only" @change="onVideoPick($event)">
+
           <div class="px-6 py-5 border-b border-gray-200 dark:border-[#24463a]">
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">📎 Media Tambahan</h3>
-            <p class="text-xs text-gray-500 mt-1">Upload gambar, video, audio, atau embed YouTube.</p>
+            <p class="text-xs text-gray-500 mt-1">Upload gambar, audio, video, atau embed YouTube.</p>
           </div>
           <div class="p-6">
+            {{-- Tab buttons --}}
             <div class="flex gap-2 mb-5 flex-wrap">
               <button type="button" @click="mediaType = 'audio'"
-                :class="mediaType === 'audio' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-[#24463a] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
-                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">🎵 Audio / MP3</button>
+                :class="mediaType==='audio' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-[#24463a] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">
+                🎵 Audio / MP3
+                <span x-show="audioFiles.length > 0" class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white/20 text-[10px]" x-text="audioFiles.length"></span>
+              </button>
               <button type="button" @click="mediaType = 'image'"
-                :class="mediaType === 'image' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-[#24463a] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
-                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">🖼️ Gambar</button>
+                :class="mediaType==='image' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-[#24463a] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">
+                🖼️ Gambar
+                <span x-show="imageFiles.length > 0" class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white/20 text-[10px]" x-text="imageFiles.length"></span>
+              </button>
               <button type="button" @click="mediaType = 'video'"
-                :class="mediaType === 'video' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-[#24463a] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
-                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">🎬 Video</button>
+                :class="mediaType==='video' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-[#24463a] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">
+                🎬 Video
+                <span x-show="videoFiles.length > 0" class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white/20 text-[10px]" x-text="videoFiles.length"></span>
+              </button>
               <button type="button" @click="mediaType = 'youtube'"
-                :class="mediaType === 'youtube' ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-[#24463a] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                :class="mediaType==='youtube' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-[#24463a] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
                 class="px-4 py-2 text-xs font-semibold rounded-lg transition-all">▶️ YouTube</button>
             </div>
 
-            {{-- Audio --}}
+            {{-- AUDIO TAB --}}
             <div x-show="mediaType === 'audio'" x-transition>
-              <label
-                class="media-drop-zone flex items-center justify-center w-full h-36 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#24463a]/50 cursor-pointer hover:border-brand-400 transition-colors"
-                :class="audioFile ? 'has-file' : ''" for="audio-upload-bahasa">
-                <input type="file" id="audio-upload-bahasa" name="audio_file" accept="audio/mpeg,audio/wav,audio/ogg"
-                  class="sr-only" @change="handleAudioChange($event)">
-                <div class="text-center" x-show="!audioFile">
-                  <span class="text-3xl mb-2 block">🎧</span>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload audio — <span
-                      class="text-brand-500 font-medium">klik untuk pilih</span></p>
-                  <p class="text-[10px] text-gray-400 mt-1">MP3 / WAV — Maks 20MB</p>
-                </div>
-                <div x-show="audioFile" class="flex items-center gap-3 px-4">
-                  <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-brand-500/10 shrink-0">
-                    <span class="text-2xl">🎧</span>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                Ketik <code class="bg-gray-100 dark:bg-[#24463a] px-1 rounded font-mono">[audio1]</code>, <code class="bg-gray-100 dark:bg-[#24463a] px-1 rounded font-mono">[audio2]</code> dst. di editor untuk posisikan audio.
+              </p>
+
+              {{-- Audio cards grid --}}
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-3" x-show="audioFiles.length > 0">
+                <template x-for="(item, i) in audioFiles" :key="i">
+                  <div class="relative group rounded-xl border border-gray-200 dark:border-[#24463a] bg-gray-50 dark:bg-[#24463a]/40 overflow-hidden">
+                    {{-- Icon area --}}
+                    <div class="flex flex-col items-center justify-center h-24 px-2 pt-3">
+                      <span class="text-3xl mb-1">🎧</span>
+                      <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate w-full text-center" x-text="item.name"></p>
+                      <p class="text-[9px] text-gray-400" x-text="formatBytes(item.size)"></p>
+                    </div>
+                    {{-- Label input --}}
+                    <div class="px-2 pb-2">
+                      <input type="text" :name="'audio_labels[' + i + ']'" x-model="item.label"
+                        placeholder="Label (opsional)"
+                        class="w-full rounded border border-gray-300 dark:border-[#24463a] bg-white dark:bg-[#1a2e24] px-2 py-1 text-[10px] dark:text-white/80 focus:outline-none focus:ring-1 focus:ring-emerald-400">
+                    </div>
+                    {{-- Shortcode badge --}}
+                    <div class="bg-emerald-50 dark:bg-emerald-900/20 py-1 text-center">
+                      <span class="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400" x-text="'[audio' + (i+1) + ']'"></span>
+                    </div>
+                    {{-- Remove button --}}
+                    <button type="button" @click="removeAudio(i)"
+                      class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none">✕</button>
                   </div>
-                  <div class="text-left min-w-0">
-                    <p class="text-sm font-medium text-gray-800 dark:text-white/90 truncate" x-text="audioFile?.name"></p>
-                    <p class="text-xs text-gray-500" x-text="formatBytes(audioFile?.size || 0)"></p>
-                    <button type="button"
-                      @click.prevent="audioFile = null; document.getElementById('audio-upload-bahasa').value = ''"
-                      class="text-xs text-red-500 hover:text-red-600 mt-1">Hapus</button>
-                  </div>
+                </template>
+              </div>
+
+              {{-- Upload drop zone --}}
+              <label @click.prevent="pickAudio()"
+                class="flex items-center justify-center w-full h-24 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#24463a]/50 cursor-pointer hover:border-emerald-400 transition-colors">
+                <div class="text-center">
+                  <span class="text-2xl block mb-1">🎧</span>
+                  <p class="text-xs text-gray-500">Klik untuk tambah audio <span class="text-emerald-500 font-medium">MP3 / WAV / OGG</span></p>
+                  <p class="text-[10px] text-gray-400">Bisa pilih beberapa sekaligus · Maks 20MB per file</p>
                 </div>
               </label>
-              <div class="mt-3">
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Label Audio</label>
-                <input type="text" name="audio_label" placeholder="Misal: Percakapan di Restoran"
-                  value="{{ old('audio_label') }}"
-                  class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-[#24463a] dark:bg-[#1a2e24] dark:text-white/90 dark:placeholder:text-white/30">
-              </div>
             </div>
 
-            {{-- Image --}}
+            {{-- IMAGE TAB --}}
             <div x-show="mediaType === 'image'" x-transition>
-              <label
-                class="media-drop-zone flex flex-col items-center justify-center w-full min-h-[140px] rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#24463a]/50 cursor-pointer hover:border-brand-400 transition-colors"
-                :class="imageFiles.length > 0 ? 'has-file' : ''" @dragover.prevent="$el.classList.add('drag-over')"
-                @dragleave.prevent="$el.classList.remove('drag-over')"
-                @drop.prevent="$el.classList.remove('drag-over'); handleImageDrop($event)" for="image-upload-bahasa">
-                <input type="file" id="image-upload-bahasa" name="additional_images[]" multiple accept="image/*"
-                  class="sr-only" @change="handleImageDrop($event)">
-                <div class="text-center py-4" x-show="imageFiles.length === 0">
-                  <svg class="mx-auto w-10 h-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M18 13.5V6.75A2.25 2.25 0 0015.75 4.5h-13.5A2.25 2.25 0 000 6.75v10.5A2.25 2.25 0 002.25 19.5h15" />
-                  </svg>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Drag & drop gambar atau <span
-                      class="text-brand-500 font-medium">klik untuk upload</span></p>
-                  <p class="text-[10px] text-gray-400 mt-1">JPG, PNG, WebP — Maks 5MB per file</p>
-                </div>
-                <div x-show="imageFiles.length > 0" class="w-full p-3">
-                  <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-2">
-                    <template x-for="(img, i) in imageFiles" :key="i">
-                      <div
-                        class="relative file-preview-item group rounded-lg overflow-hidden border border-gray-200 dark:border-[#24463a]">
-                        <div class="aspect-square"><img :src="img.preview" class="w-full h-full object-cover"></div>
-                        <button type="button" @click.prevent="removeImage(i)"
-                          class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none">✕</button>
-                        <div class="text-center py-1 bg-gray-100 dark:bg-[#24463a]">
-                          <span class="text-[10px] font-mono font-bold text-brand-600 dark:text-brand-400"
-                            x-text="'[gambar' + (i + 1) + ']'"></span>
-                        </div>
-                      </div>
-                    </template>
-                    <label for="image-upload-bahasa"
-                      class="aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center cursor-pointer hover:border-brand-400 transition-colors"
-                      x-show="imageFiles.length < 5">
-                      <span class="text-2xl text-gray-400">+</span>
-                    </label>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                Ketik <code class="bg-gray-100 dark:bg-[#24463a] px-1 rounded font-mono">[gambar1]</code>, <code class="bg-gray-100 dark:bg-[#24463a] px-1 rounded font-mono">[gambar2]</code> dst. di editor.
+              </p>
+              <div x-show="imageFiles.length > 0" class="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-3">
+                <template x-for="(img, i) in imageFiles" :key="i">
+                  <div class="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-[#24463a]">
+                    <div class="aspect-square"><img :src="img.preview" class="w-full h-full object-cover"></div>
+                    <div class="bg-emerald-50 dark:bg-emerald-900/20 py-1 text-center">
+                      <span class="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400" x-text="'[gambar' + (i+1) + ']'"></span>
+                    </div>
+                    <button type="button" @click.prevent="removeImage(i)"
+                      class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none">✕</button>
                   </div>
-                  <p class="text-[10px] text-gray-400 text-center" x-text="imageFiles.length + ' gambar dipilih'"></p>
-                </div>
-              </label>
-            </div>
-
-            {{-- Video --}}
-            <div x-show="mediaType === 'video'" x-transition>
-              <label
-                class="media-drop-zone flex items-center justify-center w-full h-36 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#24463a]/50 cursor-pointer hover:border-brand-400 transition-colors"
-                :class="videoFile ? 'has-file' : ''" for="video-upload-bahasa">
-                <input type="file" id="video-upload-bahasa" name="media_video" accept="video/mp4,video/webm"
-                  class="sr-only" @change="handleVideoChange($event)">
-                <div class="text-center" x-show="!videoFile">
-                  <span class="text-3xl mb-2 block">🎬</span>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Upload video — <span
-                      class="text-brand-500 font-medium">klik untuk pilih</span></p>
-                  <p class="text-[10px] text-gray-400 mt-1">MP4 / WebM — Maks 50MB</p>
-                </div>
-                <div x-show="videoFile" class="flex items-center gap-3 px-4">
-                  <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-brand-500/10 shrink-0">
-                    <span class="text-2xl">🎬</span>
-                  </div>
-                  <div class="text-left min-w-0">
-                    <p class="text-sm font-medium text-gray-800 dark:text-white/90 truncate" x-text="videoFile?.name"></p>
-                    <p class="text-xs text-gray-500" x-text="formatBytes(videoFile?.size || 0)"></p>
-                    <button type="button"
-                      @click.prevent="videoFile = null; document.getElementById('video-upload-bahasa').value = ''"
-                      class="text-xs text-red-500 hover:text-red-600 mt-1">Hapus</button>
-                  </div>
-                </div>
-              </label>
-            </div>
-
-            {{-- YouTube --}}
-            <div x-show="mediaType === 'youtube'" x-transition>
-              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Link YouTube</label>
-              <div class="flex items-center gap-2">
-                <span
-                  class="flex items-center justify-center w-11 h-11 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 shrink-0">
-                  <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                  </svg>
-                </span>
-                <input type="url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=..."
-                  value="{{ old('youtube_url') }}"
-                  class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-[#24463a] dark:bg-[#1a2e24] dark:text-white/90 dark:placeholder:text-white/30">
+                </template>
               </div>
-              <p class="text-xs text-gray-400 mt-1.5">Video akan ditanamkan (embed) di halaman artikel.</p>
+              <label class="flex items-center justify-center w-full h-24 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#24463a]/50 cursor-pointer hover:border-emerald-400 transition-colors"
+                @dragover.prevent @drop.prevent="handleImageDrop($event)" for="image-upload-bahasa">
+                <input type="file" id="image-upload-bahasa" name="additional_images[]" multiple accept="image/*" class="sr-only" @change="handleImageDrop($event)">
+                <div class="text-center">
+                  <span class="text-2xl block mb-1">🖼️</span>
+                  <p class="text-xs text-gray-500">Drag &amp; drop atau <span class="text-emerald-500 font-medium">klik untuk upload</span></p>
+                  <p class="text-[10px] text-gray-400">JPG, PNG, WebP · Maks 5MB per file · Maks 5 gambar</p>
+                </div>
+              </label>
             </div>
+
+            {{-- VIDEO TAB --}}
+            <div x-show="mediaType === 'video'" x-transition>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                Ketik <code class="bg-gray-100 dark:bg-[#24463a] px-1 rounded font-mono">[video1]</code>, <code class="bg-gray-100 dark:bg-[#24463a] px-1 rounded font-mono">[video2]</code> dst. di editor.
+              </p>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3" x-show="videoFiles.length > 0">
+                <template x-for="(item, i) in videoFiles" :key="i">
+                  <div class="relative group rounded-xl border border-gray-200 dark:border-[#24463a] bg-gray-50 dark:bg-[#24463a]/40 overflow-hidden">
+                    <div class="flex flex-col items-center justify-center h-24 px-2 pt-3">
+                      <span class="text-3xl mb-1">🎬</span>
+                      <p class="text-[10px] text-gray-500 truncate w-full text-center" x-text="item.name"></p>
+                      <p class="text-[9px] text-gray-400" x-text="formatBytes(item.size)"></p>
+                    </div>
+                    <div class="px-2 pb-2">
+                      <input type="text" :name="'video_labels[' + i + ']'" x-model="item.label"
+                        placeholder="Label (opsional)"
+                        class="w-full rounded border border-gray-300 dark:border-[#24463a] bg-white dark:bg-[#1a2e24] px-2 py-1 text-[10px] dark:text-white/80 focus:outline-none focus:ring-1 focus:ring-emerald-400">
+                    </div>
+                    <div class="bg-emerald-50 dark:bg-emerald-900/20 py-1 text-center">
+                      <span class="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400" x-text="'[video' + (i+1) + ']'"></span>
+                    </div>
+                    <button type="button" @click="removeVideo(i)"
+                      class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none">✕</button>
+                  </div>
+                </template>
+              </div>
+              <label @click.prevent="pickVideo()"
+                class="flex items-center justify-center w-full h-24 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#24463a]/50 cursor-pointer hover:border-emerald-400 transition-colors">
+                <div class="text-center">
+                  <span class="text-2xl block mb-1">🎬</span>
+                  <p class="text-xs text-gray-500">Klik untuk tambah video <span class="text-emerald-500 font-medium">MP4 / WebM</span></p>
+                  <p class="text-[10px] text-gray-400">Bisa pilih beberapa · Maks 100MB per file</p>
+                </div>
+              </label>
+            </div>
+
+            {{-- YOUTUBE TAB --}}
+            <div x-show="mediaType === 'youtube'" x-transition>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                Ketik <code class="bg-gray-100 dark:bg-[#24463a] px-1 rounded font-mono">[youtube1]</code>, <code class="bg-gray-100 dark:bg-[#24463a] px-1 rounded font-mono">[youtube2]</code> dst. di editor.
+              </p>
+              <div class="space-y-2">
+                <template x-for="(url, i) in ytUrls" :key="i">
+                  <div class="flex items-center gap-2 p-3 rounded-xl border border-gray-200 dark:border-[#24463a] bg-gray-50 dark:bg-[#24463a]/40">
+                    <span class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
+                      <svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    </span>
+                    <input type="url" :name="'youtube_urls[' + i + ']'" x-model="ytUrls[i]"
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      class="flex-1 rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm dark:border-[#24463a] dark:bg-[#1a2e24] dark:text-white/90 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/20 focus:outline-none">
+                    <span class="shrink-0 text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 min-w-[52px] text-center" x-text="'[youtube' + (i+1) + ']'"></span>
+                    <button type="button" @click="if(ytUrls.length > 1) ytUrls.splice(i, 1)"
+                      class="shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-red-100 text-red-500 hover:bg-red-200 transition-colors text-xs">✕</button>
+                  </div>
+                </template>
+              </div>
+              <button type="button" @click="ytUrls.push('')"
+                class="mt-3 flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
+                <span class="text-base leading-none">＋</span> Tambah YouTube
+              </button>
+            </div>
+
           </div>
         </div>{{-- END Section D --}}
 
         {{-- ===== SECTION E: Kuis Review Interaktif ===== --}}
+
         <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] shadow-sm dark:border-[#24463a] dark:bg-[#1a2e24]" x-data="{
               quizzes: [{ question: '', options: ['', '', '', ''], correctAnswer: 0 }],
               addQuiz() {

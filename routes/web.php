@@ -59,4 +59,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     Route::patch('/articles/{article}/toggle-status', [App\Http\Controllers\Admin\ArticleController::class, 'toggleStatus'])
         ->name('articles.toggleStatus');
+
+    Route::delete('/articles/{article}/media', [App\Http\Controllers\Admin\ArticleController::class, 'deleteMedia'])
+        ->name('articles.deleteMedia');
 });

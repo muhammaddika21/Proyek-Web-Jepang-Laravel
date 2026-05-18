@@ -3,7 +3,11 @@
 @section('title', $article->title)
 
 @push('styles')
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <style>
+    :root {
+        --plyr-color-main: #2D6A4F;
+    }
     .jp-text { font-family: 'Noto Sans JP', sans-serif; font-size: 110%; }
 
     /* Quiz styles */
@@ -176,21 +180,45 @@
     <article class="article-content-col space-y-10">
 
         @php
-            $audioHtml = '';
-            $youtubeHtml = '';
-            $quizHtml = '';
+            $audioHtmlArr   = [];  // indexed: $audioHtmlArr[0] = HTML for [audio1]
+            $youtubeHtmlArr = []; // indexed
+            $videoHtmlArr   = []; // indexed
+            $audioHtml   = '';   // legacy [audio]
+            $youtubeHtml = '';   // legacy [youtube]
+            $quizHtml    = '';
         @endphp
 
-        {{-- Pre-render Audio --}}
+        {{-- Pre-render Multiple Audios (audio_files[]) --}}
+        @if($article->audio_files)
+            @foreach($article->audio_files as $i => $af)
+                @php ob_start(); @endphp
+                <div class="my-6 not-prose rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    @if($af['label'] ?? '')
+                        <div class="px-4 py-2.5 bg-[#f8fcf9] border-b border-gray-100 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[#2D6A4F] text-[18px]">music_note</span>
+                            <p class="font-semibold text-[#1a3c2a] text-sm">{{ $af['label'] }}</p>
+                        </div>
+                    @endif
+                    <div class="p-1">
+                        <audio controls class="plyr-media w-full">
+                            <source src="{{ asset('storage/' . $af['path']) }}" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+                @php $audioHtmlArr[$i] = ob_get_clean(); @endphp
+            @endforeach
+        @endif
+
+        {{-- Pre-render Legacy Single Audio (audio_file) --}}
         @if($article->audio_file)
             @php ob_start(); @endphp
-            <div class="bg-gray-50 rounded-xl p-5 my-8 flex items-start gap-4 not-prose border border-gray-100 hover:bg-gray-100/50 transition-colors">
-                <button onclick="this.closest('div').querySelector('audio').play()" class="mt-1 flex-shrink-0 w-10 h-10 rounded-full bg-[#2D6A4F] text-white flex items-center justify-center hover:bg-[#0F5238] transition-colors">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
-                </button>
-                <div class="flex-grow w-full">
-                    <p class="font-medium text-gray-800 mb-2">{{ $article->audio_label ?: 'Dengarkan Audio' }}</p>
-                    <audio controls class="w-full h-10">
+            <div class="my-8 not-prose rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div class="px-4 py-2.5 bg-[#f8fcf9] border-b border-gray-100 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[#2D6A4F] text-[18px]">music_note</span>
+                    <p class="font-semibold text-[#1a3c2a] text-sm">{{ $article->audio_label ?: 'Dengarkan Audio' }}</p>
+                </div>
+                <div class="p-1">
+                    <audio controls class="plyr-media w-full">
                         <source src="{{ asset('storage/' . $article->audio_file) }}" type="audio/mpeg">
                     </audio>
                 </div>
@@ -198,8 +226,46 @@
             @php $audioHtml = ob_get_clean(); @endphp
         @endif
 
-        {{-- Pre-render YouTube --}}
-        @if($article->youtube_url)
+        {{-- Pre-render Multiple Videos (video_files[]) --}}
+        @if($article->video_files)
+            @foreach($article->video_files as $i => $vf)
+                @php ob_start(); @endphp
+                <div class="my-8 not-prose rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    @if($vf['label'] ?? '')
+                        <div class="px-4 py-2.5 bg-[#f8fcf9] border-b border-gray-100 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[#2D6A4F] text-[18px]">movie</span>
+                            <p class="font-semibold text-[#1a3c2a] text-sm">{{ $vf['label'] }}</p>
+                        </div>
+                    @endif
+                    <div class="bg-black">
+                        <video controls class="plyr-media w-full">
+                            <source src="{{ asset('storage/' . $vf['path']) }}" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+                @php $videoHtmlArr[$i] = ob_get_clean(); @endphp
+            @endforeach
+        @endif
+
+        {{-- Pre-render Multiple YouTubes (youtube_urls[]) --}}
+        @if($article->youtube_urls)
+            @foreach($article->youtube_urls as $i => $ytUrl)
+                @php
+                    preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i', $ytUrl, $ytMatches);
+                    $ytId = $ytMatches[1] ?? null;
+                    ob_start();
+                @endphp
+                @if($ytId)
+                <div class="my-8 rounded-2xl overflow-hidden shadow-lg border border-gray-100 relative pt-[56.25%] not-prose">
+                    <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/{{ $ytId }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                @endif
+                @php $youtubeHtmlArr[$i] = ob_get_clean(); @endphp
+            @endforeach
+        @endif
+
+        {{-- Pre-render Legacy Single YouTube (youtube_url) --}}
+        @if($article->youtube_url && empty($article->youtube_urls))
             @php
                 preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i', $article->youtube_url, $matches);
                 $videoId = $matches[1] ?? null;
@@ -468,18 +534,6 @@
                 @php $individualImageHtml[$imgIndex] = ob_get_clean(); @endphp
             @endforeach
 
-            @php ob_start(); @endphp
-            <div class="my-10 not-prose">
-                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[#2D6A4F]">photo_library</span> Galeri Foto
-                </h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    @foreach($article->additional_images as $img)
-                        <img src="{{ asset('storage/' . $img) }}" class="rounded-xl w-full aspect-square object-cover border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer" alt="Galeri">
-                    @endforeach
-                </div>
-            </div>
-            @php $galleryHtml = ob_get_clean(); @endphp
         @endif
 
         @php
@@ -506,6 +560,7 @@
                 }
             }
 
+
             // === NUMBERED VOCAB SHORTCODES ===
             $hasAnyNumberedVocab = false;
             foreach ($vocabTablesHtml as $idx => $html) {
@@ -518,7 +573,43 @@
                 }
             }
 
-            // === GENERIC SHORTCODES ===
+            // === NUMBERED AUDIO SHORTCODES [audio1], [audio2] ... ===
+            $hasAnyNumberedAudio = false;
+            foreach ($audioHtmlArr as $idx => $html) {
+                $num = $idx + 1;
+                $tag = "[audio{$num}]";
+                if (str_contains($parsedContent, $tag)) {
+                    $hasAnyNumberedAudio = true;
+                    $parsedContent = str_replace("<p>{$tag}</p>", $html, $parsedContent);
+                    $parsedContent = str_replace($tag, $html, $parsedContent);
+                }
+            }
+
+            // === NUMBERED VIDEO SHORTCODES [video1], [video2] ... ===
+            $hasAnyNumberedVideo = false;
+            foreach ($videoHtmlArr as $idx => $html) {
+                $num = $idx + 1;
+                $tag = "[video{$num}]";
+                if (str_contains($parsedContent, $tag)) {
+                    $hasAnyNumberedVideo = true;
+                    $parsedContent = str_replace("<p>{$tag}</p>", $html, $parsedContent);
+                    $parsedContent = str_replace($tag, $html, $parsedContent);
+                }
+            }
+
+            // === NUMBERED YOUTUBE SHORTCODES [youtube1], [youtube2] ... ===
+            $hasAnyNumberedYoutube = false;
+            foreach ($youtubeHtmlArr as $idx => $html) {
+                $num = $idx + 1;
+                $tag = "[youtube{$num}]";
+                if (str_contains($parsedContent, $tag)) {
+                    $hasAnyNumberedYoutube = true;
+                    $parsedContent = str_replace("<p>{$tag}</p>", $html, $parsedContent);
+                    $parsedContent = str_replace($tag, $html, $parsedContent);
+                }
+            }
+
+            // === GENERIC LEGACY SHORTCODES ===
             $hasAudio   = str_contains($parsedContent, '[audio]');
             $hasYoutube = str_contains($parsedContent, '[youtube]');
             $hasVocab   = str_contains($parsedContent, '[vocab]');
@@ -547,13 +638,38 @@
             }
         @endphp
 
-        {{-- Fallback: Audio/Youtube top --}}
+        {{-- Fallback: Show media NOT placed via shortcode (auto-render at top) --}}
+
+        {{-- Legacy single audio --}}
         @if(!$hasAudio && $audioHtml)
             {!! $audioHtml !!}
         @endif
+
+        {{-- Multiple audios: only show those NOT placed via shortcode --}}
+        @foreach($audioHtmlArr as $i => $aHtml)
+            @if(!str_contains($rawContent, '[audio' . ($i+1) . ']'))
+                {!! $aHtml !!}
+            @endif
+        @endforeach
+
+        {{-- Legacy single youtube --}}
         @if(!$hasYoutube && $youtubeHtml)
             {!! $youtubeHtml !!}
         @endif
+
+        {{-- Multiple youtubes: only show those NOT placed via shortcode --}}
+        @foreach($youtubeHtmlArr as $i => $ytHtml)
+            @if(!str_contains($rawContent, '[youtube' . ($i+1) . ']'))
+                {!! $ytHtml !!}
+            @endif
+        @endforeach
+
+        {{-- Multiple videos: only show those NOT placed via shortcode --}}
+        @foreach($videoHtmlArr as $i => $vHtml)
+            @if(!str_contains($rawContent, '[video' . ($i+1) . ']'))
+                {!! $vHtml !!}
+            @endif
+        @endforeach
 
         {{-- Article Body --}}
         <div class="prose prose-wide prose-lg prose-slate max-w-none leading-relaxed text-gray-700
@@ -575,10 +691,6 @@
             {!! $quizHtml !!}
         @endif
 
-        {{-- Fallback: Gallery --}}
-        @if(!$hasGallery && !$hasAnyGambar && $galleryHtml)
-            {!! $galleryHtml !!}
-        @endif
 
     </article>
 
@@ -689,3 +801,14 @@
 @endif
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const players = Array.from(document.querySelectorAll('.plyr-media')).map(p => new Plyr(p, {
+            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+        }));
+    });
+</script>
+@endpush

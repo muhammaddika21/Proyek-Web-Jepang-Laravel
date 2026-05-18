@@ -13,7 +13,9 @@ class Article extends Model
     protected $fillable = [
         'user_id', 'category_id', 'title', 'slug', 'type', 'excerpt',
         'content', 'cover_image', 'cover_image_caption',
-        'additional_images', 'audio_file', 'audio_label', 'youtube_url',
+        'additional_images', 'audio_file', 'audio_label',
+        'audio_files', 'video_files', 'youtube_urls',
+        'youtube_url',
         'japanese_title', 'romaji_title', 'kemahiran_level',
         'grammar_explanation', 'vocabulary_list', 'quiz_questions',
         'status', 'read_time', 'view_count', 'published_at',
@@ -23,6 +25,9 @@ class Article extends Model
         'vocabulary_list'    => 'array',
         'quiz_questions'     => 'array',
         'additional_images'  => 'array',
+        'audio_files'        => 'array',
+        'video_files'        => 'array',
+        'youtube_urls'       => 'array',
         'published_at'       => 'datetime',
     ];
 

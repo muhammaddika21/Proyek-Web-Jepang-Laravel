@@ -145,7 +145,15 @@
       {{-- SECTION: MEDIA TAMBAHAN (Gambar, Audio, YouTube) --}}
       {{-- Posisi: setelah Kosakata, sebelum Kuis --}}
       {{-- ============================================= --}}
-      @if(($article->additional_images && count($article->additional_images) > 0) || $article->audio_file || $article->youtube_url)
+      @php
+        $hasAdditionalMedia = ($article->additional_images && count($article->additional_images) > 0) || 
+                              $article->audio_file || 
+                              ($article->audio_files && count($article->audio_files) > 0) || 
+                              ($article->video_files && count($article->video_files) > 0) || 
+                              $article->youtube_url || 
+                              ($article->youtube_urls && count($article->youtube_urls) > 0);
+      @endphp
+      @if($hasAdditionalMedia)
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-[#24463a] dark:bg-[#1a2e24] overflow-hidden">
           <div class="px-6 py-5 border-b border-gray-200 dark:border-[#24463a] bg-indigo-50/30 dark:bg-transparent">
             <h3 class="text-base font-bold text-gray-800 dark:text-white/90">📎 Media Tambahan</h3>
@@ -227,6 +235,40 @@
                       ⬇ Download
                     </a>
                   </div>
+                </div>
+              </div>
+            @endif
+
+            {{-- === Video Player === --}}
+            @if($article->video_files && count($article->video_files) > 0)
+              <div>
+                <div class="flex items-center gap-2 mb-4">
+                  <span class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-sm">🎬</span>
+                  <div>
+                    <h4 class="text-sm font-bold text-gray-800 dark:text-white">Video</h4>
+                    <p class="text-xs text-gray-500">{{ count($article->video_files) }} video terlampir</p>
+                  </div>
+                </div>
+                <div class="space-y-4">
+                  @foreach($article->video_files as $idx => $vItem)
+                    <div class="rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/5 p-4">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-bold text-gray-800 dark:text-white">{{ $vItem['label'] ?: 'Video ' . ($idx + 1) }}</span>
+                        <span class="text-[10px] text-gray-500 font-mono bg-white dark:bg-[#1a2e24] px-2 py-0.5 rounded border border-gray-200 dark:border-[#24463a]">[video{{ $idx + 1 }}]</span>
+                      </div>
+                      <video controls class="w-full rounded-lg bg-black" style="max-height: 400px;" preload="metadata">
+                        <source src="{{ asset('storage/' . $vItem['path']) }}" type="video/mp4">
+                        <source src="{{ asset('storage/' . $vItem['path']) }}" type="video/webm">
+                        Browser Anda tidak mendukung pemutar video.
+                      </video>
+                      <div class="mt-2 flex items-center justify-end">
+                        <a href="{{ asset('storage/' . $vItem['path']) }}" download
+                          class="text-[10px] text-emerald-600 dark:text-emerald-400 hover:underline font-medium">
+                          ⬇ Download Video
+                        </a>
+                      </div>
+                    </div>
+                  @endforeach
                 </div>
               </div>
             @endif
@@ -465,6 +507,34 @@
                     <source src="{{ asset('storage/' . $article->audio_file) }}" type="audio/ogg">
                   </audio>
                 </div>
+              </div>
+            @endif
+          </div>
+
+          {{-- Video --}}
+          <div>
+            <div class="flex items-center gap-3 text-sm">
+              <span class="w-8 h-8 rounded-lg flex items-center justify-center {{ $article->video_files && count($article->video_files) > 0 ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-[#24463a] text-gray-400' }}">🎬</span>
+              <div class="flex-1 min-w-0">
+                <p class="{{ $article->video_files && count($article->video_files) > 0 ? 'text-gray-800 dark:text-white' : 'text-gray-400' }}">Video</p>
+              </div>
+              @if($article->video_files && count($article->video_files) > 0)
+                <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">{{ count($article->video_files) }} file</span>
+              @else
+                <span class="text-xs text-gray-400">—</span>
+              @endif
+            </div>
+            {{-- Video List --}}
+            @if($article->video_files && count($article->video_files) > 0)
+              <div class="mt-2 ml-11 space-y-1.5">
+                @foreach($article->video_files as $idx => $vItem)
+                  <div class="flex items-center gap-2 rounded-lg border border-emerald-200/60 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/5 px-2.5 py-1.5">
+                    <span class="text-[10px] text-emerald-500/70">🎬</span>
+                    <p class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate flex-1" title="{{ basename($vItem['path']) }}">
+                      {{ $vItem['label'] ?: basename($vItem['path']) }}
+                    </p>
+                  </div>
+                @endforeach
               </div>
             @endif
           </div>
