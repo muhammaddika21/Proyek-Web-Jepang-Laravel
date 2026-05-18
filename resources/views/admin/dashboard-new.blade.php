@@ -215,6 +215,49 @@
     </a>
   </div>
 
-
+  {{-- ============================================ --}}
+  {{-- SECTION 5: PENGURUS INTI RINGKASAN --}}
+  {{-- ============================================ --}}
+  @if($pengurusInti->isNotEmpty())
+  <div class="mb-6">
+    <div class="rounded-2xl border border-stone-200 bg-[#fdfcf7] dark:border-[#24463a] dark:bg-[#1a2e24] shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100 dark:border-[#24463a] sm:px-6 sm:py-5 flex items-center justify-between">
+        <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
+          🏮 Pengurus Inti
+          <span class="text-xs font-normal text-gray-400 ml-1">Tahun Aktif</span>
+        </h3>
+        <a href="{{ route('admin.organisasi.index') }}"
+          class="text-xs font-semibold text-[#296751] dark:text-emerald-400 hover:underline">
+          Kelola Organisasi →
+        </a>
+      </div>
+      <div class="grid grid-cols-2 xl:grid-cols-4 divide-x divide-y xl:divide-y-0 divide-gray-100 dark:divide-[#24463a]">
+        @php
+          $jabatanColor = [
+            'Ketua'       => ['bg'=>'bg-emerald-100 dark:bg-emerald-500/20', 'text'=>'text-emerald-700 dark:text-emerald-400', 'kanji' => '長'],
+            'Wakil Ketua' => ['bg'=>'bg-teal-100 dark:bg-teal-500/20',     'text'=>'text-teal-700 dark:text-teal-400', 'kanji' => '副'],
+            'Sekretaris'  => ['bg'=>'bg-amber-100 dark:bg-amber-500/20',    'text'=>'text-amber-700 dark:text-amber-400', 'kanji' => '記'],
+            'Bendahara'   => ['bg'=>'bg-purple-100 dark:bg-purple-500/20',  'text'=>'text-purple-700 dark:text-purple-400', 'kanji' => '財'],
+          ];
+        @endphp
+        @foreach($pengurusInti as $p)
+        @php $colors = $jabatanColor[$p->jabatan] ?? ['bg'=>'bg-gray-100','text'=>'text-gray-600','kanji'=>'員']; @endphp
+        <a href="{{ route('admin.organisasi.editPengurus', $p) }}"
+          class="flex items-center gap-3 px-5 py-4 hover:bg-gray-50/60 dark:hover:bg-white/[0.02] transition-colors group">
+          <div class="w-10 h-10 rounded-full {{ $colors['bg'] }} flex items-center justify-center shrink-0 text-base font-bold {{ $colors['text'] }}" style="font-family: 'Noto Sans JP', sans-serif;">
+            {{ $colors['kanji'] }}
+          </div>
+          <div class="min-w-0">
+            <p class="text-[10px] font-semibold uppercase tracking-wider {{ $colors['text'] }} mb-0.5">{{ $p->jabatan }}</p>
+            <p class="text-sm font-semibold text-gray-800 dark:text-white/90 truncate group-hover:text-[#296751] dark:group-hover:text-emerald-400 transition-colors">{{ $p->nama }}</p>
+            @if($p->nim)<p class="text-[11px] text-gray-400">{{ $p->nim }}</p>@endif
+          </div>
+        </a>
+        @endforeach
+      </div>
+    </div>
+  </div>
+  @endif
 
 @endsection
+

@@ -33,6 +33,11 @@ class MenuHelper
                     ],
                 ],
             ],
+            [
+                'icon' => 'user-profile',
+                'name' => 'Organisasi',
+                'path' => '/admin/organisasi',
+            ],
         ];
     }
 

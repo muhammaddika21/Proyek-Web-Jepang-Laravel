@@ -1,5 +1,5 @@
 @php
-    $isHome = request()->routeIs('home');
+    $isHome = request()->routeIs('home') || request()->routeIs('kepengurusan');
 @endphp
 {{-- Navbar — Always visible, full width --}}
 <header x-data="{
@@ -43,6 +43,7 @@
             @php
                 $navItems = [
                     ['label' => 'Home', 'href' => route('home')],
+                    ['label' => 'Kepengurusan', 'href' => route('kepengurusan')],
                     ['label' => 'Bahasa', 'href' => url('/bahasa')],
                     ['label' => 'Kegiatan', 'href' => url('/kegiatan')],
                     ['label' => 'Budaya', 'href' => url('/budaya')],

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Article;
+use App\Models\PengurusInti;
 
 class DashboardController extends Controller
 {
@@ -31,6 +32,14 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('admin.dashboard-new', compact('stats', 'recentArticles', 'popularArticles') + ['title' => 'Dashboard']);
+        // Pengurus inti (safe: kosong jika tabel belum ada)
+        try {
+            $pengurusInti = PengurusInti::orderBy('id')->get();
+        } catch (\Exception $e) {
+            $pengurusInti = collect();
+        }
+
+        return view('admin.dashboard-new', compact('stats', 'recentArticles', 'popularArticles', 'pengurusInti') + ['title' => 'Dashboard']);
     }
 }
+

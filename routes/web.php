@@ -7,8 +7,12 @@ use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\BudayaController;
 use App\Http\Controllers\AuthController;
 
+use App\Http\Controllers\KepengurusanController;
+
 // ===== PUBLIC ROUTES =====
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/kepengurusan', [KepengurusanController::class, 'index'])->name('kepengurusan');
+
 Route::get('/bahasa', [BahasaController::class, 'index'])->name('bahasa.index');
 Route::get('/bahasa/{slug}', [BahasaController::class, 'show'])->name('bahasa.show');
 
@@ -62,4 +66,34 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     Route::delete('/articles/{article}/media', [App\Http\Controllers\Admin\ArticleController::class, 'deleteMedia'])
         ->name('articles.deleteMedia');
+
+    // ===== ORGANISASI ROUTES =====
+    Route::get('/organisasi', [App\Http\Controllers\Admin\OrganisasiController::class, 'index'])
+        ->name('organisasi.index');
+
+    // Pengurus Inti
+    Route::get('/organisasi/pengurus/{pengurus}/edit', [App\Http\Controllers\Admin\OrganisasiController::class, 'editPengurus'])
+        ->name('organisasi.editPengurus');
+    Route::put('/organisasi/pengurus/{pengurus}', [App\Http\Controllers\Admin\OrganisasiController::class, 'updatePengurus'])
+        ->name('organisasi.updatePengurus');
+
+    // Ketua Divisi
+    Route::get('/organisasi/divisi/{divisi}/ketua/edit', [App\Http\Controllers\Admin\OrganisasiController::class, 'editKetuaDivisi'])
+        ->name('organisasi.editKetuaDivisi');
+    Route::put('/organisasi/divisi/{divisi}/ketua', [App\Http\Controllers\Admin\OrganisasiController::class, 'updateKetuaDivisi'])
+        ->name('organisasi.updateKetuaDivisi');
+
+    // Anggota Divisi
+    Route::get('/organisasi/divisi/{divisi}/anggota', [App\Http\Controllers\Admin\OrganisasiController::class, 'anggota'])
+        ->name('organisasi.anggota');
+    Route::get('/organisasi/divisi/{divisi}/anggota/create', [App\Http\Controllers\Admin\OrganisasiController::class, 'createAnggota'])
+        ->name('organisasi.createAnggota');
+    Route::post('/organisasi/divisi/{divisi}/anggota', [App\Http\Controllers\Admin\OrganisasiController::class, 'storeAnggota'])
+        ->name('organisasi.storeAnggota');
+    Route::get('/organisasi/divisi/{divisi}/anggota/{anggota}/edit', [App\Http\Controllers\Admin\OrganisasiController::class, 'editAnggota'])
+        ->name('organisasi.editAnggota');
+    Route::put('/organisasi/divisi/{divisi}/anggota/{anggota}', [App\Http\Controllers\Admin\OrganisasiController::class, 'updateAnggota'])
+        ->name('organisasi.updateAnggota');
+    Route::delete('/organisasi/divisi/{divisi}/anggota/{anggota}', [App\Http\Controllers\Admin\OrganisasiController::class, 'destroyAnggota'])
+        ->name('organisasi.destroyAnggota');
 });
