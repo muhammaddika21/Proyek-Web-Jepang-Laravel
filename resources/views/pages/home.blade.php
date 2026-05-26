@@ -15,12 +15,7 @@
         <img src="{{ asset('images/hero_kereta.png') }}" alt="Hero kereta Jepang" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-gradient-to-b from-white/70 via-white/50 to-white/80"></div>
     </div>
-    <!-- Sakura petals -->
-    <span class="petal"></span>
-    <span class="petal"></span>
-    <span class="petal"></span>
-    <span class="petal"></span>
-    <span class="petal"></span>
+
 
 
     <div class="text-center px-4 relative z-10 max-w-3xl mx-auto">

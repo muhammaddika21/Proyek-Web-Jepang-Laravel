@@ -43,7 +43,7 @@
             @php
                 $navItems = [
                     ['label' => 'Home', 'href' => route('home')],
-                    ['label' => 'Kepengurusan', 'href' => route('kepengurusan')],
+                    ['label' => 'Profil', 'href' => route('kepengurusan')],
                     ['label' => 'Bahasa', 'href' => url('/bahasa')],
                     ['label' => 'Kegiatan', 'href' => url('/kegiatan')],
                     ['label' => 'Budaya', 'href' => url('/budaya')],

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kepengurusan — Nihongo Bu STIS')
+@section('title', 'Profil — Nihongo Bu STIS')
 @section('meta_description', 'Berkenalan dengan pengurus yang berdedikasi membawa Nihongo Bu STIS menjadi lebih baik.')
 
 @push('styles')
@@ -321,34 +321,17 @@
 
 @section('content')
 
-{{-- ══════════ HERO ══════════ --}}
-<section class="kep-hero relative">
-
-    <div class="kep-hero-fuji" aria-hidden="true"></div>
-
-    {{-- Sakura petals (auto-injected by animations.js) --}}
-
-    <div class="relative z-10 hero-label-slide">
-        <span class="hero-tag">Struktur Organisasi {{ date('Y') }}/{{ date('Y')+1 }}</span>
-    </div>
-    <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold text-[#1A1A2E] leading-tight relative z-10 hero-title-slide"
-        style="font-family:'Zen Kurenaido', serif;">
-        Kepengurusan
-    </h1>
-    <p class="hero-jp-subtitle hero-sub-slide">共に学び、共に成長する</p>
-    <p class="hero-desc hero-sub-slide">
-        Berkenalan dengan pengurus yang berdedikasi membawa<br class="hidden sm:inline">
-        Nihongo Bu STIS menjadi lebih baik.
-    </p>
-</section>
-
 {{-- ══════════ MAIN ══════════ --}}
-<main style="background: var(--cream); padding-bottom: 80px;">
-
-    {{-- Subtle wave separator --}}
-    <div style="height:48px; background: linear-gradient(to bottom, #fff 0%, var(--cream) 100%); margin-bottom: 0;"></div>
+<main class="pt-32" style="background: var(--cream); padding-bottom: 80px; min-height: 100vh;">
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+        {{-- JUDUL HALAMAN --}}
+        <div class="text-center mb-16 reveal">
+            <h1 class="text-3xl md:text-4xl font-bold text-[#1A1A2E] tracking-tight" style="font-family:'Zen Kurenaido', serif;">
+                Struktur Kepengurusan
+            </h1>
+        </div>
 
         {{-- ── PENGURUS INTI ── --}}
         <section class="mb-20 reveal">
@@ -410,9 +393,9 @@
 
             @php
                 $divisiConfig = [
-                    'bahasa' => ['icon' => '📖', 'bg' => 'rgba(45,106,79,0.1)',   'color' => '#2D6A4F',  'dot' => '#52B788'],
-                    'budaya' => ['icon' => '🎏', 'bg' => 'rgba(231,111,81,0.1)', 'color' => '#E76F51',  'dot' => '#E76F51'],
-                    'hpd'    => ['icon' => '📸', 'bg' => 'rgba(201,135,74,0.12)','color' => '#c9874a',  'dot' => '#c9874a'],
+                    'bahasa' => ['icon' => '語', 'bg' => 'rgba(45,106,79,0.1)',   'color' => '#2D6A4F',  'dot' => '#52B788'],
+                    'budaya' => ['icon' => '文', 'bg' => 'rgba(231,111,81,0.1)', 'color' => '#E76F51',  'dot' => '#E76F51'],
+                    'hpd'    => ['icon' => '広', 'bg' => 'rgba(201,135,74,0.12)','color' => '#c9874a',  'dot' => '#c9874a'],
                 ];
             @endphp
 
@@ -426,7 +409,7 @@
                 <div class="div-card">
                     {{-- Top section --}}
                     <div class="div-card-top">
-                        <div class="div-icon" style="background:{{ $cfg['bg'] }};">{{ $cfg['icon'] }}</div>
+                        <div class="div-icon" style="background:{{ $cfg['bg'] }}; color:{{ $cfg['color'] }}; font-family: 'Noto Sans JP', sans-serif;">{{ $cfg['icon'] }}</div>
                         <div class="div-nama-text">{{ $div->nama }}</div>
                         @if($div->deskripsi)
                         <p class="div-deskripsi">{{ $div->deskripsi }}</p>

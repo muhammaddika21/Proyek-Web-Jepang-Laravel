@@ -117,7 +117,7 @@
             @php $catWithData = $categories->firstWhere('id', $category->id); $articles = $catWithData ? $catWithData->articles : collect(); @endphp
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 article-grid">
                 @forelse($articles as $article)
-                <article class="article-card" data-title="{{ strtolower($article->title) }}" data-excerpt="{{ strtolower(strip_tags($article->excerpt ?? $article->content ?? '')) }}">
+                <article class="article-card reveal-card" data-title="{{ strtolower($article->title) }}" data-excerpt="{{ strtolower(strip_tags($article->excerpt ?? $article->content ?? '')) }}">
                     <a href="{{ route('kegiatan.show', $article->slug) }}" class="article-card-link">
                         @if($article->cover_image)
                             <img src="{{ asset('storage/' . $article->cover_image) }}" alt="{{ $article->title }}">

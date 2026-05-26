@@ -7,20 +7,6 @@
 (function () {
   'use strict';
 
-  /* ────────────────────────────────────────────────────
-   * 0. SAKURA PETALS — auto-inject 8 petals into every hero section
-   * ──────────────────────────────────────────────────── */
-  document.querySelectorAll(
-    'section.relative.overflow-hidden, header.relative.overflow-hidden'
-  ).forEach(hero => {
-    // Skip if already has petals
-    if (hero.querySelector('.petal')) return;
-    for (let i = 0; i < 8; i++) {
-      const p = document.createElement('span');
-      p.className = 'petal';
-      hero.appendChild(p);
-    }
-  });
 
   /* ────────────────────────────────────────────────────
    * 1. SCROLL REVEAL — Intersection Observer

@@ -29,7 +29,9 @@ class KegiatanController extends Controller
             }])
             ->get();
 
-        $allCategories = $parentKegiatan->children()->get();
+        $allCategories = $parentKegiatan->children()->get()->sortBy(function($cat) {
+            return $cat->slug === 'kegiatan-terbaru' ? 0 : 1;
+        });
 
         return view('pages.kegiatan.index', compact('categories', 'allCategories'));
     }

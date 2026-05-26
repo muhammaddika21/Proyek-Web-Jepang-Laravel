@@ -77,17 +77,17 @@
         </div>
     @endif
     <div class="relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center text-center gap-3">
-        <div class="flex items-center gap-3 flex-wrap justify-center">
+        <div class="flex items-center gap-3 flex-wrap justify-center hero-sub-slide">
             @if($article->category)
                 <span class="px-3 py-1 rounded-full bg-[#E76F51]/10 text-[#E76F51] text-xs font-medium tracking-wide">
                     {{ $article->category->name }}
                 </span>
             @endif
         </div>
-        <h1 class="text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-tight max-w-3xl" style="font-family: 'Zen Kurenaido', serif;">
+        <h1 class="text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-tight max-w-3xl hero-title-slide" style="font-family: 'Zen Kurenaido', serif;">
             {{ $article->title }}
         </h1>
-        <div class="flex items-center gap-4 text-sm text-gray-500 mt-2 justify-center">
+        <div class="flex items-center gap-4 text-sm text-gray-500 mt-2 justify-center hero-sub-slide">
             @if($article->user)
                 <span>Oleh {{ $article->user->name ?? 'Admin' }}</span>
             @endif
