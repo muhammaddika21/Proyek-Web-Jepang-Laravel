@@ -24,7 +24,10 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Seed kategori
-        $this->call(CategorySeeder::class);
+        // Seed kategori & organisasi
+        $this->call([
+            CategorySeeder::class,
+            OrganisasiSeeder::class,
+        ]);
     }
 }
