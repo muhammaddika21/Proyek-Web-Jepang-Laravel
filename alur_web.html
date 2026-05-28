@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Alur Web Nihongo Bu</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: #e2e8f0; padding: 30px 20px; }
+  h1 { text-align: center; font-size: 1.6rem; color: #38bdf8; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: #94a3b8; font-size: .85rem; margin-bottom: 40px; }
+
+  /* Layout kolom */
+  .flow { display: flex; flex-direction: column; gap: 10px; max-width: 900px; margin: 0 auto; }
+
+  /* Section label */
+  .section-label {
+    font-size: .7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: #64748b; margin-top: 24px; margin-bottom: 4px;
+  }
+
+  /* Row */
+  .row { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
+
+  /* Card */
+  .card {
+    flex: 1; min-width: 140px; border-radius: 12px; padding: 14px 16px;
+    font-size: .82rem; line-height: 1.5; position: relative;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .card .title { font-weight: 700; font-size: .88rem; margin-bottom: 6px; }
+  .card .badge {
+    display: inline-block; font-size: .65rem; padding: 2px 8px;
+    border-radius: 99px; font-weight: 600; margin-bottom: 8px;
+  }
+  .card ul { padding-left: 16px; color: #cbd5e1; }
+  .card ul li { margin-bottom: 2px; }
+
+  /* Colors */
+  .c-user   { background: #1e293b; border-color: #38bdf8; }
+  .c-public { background: #1a2e22; border-color: #4ade80; }
+  .c-auth   { background: #2c1f3b; border-color: #a78bfa; }
+  .c-admin  { background: #2a1f10; border-color: #fb923c; }
+  .c-db     { background: #1e1e2e; border-color: #f472b6; }
+  .c-deploy { background: #1a1a2e; border-color: #60a5fa; }
+
+  .badge-user   { background: #0ea5e9; color: #fff; }
+  .badge-public { background: #16a34a; color: #fff; }
+  .badge-auth   { background: #7c3aed; color: #fff; }
+  .badge-admin  { background: #ea580c; color: #fff; }
+  .badge-db     { background: #db2777; color: #fff; }
+  .badge-deploy { background: #2563eb; color: #fff; }
+
+  /* Arrow */
+  .arrow {
+    text-align: center; color: #475569; font-size: 1.4rem; padding: 2px 0;
+  }
+
+  /* Connector line */
+  .connector {
+    border-left: 2px dashed #334155; margin-left: 24px; padding-left: 16px;
+    margin-bottom: 4px;
+  }
+
+  /* Big divider */
+  .divider { border: none; border-top: 1px solid #1e293b; margin: 20px 0; }
+
+  /* Legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; justify-content: center; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: .75rem; color: #94a3b8; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<h1>🗾 Alur Web — Nihongo Bu</h1>
+<p class="subtitle">Gambaran keseluruhan sistem: dari user mengakses hingga data tersimpan di database</p>
+
+<div class="flow">
+
+  <!-- ====== USER ====== -->
+  <div class="section-label">① Pengunjung (User)</div>
+  <div class="row">
+    <div class="card c-user">
+      <div class="badge badge-user">Browser</div>
+      <div class="title">Pengunjung Umum</div>
+      <ul>
+        <li>Buka website dari URL Railway</li>
+        <li>Tidak perlu login</li>
+        <li>Bisa baca artikel & lihat halaman</li>
+      </ul>
+    </div>
+    <div class="card c-auth">
+      <div class="badge badge-auth">Admin</div>
+      <div class="title">Admin / Pengelola</div>
+      <ul>
+        <li>Login di <code>/login</code></li>
+        <li>Mengelola konten artikel</li>
+        <li>Mengelola data kepengurusan</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- ====== HALAMAN PUBLIK ====== -->
+  <div class="section-label">② Halaman Publik (routes/web.php)</div>
+  <div class="row">
+    <div class="card c-public">
+      <div class="badge badge-public">GET /</div>
+      <div class="title">🏠 Beranda</div>
+      <ul><li>HomeController</li><li>Artikel terbaru, hero section</li></ul>
+    </div>
+    <div class="card c-public">
+      <div class="badge badge-public">GET /bahasa</div>
+      <div class="title">📖 Bahasa</div>
+      <ul><li>BahasaController</li><li>Artikel JLPT N5–N1</li></ul>
+    </div>
+    <div class="card c-public">
+      <div class="badge badge-public">GET /kegiatan</div>
+      <div class="title">🎯 Kegiatan</div>
+      <ul><li>KegiatanController</li><li>Artikel sub-kategori kegiatan</li></ul>
+    </div>
+    <div class="card c-public">
+      <div class="badge badge-public">GET /budaya</div>
+      <div class="title">🎎 Budaya</div>
+      <ul><li>BudayaController</li><li>Artikel sub-kategori budaya</li></ul>
+    </div>
+    <div class="card c-public">
+      <div class="badge badge-public">GET /kepengurusan</div>
+      <div class="title">👥 Kepengurusan</div>
+      <ul><li>KepengurusanController</li><li>Pengurus Inti + Divisi</li></ul>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- ====== AUTH ====== -->
+  <div class="section-label">③ Autentikasi Admin</div>
+  <div class="row">
+    <div class="card c-auth" style="max-width:420px">
+      <div class="badge badge-auth">POST /login</div>
+      <div class="title">🔐 AuthController</div>
+      <ul>
+        <li><b>Login:</b> cek username + password di tabel <code>users</code></li>
+        <li>Jika cocok → session dibuat → redirect ke <code>/admin</code></li>
+        <li>Jika gagal → kembali ke form login dengan error</li>
+        <li><b>Logout:</b> POST /logout → session dihapus</li>
+      </ul>
+    </div>
+    <div class="card c-auth" style="max-width:420px">
+      <div class="badge badge-auth">Middleware</div>
+      <div class="title">🛡️ Proteksi Route Admin</div>
+      <ul>
+        <li>Semua route <code>/admin/*</code> dijaga middleware <code>auth</code></li>
+        <li>Jika belum login → redirect ke <code>/login</code></li>
+        <li>Route login dijaga middleware <code>guest</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- ====== ADMIN ====== -->
+  <div class="section-label">④ Panel Admin (prefix /admin)</div>
+  <div class="row">
+    <div class="card c-admin">
+      <div class="badge badge-admin">Dashboard</div>
+      <div class="title">📊 DashboardController</div>
+      <ul>
+        <li>Statistik jumlah artikel</li>
+        <li>Artikel terbaru</li>
+      </ul>
+    </div>
+    <div class="card c-admin">
+      <div class="badge badge-admin">Artikel CRUD</div>
+      <div class="title">📝 ArticleController</div>
+      <ul>
+        <li>Buat artikel (Umum/Bahasa)</li>
+        <li>Edit, hapus, publish/draft</li>
+        <li>Upload gambar + video YouTube</li>
+        <li>Pilih Kategori & Sub-kategori</li>
+      </ul>
+    </div>
+    <div class="card c-admin">
+      <div class="badge badge-admin">Organisasi</div>
+      <div class="title">🏛️ OrganisasiController</div>
+      <ul>
+        <li>Edit Pengurus Inti</li>
+        <li>Edit Ketua Divisi</li>
+        <li>Tambah/Edit/Hapus Anggota</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- ====== DATABASE ====== -->
+  <div class="section-label">⑤ Database (MySQL di Railway)</div>
+  <div class="row">
+    <div class="card c-db">
+      <div class="badge badge-db">Tabel</div>
+      <div class="title">users</div>
+      <ul><li>id, name, username, password</li><li>Akun login admin</li></ul>
+    </div>
+    <div class="card c-db">
+      <div class="badge badge-db">Tabel</div>
+      <div class="title">categories</div>
+      <ul><li>id, name, slug, parent_id</li><li>Budaya, Kegiatan & sub-nya</li></ul>
+    </div>
+    <div class="card c-db">
+      <div class="badge badge-db">Tabel</div>
+      <div class="title">articles</div>
+      <ul><li>id, title, slug, content, type</li><li>status, category_id, jlpt_level</li><li>image, youtube_url</li></ul>
+    </div>
+    <div class="card c-db">
+      <div class="badge badge-db">Tabel</div>
+      <div class="title">organisasi</div>
+      <ul><li>pengurus_inti</li><li>divisi</li><li>anggota_divisi</li></ul>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- ====== DEPLOY ====== -->
+  <div class="section-label">⑥ Infrastruktur Hosting (Railway)</div>
+  <div class="row">
+    <div class="card c-deploy">
+      <div class="badge badge-deploy">Railway</div>
+      <div class="title">🚂 Web Service (Laravel)</div>
+      <ul>
+        <li>Source: GitHub <code>main</code> branch</li>
+        <li>Auto-deploy saat push</li>
+        <li>Environment Variables: APP_KEY, DB, dll</li>
+      </ul>
+    </div>
+    <div class="card c-deploy">
+      <div class="badge badge-deploy">Railway</div>
+      <div class="title">🐬 MySQL Service</div>
+      <ul>
+        <li>Database terpisah dari web service</li>
+        <li>Perlu <b>migrate + seed</b> pertama kali</li>
+        <li>Koneksi via <code>DATABASE_URL</code></li>
+      </ul>
+    </div>
+    <div class="card c-deploy">
+      <div class="badge badge-deploy">Storage</div>
+      <div class="title">🖼️ File/Gambar</div>
+      <ul>
+        <li>Gambar artikel → <code>storage/app/public</code></li>
+        <li>Perlu <code>php artisan storage:link</code></li>
+        <li>Di Railway: volatile (hilang saat redeploy)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- MASALAH SEKARANG -->
+  <hr class="divider">
+  <div class="section-label">⚠️ Masalah Saat Ini & Solusinya</div>
+  <div class="row">
+    <div class="card" style="background:#2a1515; border-color:#ef4444; flex:2">
+      <div class="badge" style="background:#ef4444;color:#fff">MASALAH</div>
+      <div class="title">Halaman Budaya/Kegiatan 404 & Kepengurusan Kosong</div>
+      <p style="color:#fca5a5; margin-top:6px; font-size:.82rem;">
+        Database MySQL di Railway masih <b>kosong</b>. Tabel ada, tapi isinya belum ada. <br>
+        Kategori "Budaya" & "Kegiatan" tidak ditemukan → BudayaController abort 404.<br>
+        Data pengurus belum diisi → kepengurusan tampil kosong.
+      </p>
+    </div>
+    <div class="card" style="background:#0f2a1a; border-color:#4ade80; flex:2">
+      <div class="badge" style="background:#16a34a;color:#fff">SOLUSI</div>
+      <div class="title">Jalankan Migrate + Seed di Railway Terminal</div>
+      <ul style="margin-top:6px; color:#86efac; font-size:.82rem;">
+        <li>Buka Railway → klik service Laravel → tab <b>Settings → Deploy</b></li>
+        <li>Isi Start Command: <code>php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=$PORT</code></li>
+        <li>Tunggu redeploy selesai → hapus migrate/seed dari command</li>
+        <li>Login admin → isi data kepengurusan manual</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div> User/Browser</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div> Halaman Publik</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div> Autentikasi</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div> Panel Admin</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f472b6"></div> Database</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div> Infrastruktur Railway</div>
+</div>
+
+<p style="text-align:center; color:#475569; font-size:.75rem; margin-top:24px;">Nihongo Bu — Proyek Web Laravel © 2026</p>
+
+</body>
+</html>

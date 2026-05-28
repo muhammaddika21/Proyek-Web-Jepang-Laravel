@@ -7,7 +7,7 @@
     .jp-text { font-family: 'Noto Sans JP', sans-serif; font-size: 110%; }
 
     /* Quiz styles */
-    .quiz-option { transition: all 0.25s ease; cursor: pointer; }
+    .quiz-option { font-family: 'Noto Sans JP', sans-serif; transition: all 0.25s ease; cursor: pointer; }
     .quiz-option:hover:not(.quiz-locked) { border-color: #C0392B; background-color: rgba(192,57,43,0.05); transform: translateY(-1px); }
     .quiz-option.selected { border-color: #C0392B; background-color: rgba(192,57,43,0.08); box-shadow: 0 0 0 3px rgba(192,57,43,0.12); }
     .quiz-option.correct { border-color: #22c55e !important; background-color: rgba(34,197,94,0.08) !important; }
@@ -27,7 +27,7 @@
     .vocab-table tbody tr { transition: background 0.15s ease; }
     .vocab-table tbody tr:hover { background: #f9fafb; }
     .vocab-table tbody tr:last-child td { border-bottom: none; }
-    .vocab-table td.jp-col { font-family: 'Noto Sans JP', sans-serif; font-weight: 500; font-size: 1.25em; color: #111827; }
+    .vocab-table td.jp-col { font-family: 'Noto Sans JP', sans-serif; font-weight: 500; font-size: 1.1rem; color: #111827; }
     .vocab-table td.romaji-col { color: #6b7280; font-size: 0.9rem; }
     .vocab-table td.arti-col { color: #374151; font-weight: 500; }
     .vocab-table td.contoh-col { font-family: 'Noto Sans JP', sans-serif; color: #4b5563; font-size: 0.9rem; line-height: 1.5; }
@@ -41,16 +41,16 @@
     @media (max-width: 768px) {
         .vocab-table th, .vocab-table td { padding: 10px 8px; }
         .vocab-table td { font-size: 0.85rem; }
-        .vocab-table td.jp-col { font-size: 1rem; line-height: 1.3; }
+        .vocab-table td.jp-col { font-size: 0.95rem; line-height: 1.3; }
         .vocab-table td.romaji-col { font-size: 0.8rem; }
         .vocab-table td.contoh-col { font-size: 0.8rem; line-height: 1.4; }
         .vocab-table th { font-size: 0.65rem; }
         
         /* Adjust column widths for mobile */
-        .vocab-table th:nth-child(1) { width: 22% !important; }
-        .vocab-table th:nth-child(2) { width: 23% !important; }
-        .vocab-table th:nth-child(3) { width: 25% !important; }
-        .vocab-table th:nth-child(4) { width: 30% !important; }
+        .vocab-table th:nth-child(1) { width: 28% !important; }
+        .vocab-table th:nth-child(2) { width: 22% !important; }
+        .vocab-table th:nth-child(3) { width: 22% !important; }
+        .vocab-table th:nth-child(4) { width: 28% !important; }
     }
 
     /* Quiz warning */
@@ -171,10 +171,10 @@
                         <div class="overflow-x-auto bg-white">
                             <table class="w-full text-left vocab-table">
                                 <thead><tr>
-                                    <th style="width:18%;">Kanji / Kata</th>
+                                    <th style="width:26%;">Kanji / Kata</th>
                                     <th style="width:20%;">Romaji</th>
-                                    <th style="width:28%;">Arti</th>
-                                    <th style="width:34%;">Contoh</th>
+                                    <th style="width:24%;">Arti</th>
+                                    <th style="width:30%;">Contoh</th>
                                 </tr></thead>
                                 <tbody>
                                     @foreach($table['rows'] as $vocab)
